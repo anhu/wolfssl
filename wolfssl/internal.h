@@ -1501,7 +1501,7 @@ enum Misc {
 #endif
 
 #if defined(HAVE_LIBOQS)
-    MAX_X509_SIZE      = 20000,/* max static x509 buffer size; falcon is big */
+    MAX_X509_SIZE      = 5120, /* max static x509 buffer size; falcon is big */
 #elif defined(WOLFSSL_HAPROXY)
     MAX_X509_SIZE      = 3072, /* max static x509 buffer size */
 #else
@@ -1573,7 +1573,9 @@ enum Misc {
 
 #ifdef HAVE_LIBOQS
 /* set minimum Falcon key size allowed */
-#define MIN_FALCONKEY_SZ    897
+#ifndef MIN_FALCONKEY_SZ
+    #define MIN_FALCONKEY_SZ    897
+#endif
 #endif
 
 /* set minimum RSA key size allowed */
