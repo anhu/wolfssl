@@ -6235,14 +6235,6 @@ int ProcessBuffer(WOLFSSL_CTX* ctx, const unsigned char* buff,
         #ifdef HAVE_LIBOQS
             case FALCON_LEVEL1k:
             case FALCON_LEVEL5k:
-            #if defined(HAVE_PKCS11)
-                if (cert->keyOID) {
-                    keyType = FALCON_LEVEL1k;
-                }
-                else {
-                    keyType = FALCON_LEVEL5k;
-                }
-            #endif
                 /* Falcon is fixed key size */
                 keySz = FALCON_MAX_KEY_SIZE;
                 if (ssl && !ssl->options.verifyNone) {
