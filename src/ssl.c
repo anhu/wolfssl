@@ -5679,6 +5679,7 @@ static int ProcessBufferTryDecode(WOLFSSL_CTX* ctx, WOLFSSL* ssl, DerBuffer* der
             else {
                 /* What if *keyformat is 0? We might want to do something more
                  * graceful here. */
+                wc_falcon_free(key);
                 ret = ALGO_ID_E;
             }
         }
@@ -5718,8 +5719,8 @@ static int ProcessBufferTryDecode(WOLFSSL_CTX* ctx, WOLFSSL* ssl, DerBuffer* der
                     *resetSuites = 1;
                 }
             }
+            wc_falcon_free(key);
         }
-        wc_falcon_free(key);
         XFREE(key, heap, DYNAMIC_TYPE_FALCON);
     }
 #endif /* HAVE_LIBOQS */
