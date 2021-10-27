@@ -5619,11 +5619,7 @@ static int ProcessBufferTryDecode(WOLFSSL_CTX* ctx, WOLFSSL* ssl, DerBuffer* der
         ret = wc_ed448_init(key);
         if (ret == 0) {
             *idx = 0;
-            if (wc_Ed448PrivateKeyDecode(der->buffer, idx, key,
-                                                            der->length) != 0) {
-                ret = WOLFSSL_BAD_FILE;
-            }
-
+            ret = wc_Ed448PrivateKeyDecode(der->buffer, idx, key, der->length);
             if (ret == 0) {
                 /* check for minimum key size and then free */
                 int minKeySz = ssl ? ssl->options.minEccKeySz :
@@ -5664,7 +5660,7 @@ static int ProcessBufferTryDecode(WOLFSSL_CTX* ctx, WOLFSSL* ssl, DerBuffer* der
     }
 #endif /* HAVE_ED448 && HAVE_ED448_KEY_IMPORT */
 #ifdef HAVE_LIBOQS
-    if (ret == 0 && ((*keyFormat == 0) || (*keyFormat == FALCON_LEVEL1k) |
+    if (ret == 0 && ((*keyFormat == 0) || (*keyFormat == FALCON_LEVEL1k) ||
                      (*keyFormat == FALCON_LEVEL5k))) {
         /* make sure Falcon key can be used */
         falcon_key* key = (falcon_key*)XMALLOC(sizeof(falcon_key), heap,
@@ -5689,10 +5685,8 @@ static int ProcessBufferTryDecode(WOLFSSL_CTX* ctx, WOLFSSL* ssl, DerBuffer* der
 
         if (ret == 0) {
             *idx = 0;
-            if (wc_falcon_import_private_only(der->buffer, der->length, key)
-                != 0) {
-                ret = WOLFSSL_BAD_FILE;
-            } else {
+            ret = wc_falcon_import_private_only(der->buffer, der->length, key);
+            if (ret == 0) {
                 /* check for minimum key size and then free */
                 int minKeySz = ssl ? ssl->options.minFalconKeySz :
                                      ctx->minFalconKeySz;
@@ -5723,9 +5717,9 @@ static int ProcessBufferTryDecode(WOLFSSL_CTX* ctx, WOLFSSL* ssl, DerBuffer* der
                 if (ssl && ssl->options.side == WOLFSSL_SERVER_END) {
                     *resetSuites = 1;
                 }
-                wc_falcon_free(key);
             }
         }
+        wc_falcon_free(key);
         XFREE(key, heap, DYNAMIC_TYPE_FALCON);
     }
 #endif /* HAVE_LIBOQS */
