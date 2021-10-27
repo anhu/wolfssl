@@ -5667,7 +5667,8 @@ static int ProcessBufferTryDecode(WOLFSSL_CTX* ctx, WOLFSSL* ssl, DerBuffer* der
     if (ret == 0 && ((*keyFormat == 0) || (*keyFormat == FALCON_LEVEL1k) |
                      (*keyFormat == FALCON_LEVEL5k))) {
         /* make sure Falcon key can be used */
-        falcon_key* key = (falcon_key*)XMALLOC(sizeof(falcon_key), heap, DYNAMIC_TYPE_FALCON);
+        falcon_key* key = (falcon_key*)XMALLOC(sizeof(falcon_key), heap,
+                                               DYNAMIC_TYPE_FALCON);
         if (key == NULL) {
             return MEMORY_E;
         }
