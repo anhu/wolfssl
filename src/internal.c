@@ -11756,9 +11756,17 @@ static int ProcessPeerCertCheckKey(WOLFSSL* ssl, ProcPeerCertArgs* args)
             break;
     #endif /* HAVE_ED448 */
     #ifdef HAVE_LIBOQS
-        case Falconk:
+        case FALCON_LEVEL1k:
             if (ssl->options.minFalconKeySz < 0 ||
-                    FALCON_KEY_SIZE < (word16)ssl->options.minFalconKeySz) {
+                 FALCON_LEVEL1_KEY_SIZE < (word16)ssl->options.minFalconKeySz) {
+                WOLFSSL_MSG(
+                    "Falcon key size in cert chain error");
+                ret = FALCON_KEY_SIZE_E;
+            }
+            break;
+        case FALCON_LEVEL5k:
+            if (ssl->options.minFalconKeySz < 0 ||
+                 FALCON_LEVEL5_KEY_SIZE < (word16)ssl->options.minFalconKeySz) {
                 WOLFSSL_MSG(
                     "Falcon key size in cert chain error");
                 ret = FALCON_KEY_SIZE_E;
