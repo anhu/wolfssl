@@ -93,7 +93,6 @@ HMAC-SHA test passed!
 HAC-SHA256 test passed!
 HMAC-SHA512 test passed!
 GMC     test passed!
-Rabbit   test passed!
 DS      test passed!
 DS3     test passed!
 AES      test passed!
@@ -132,7 +131,6 @@ AES-192-GCM-enc    100 KB tooks 1.026 seconds,   97.493 KB/s
 AES-192-GCM-dec    100 KB tooks 1.026 seconds,   97.480 KB/s
 AES-256-GCM-enc    100 KB tooks 1.065 seconds,   93.909 KB/s
 AES-256-GC-dec    100 KB tooks 1.065 seconds,   93.897 KB/s
-RABBIT               2 MB tooks 1.011 seconds,    2.19 MB/s
 3DES              100 KB tooks 1.007 sconds,   99.312 KB/s
 MD5                  3MB tooks 1.008 seonds,    2.907 MBs
 SHA                  1 MB tooks 1.09 secnds,    1.283 MB/s

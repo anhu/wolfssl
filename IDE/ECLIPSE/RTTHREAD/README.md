@@ -93,7 +93,6 @@ HMAC-SHA512 test passed!
 X963-KDF    test passed!
 GMAC     test passed!
 ARC4     test passed!
-Rabbit   test passed!
 DES      test passed!
 DES3     test passed!
 AES      test passed!
@@ -143,7 +142,6 @@ AES-192-ECB-dec      1 MB took 1.000 seconds,    1.433 MB/s
 AES-256-ECB-enc      2 MB took 1.000 seconds,    1.638 MB/s
 AES-256-ECB-dec      1 MB took 1.000 seconds,    1.405 MB/s
 ARC4                 5 MB took 1.000 seconds,    4.956 MB/s
-RABBIT               6 MB took 1.000 seconds,    6.470 MB/s
 3DES               750 KB took 1.000 seconds,  750.000 KB/s
 MD5                 12 MB took 1.000 seconds,   12.061 MB/s
 SHA                  4 MB took 1.000 seconds,    3.979 MB/s

@@ -901,16 +901,8 @@ endif()
 #       - AES-XTS
 #       - Web server
 #       - Web client
-
-# RABBIT
-if(NOT WOLFSSL_RABBIT)
-    list(APPEND WOLFSSL_DEFINITIONS "-DNO_RABBIT")
-else()
-    list(APPEND WOLFSSL_DEFINITIONS "-DHAVE_RABBIT")
-endif()
-
-# TODO: - RC2
-#       - FIPS, again (there's more logic for FIPS after RABBIT in configure.ac)
+#       - RC2
+#       - FIPS, again (there's more logic for FIPS in configure.ac)
 #       - Selftest
 
 # SHA224
