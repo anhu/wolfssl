@@ -15,7 +15,6 @@ var wolfSSLObjList = [
     "wolfcrypt/src/asm.c",
     "wolfcrypt/src/asn.c",
     "wolfcrypt/src/blake2b.c",
-    "wolfcrypt/src/camellia.c",
     "wolfcrypt/src/chacha.c",
     "wolfcrypt/src/coding.c",
     "wolfcrypt/src/des3.c",

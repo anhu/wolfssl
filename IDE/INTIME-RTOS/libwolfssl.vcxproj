@@ -28,7 +28,6 @@
     <ClCompile Include="..\..\wolfcrypt\src\asm.c" />
     <ClCompile Include="..\..\wolfcrypt\src\asn.c" />
     <ClCompile Include="..\..\wolfcrypt\src\blake2b.c" />
-    <ClCompile Include="..\..\wolfcrypt\src\camellia.c" />
     <ClCompile Include="..\..\wolfcrypt\src\chacha.c" />
     <ClCompile Include="..\..\wolfcrypt\src\chacha20_poly1305.c" />
     <ClCompile Include="..\..\wolfcrypt\src\cmac.c" />
@@ -94,7 +93,6 @@
     <ClInclude Include="..\..\wolfssl\wolfcrypt\blake2-impl.h" />
     <ClInclude Include="..\..\wolfssl\wolfcrypt\blake2-int.h" />
     <ClInclude Include="..\..\wolfssl\wolfcrypt\blake2.h" />
-    <ClInclude Include="..\..\wolfssl\wolfcrypt\camellia.h" />
     <ClInclude Include="..\..\wolfssl\wolfcrypt\chacha.h" />
     <ClInclude Include="..\..\wolfssl\wolfcrypt\chacha20_poly1305.h" />
     <ClInclude Include="..\..\wolfssl\wolfcrypt\cmac.h" />

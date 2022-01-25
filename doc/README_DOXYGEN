@@ -108,7 +108,6 @@ are as follows but new group can be made:
     \ingroup AES
     \ingroup ARC4
     \ingroup BLAKE2
-    \ingroup Camellia
     \ingroup ChaCha
     \ingroup ChaCha20Poly1305
     \ingroup Curve25519

@@ -3035,7 +3035,6 @@ enum BulkCipherAlgorithm {
     wolfssl_aes_gcm     = 7,
     wolfssl_aes_ccm     = 8,
     wolfssl_chacha      = 9,
-    wolfssl_camellia    = 10
 };
 
 

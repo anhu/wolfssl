@@ -135,11 +135,6 @@
 			<locationURI>WOLFSSL_ROOT/wolfcrypt/src/blake2s.c</locationURI>
 		</link>
 		<link>
-			<name>wolfcrypt/src/camellia.c</name>
-			<type>1</type>
-			<locationURI>WOLFSSL_ROOT/wolfcrypt/src/camellia.c</locationURI>
-		</link>
-		<link>
 			<name>wolfcrypt/src/chacha.c</name>
 			<type>1</type>
 			<locationURI>WOLFSSL_ROOT/wolfcrypt/src/chacha.c</locationURI>

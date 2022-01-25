@@ -25867,8 +25867,6 @@ int wolfSSL_CIPHER_get_cipher_nid(const WOLFSSL_CIPHER* cipher)
         {"AESCCM(128)",             NID_aes_128_ccm},
         {"AES(128)",                NID_aes_128_cbc},
         {"AES(256)",                NID_aes_256_cbc},
-        {"CAMELLIA(256)",           NID_camellia_256_cbc},
-        {"CAMELLIA(128)",           NID_camellia_128_cbc},
         {"RC4",                     NID_rc4},
         {"3DES",                    NID_des_ede3_cbc},
         {"CHACHA20/POLY1305(256)",  NID_chacha20_poly1305},
@@ -26261,16 +26259,6 @@ static WC_INLINE const char* wolfssl_cipher_to_string(int cipher, int key_size)
 #ifdef HAVE_CHACHA
         case wolfssl_chacha:
             encStr = "CHACHA20/POLY1305(256)";
-            break;
-#endif
-#ifdef HAVE_CAMELLIA
-        case wolfssl_camellia:
-            if (key_size == 128)
-                encStr = "Camellia(128)";
-            else if (key_size == 256)
-                encStr = "Camellia(256)";
-            else
-                encStr = "Camellia(?)";
             break;
 #endif
         default:

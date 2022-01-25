@@ -208,10 +208,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\wolfcrypt\src\camellia.c"
-				>
-			</File>
-			<File
 				RelativePath=".\wolfcrypt\src\coding.c"
 				>
 			</File>

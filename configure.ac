@@ -499,7 +499,6 @@ then
     test "$enable_aesofb" = "" && enable_aesofb=yes
     test "$enable_aescfb" = "" && enable_aescfb=yes
     test "$enable_aescbc_length_checks" = "" && enable_aescbc_length_checks=yes
-    test "$enable_camellia" = "" && enable_camellia=yes
     test "$enable_ripemd" = "" && enable_ripemd=yes
     test "$enable_sha224" = "" && enable_sha224=yes
     test "$enable_sessioncerts" = "" && enable_sessioncerts=yes
@@ -667,7 +666,6 @@ then
     test "$enable_aesofb" = "" && enable_aesofb=yes
     test "$enable_aescfb" = "" && enable_aescfb=yes
     test "$enable_aescbc_length_checks" = "" && enable_aescbc_length_checks=yes
-    test "$enable_camellia" = "" && enable_camellia=yes
     test "$enable_ripemd" = "" && enable_ripemd=yes
     test "$enable_sha224" = "" && enable_sha224=yes
     test "$enable_sessioncerts" = "" && enable_sessioncerts=yes
@@ -2045,19 +2043,6 @@ then
     AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_DEVCRYPTO_HASH"
     AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_NO_HASH_RAW"
     ENABLED_DEVCRYPTO=yes
-fi
-
-
-# Camellia
-AC_ARG_ENABLE([camellia],
-    [AS_HELP_STRING([--enable-camellia],[Enable wolfSSL Camellia support (default: disabled)])],
-    [ ENABLED_CAMELLIA=$enableval ],
-    [ ENABLED_CAMELLIA=no ]
-    )
-
-if test "$ENABLED_CAMELLIA" = "yes"
-then
-    AM_CFLAGS="$AM_CFLAGS -DHAVE_CAMELLIA"
 fi
 
 
@@ -7371,7 +7356,6 @@ AM_CONDITIONAL([BUILD_INTELASM],[test "x$ENABLED_INTELASM" = "xyes"])
 AM_CONDITIONAL([BUILD_AFALG],[test "x$ENABLED_AFALG" = "xyes"])
 AM_CONDITIONAL([BUILD_KCAPI],[test "x$ENABLED_KCAPI" = "xyes"])
 AM_CONDITIONAL([BUILD_DEVCRYPTO],[test "x$ENABLED_DEVCRYPTO" = "xyes"])
-AM_CONDITIONAL([BUILD_CAMELLIA],[test "x$ENABLED_CAMELLIA" = "xyes" || test "x$ENABLED_USERSETTINGS" = "xyes"])
 AM_CONDITIONAL([BUILD_MD2],[test "x$ENABLED_MD2" = "xyes" || test "x$ENABLED_USERSETTINGS" = "xyes"])
 AM_CONDITIONAL([BUILD_RIPEMD],[test "x$ENABLED_RIPEMD" = "xyes" || test "x$ENABLED_USERSETTINGS" = "xyes"])
 AM_CONDITIONAL([BUILD_BLAKE2],[test "x$ENABLED_BLAKE2" = "xyes" || test "x$ENABLED_USERSETTINGS" = "xyes"])
@@ -7715,7 +7699,6 @@ echo "   * AES-CFB:                    $ENABLED_AESCFB"
 echo "   * AES-OFB:                    $ENABLED_AESOFB"
 echo "   * AES-SIV:                    $ENABLED_AESSIV"
 echo "   * DES3:                       $ENABLED_DES3"
-echo "   * Camellia:                   $ENABLED_CAMELLIA"
 echo "   * NULL Cipher:                $ENABLED_NULL_CIPHER"
 echo "   * MD2:                        $ENABLED_MD2"
 echo "   * MD4:                        $ENABLED_MD4"

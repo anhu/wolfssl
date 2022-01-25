@@ -2020,7 +2020,7 @@ extern void uITRON4_free(void *p) ;
 
 #if (defined(WOLFSSL_TLS13) && defined(WOLFSSL_NO_TLS12)) || \
     (!defined(HAVE_AES_CBC) && defined(NO_DES3) && defined(NO_RC4) && \
-     !defined(HAVE_CAMELLIA) & !defined(HAVE_NULL_CIPHER))
+     !defined(HAVE_NULL_CIPHER))
     #define WOLFSSL_AEAD_ONLY
 #endif
 
@@ -2431,8 +2431,8 @@ extern void uITRON4_free(void *p) ;
     #define WOLFSSL_HAVE_PRF
 #endif
 
-#if defined(NO_AES) && defined(NO_DES3) && !defined(HAVE_CAMELLIA) && \
-       !defined(WOLFSSL_HAVE_PRF) && defined(NO_PWDBASED)
+#if defined(NO_AES) && defined(NO_DES3) && !defined(WOLFSSL_HAVE_PRF) && \
+                                                            defined(NO_PWDBASED)
     #undef  WOLFSSL_NO_XOR_OPS
     #define WOLFSSL_NO_XOR_OPS
 #endif

@@ -209,13 +209,6 @@
 #define NO_DES3
 #endif
 //  </e>
-//      <e>CAMELLIA
-#define MDK_CONF_CAMELLIA 0
-#if MDK_CONF_CAMELLIA == 1
-#define HAVE_CAMELLIA
-#endif
-//  </e>
-
 //      <e>DH
 //              <i>need this for WOLFSSL_SERVER, OPENSSL_EXTRA
 #define MDK_CONF_DH 1

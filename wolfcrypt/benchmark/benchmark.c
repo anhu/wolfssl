@@ -156,7 +156,6 @@
 #include <wolfssl/wolfcrypt/chacha20_poly1305.h>
 #include <wolfssl/wolfcrypt/aes.h>
 #include <wolfssl/wolfcrypt/poly1305.h>
-#include <wolfssl/wolfcrypt/camellia.h>
 #include <wolfssl/wolfcrypt/md5.h>
 #include <wolfssl/wolfcrypt/sha.h>
 #include <wolfssl/wolfcrypt/sha256.h>
@@ -272,7 +271,6 @@
 #define BENCH_AES_XTS            0x00000008
 #define BENCH_AES_CTR            0x00000010
 #define BENCH_AES_CCM            0x00000020
-#define BENCH_CAMELLIA           0x00000100
 #define BENCH_ARC4               0x00000200
 #define BENCH_CHACHA20           0x00001000
 #define BENCH_CHACHA20_POLY1305  0x00002000
@@ -435,9 +433,6 @@ static const bench_alg bench_cipher_opt[] = {
 #endif
 #ifdef WOLFSSL_AES_SIV
     { "-aes-siv",            BENCH_AES_SIV           },
-#endif
-#ifdef HAVE_CAMELLIA
-    { "-camellia",           BENCH_CAMELLIA          },
 #endif
 #ifndef NO_RC4
     { "-arc4",               BENCH_ARC4              },
@@ -1739,10 +1734,6 @@ static void* benchmarks_do(void* args)
 #endif
 #endif /* !NO_AES */
 
-#ifdef HAVE_CAMELLIA
-    if (bench_all || (bench_cipher_algs & BENCH_CAMELLIA))
-        bench_camellia();
-#endif
 #ifndef NO_RC4
     if (bench_all || (bench_cipher_algs & BENCH_ARC4)) {
     #ifndef NO_SW_BENCH
@@ -3271,36 +3262,6 @@ void bench_poly1305(void)
     }
 }
 #endif /* HAVE_POLY1305 */
-
-
-#ifdef HAVE_CAMELLIA
-void bench_camellia(void)
-{
-    Camellia cam;
-    double   start;
-    int      ret, i, count;
-
-    ret = wc_CamelliaSetKey(&cam, bench_key, 16, bench_iv);
-    if (ret != 0) {
-        printf("CamelliaSetKey failed, ret = %d\n", ret);
-        return;
-    }
-
-    bench_stats_start(&count, &start);
-    do {
-        for (i = 0; i < numBlocks; i++) {
-            ret = wc_CamelliaCbcEncrypt(&cam, bench_plain, bench_cipher,
-                                                            BENCH_SIZE);
-            if (ret < 0) {
-                printf("CamelliaCbcEncrypt failed: %d\n", ret);
-                return;
-            }
-        }
-        count += i;
-    } while (bench_stats_sym_check(start));
-    bench_stats_sym_finish("Camellia", 0, count, bench_size, start, ret);
-}
-#endif
 
 
 #ifndef NO_DES3

@@ -1916,9 +1916,6 @@
       <name>$PROJ_DIR$\..\..\..\..\wolfcrypt\src\blake2b.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\wolfcrypt\src\camellia.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\..\..\..\wolfcrypt\src\chacha.c</name>
     </file>
     <file>

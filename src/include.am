@@ -566,10 +566,6 @@ src_libwolfssl_la_SOURCES += wolfcrypt/src/aes_gcm_asm.S
 endif
 endif
 
-if BUILD_CAMELLIA
-src_libwolfssl_la_SOURCES += wolfcrypt/src/camellia.c
-endif
-
 if BUILD_MD2
 src_libwolfssl_la_SOURCES += wolfcrypt/src/md2.c
 endif

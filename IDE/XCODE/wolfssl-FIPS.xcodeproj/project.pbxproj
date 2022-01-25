@@ -19,7 +19,6 @@
 		521646331A8992CC0062516A /* arc4.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646121A8992CC0062516A /* arc4.c */; };
 		521646341A8992CC0062516A /* asn.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646131A8992CC0062516A /* asn.c */; };
 		521646351A8992CC0062516A /* blake2b.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646141A8992CC0062516A /* blake2b.c */; };
-		521646361A8992CC0062516A /* camellia.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646151A8992CC0062516A /* camellia.c */; };
 		521646371A8992CC0062516A /* chacha.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646161A8992CC0062516A /* chacha.c */; };
 		521646381A8992CC0062516A /* coding.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646171A8992CC0062516A /* coding.c */; };
 		521646391A8992CC0062516A /* des3.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646181A8992CC0062516A /* des3.c */; };
@@ -62,7 +61,6 @@
 		521646D11A8A7FF30062516A /* blake2-impl.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646621A8993770062516A /* blake2-impl.h */; };
 		521646D21A8A7FF30062516A /* blake2-int.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646631A8993770062516A /* blake2-int.h */; };
 		521646D31A8A7FF30062516A /* blake2.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646641A8993770062516A /* blake2.h */; };
-		521646D41A8A7FF30062516A /* camellia.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646651A8993770062516A /* camellia.h */; };
 		521646D51A8A7FF30062516A /* chacha.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646661A8993770062516A /* chacha.h */; };
 		521646D61A8A7FF30062516A /* coding.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646671A8993770062516A /* coding.h */; };
 		521646D71A8A7FF30062516A /* compress.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646681A8993770062516A /* compress.h */; };
@@ -112,7 +110,6 @@
 		521647051A8A80100062516A /* blake2-impl.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646991A8993F50062516A /* blake2-impl.h */; };
 		521647061A8A80100062516A /* blake2-int.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469A1A8993F50062516A /* blake2-int.h */; };
 		521647071A8A80100062516A /* blake2.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469B1A8993F50062516A /* blake2.h */; };
-		521647081A8A80100062516A /* camellia.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469C1A8993F50062516A /* camellia.h */; };
 		521647091A8A80100062516A /* chacha.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469D1A8993F50062516A /* chacha.h */; };
 		5216470A1A8A80100062516A /* coding.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469E1A8993F50062516A /* coding.h */; };
 		5216470B1A8A80100062516A /* compress.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469F1A8993F50062516A /* compress.h */; };
@@ -183,7 +180,6 @@
 		A4A54E061BC5C3E0002866CD /* sha.c in Sources */ = {isa = PBXBuildFile; fileRef = 5216462D1A8992CC0062516A /* sha.c */; };
 		A4A54E071BC5C3E0002866CD /* poly1305.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646271A8992CC0062516A /* poly1305.c */; };
 		A4A54E081BC5C3E0002866CD /* dh.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646191A8992CC0062516A /* dh.c */; };
-		A4A54E091BC5C3E0002866CD /* camellia.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646151A8992CC0062516A /* camellia.c */; };
 		A4A54E0A1BC5C3E0002866CD /* wc_port.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646311A8992CC0062516A /* wc_port.c */; };
 		A4A54E0B1BC5C3E0002866CD /* pwdbased.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646281A8992CC0062516A /* pwdbased.c */; };
 		A4A54E0C1BC5C3E0002866CD /* misc.c in Sources */ = {isa = PBXBuildFile; fileRef = 521646251A8992CC0062516A /* misc.c */; };
@@ -236,7 +232,6 @@
 		A4A54E401BC5C3E0002866CD /* blake2-impl.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646621A8993770062516A /* blake2-impl.h */; };
 		A4A54E411BC5C3E0002866CD /* blake2-int.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646631A8993770062516A /* blake2-int.h */; };
 		A4A54E421BC5C3E0002866CD /* blake2.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646641A8993770062516A /* blake2.h */; };
-		A4A54E431BC5C3E0002866CD /* camellia.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646651A8993770062516A /* camellia.h */; };
 		A4A54E441BC5C3E0002866CD /* chacha.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646661A8993770062516A /* chacha.h */; };
 		A4A54E451BC5C3E0002866CD /* coding.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646671A8993770062516A /* coding.h */; };
 		A4A54E461BC5C3E0002866CD /* compress.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646681A8993770062516A /* compress.h */; };
@@ -286,7 +281,6 @@
 		A4A54E761BC5C3E0002866CD /* blake2-impl.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 521646991A8993F50062516A /* blake2-impl.h */; };
 		A4A54E771BC5C3E0002866CD /* blake2-int.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469A1A8993F50062516A /* blake2-int.h */; };
 		A4A54E781BC5C3E0002866CD /* blake2.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469B1A8993F50062516A /* blake2.h */; };
-		A4A54E791BC5C3E0002866CD /* camellia.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469C1A8993F50062516A /* camellia.h */; };
 		A4A54E7A1BC5C3E0002866CD /* chacha.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469D1A8993F50062516A /* chacha.h */; };
 		A4A54E7B1BC5C3E0002866CD /* coding.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469E1A8993F50062516A /* coding.h */; };
 		A4A54E7C1BC5C3E0002866CD /* compress.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5216469F1A8993F50062516A /* compress.h */; };
@@ -339,7 +333,6 @@
 				521646D11A8A7FF30062516A /* blake2-impl.h in CopyFiles */,
 				521646D21A8A7FF30062516A /* blake2-int.h in CopyFiles */,
 				521646D31A8A7FF30062516A /* blake2.h in CopyFiles */,
-				521646D41A8A7FF30062516A /* camellia.h in CopyFiles */,
 				521646D51A8A7FF30062516A /* chacha.h in CopyFiles */,
 				521646D61A8A7FF30062516A /* coding.h in CopyFiles */,
 				521646D71A8A7FF30062516A /* compress.h in CopyFiles */,
@@ -407,7 +400,6 @@
 				521647051A8A80100062516A /* blake2-impl.h in CopyFiles */,
 				521647061A8A80100062516A /* blake2-int.h in CopyFiles */,
 				521647071A8A80100062516A /* blake2.h in CopyFiles */,
-				521647081A8A80100062516A /* camellia.h in CopyFiles */,
 				521647091A8A80100062516A /* chacha.h in CopyFiles */,
 				5216470A1A8A80100062516A /* coding.h in CopyFiles */,
 				5216470B1A8A80100062516A /* compress.h in CopyFiles */,
@@ -496,7 +488,6 @@
 				A4A54E401BC5C3E0002866CD /* blake2-impl.h in CopyFiles */,
 				A4A54E411BC5C3E0002866CD /* blake2-int.h in CopyFiles */,
 				A4A54E421BC5C3E0002866CD /* blake2.h in CopyFiles */,
-				A4A54E431BC5C3E0002866CD /* camellia.h in CopyFiles */,
 				A4A54E441BC5C3E0002866CD /* chacha.h in CopyFiles */,
 				A4A54E451BC5C3E0002866CD /* coding.h in CopyFiles */,
 				A4A54E461BC5C3E0002866CD /* compress.h in CopyFiles */,
@@ -564,7 +555,6 @@
 				A4A54E761BC5C3E0002866CD /* blake2-impl.h in CopyFiles */,
 				A4A54E771BC5C3E0002866CD /* blake2-int.h in CopyFiles */,
 				A4A54E781BC5C3E0002866CD /* blake2.h in CopyFiles */,
-				A4A54E791BC5C3E0002866CD /* camellia.h in CopyFiles */,
 				A4A54E7A1BC5C3E0002866CD /* chacha.h in CopyFiles */,
 				A4A54E7B1BC5C3E0002866CD /* coding.h in CopyFiles */,
 				A4A54E7C1BC5C3E0002866CD /* compress.h in CopyFiles */,
@@ -617,7 +607,6 @@
 		521646121A8992CC0062516A /* arc4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = arc4.c; path = ../../wolfcrypt/src/arc4.c; sourceTree = SOURCE_ROOT; };
 		521646131A8992CC0062516A /* asn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = asn.c; path = ../../wolfcrypt/src/asn.c; sourceTree = SOURCE_ROOT; };
 		521646141A8992CC0062516A /* blake2b.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = blake2b.c; path = ../../wolfcrypt/src/blake2b.c; sourceTree = SOURCE_ROOT; };
-		521646151A8992CC0062516A /* camellia.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = camellia.c; path = ../../wolfcrypt/src/camellia.c; sourceTree = SOURCE_ROOT; };
 		521646161A8992CC0062516A /* chacha.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chacha.c; path = ../../wolfcrypt/src/chacha.c; sourceTree = SOURCE_ROOT; };
 		521646171A8992CC0062516A /* coding.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = coding.c; path = ../../wolfcrypt/src/coding.c; sourceTree = SOURCE_ROOT; };
 		521646181A8992CC0062516A /* des3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = des3.c; path = ../../wolfcrypt/src/des3.c; sourceTree = SOURCE_ROOT; };
@@ -660,7 +649,6 @@
 		521646621A8993770062516A /* blake2-impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "blake2-impl.h"; path = "../../wolfssl/wolfcrypt/blake2-impl.h"; sourceTree = "<group>"; };
 		521646631A8993770062516A /* blake2-int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "blake2-int.h"; path = "../../wolfssl/wolfcrypt/blake2-int.h"; sourceTree = "<group>"; };
 		521646641A8993770062516A /* blake2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blake2.h; path = ../../wolfssl/wolfcrypt/blake2.h; sourceTree = "<group>"; };
-		521646651A8993770062516A /* camellia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = camellia.h; path = ../../wolfssl/wolfcrypt/camellia.h; sourceTree = "<group>"; };
 		521646661A8993770062516A /* chacha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chacha.h; path = ../../wolfssl/wolfcrypt/chacha.h; sourceTree = "<group>"; };
 		521646671A8993770062516A /* coding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coding.h; path = ../../wolfssl/wolfcrypt/coding.h; sourceTree = "<group>"; };
 		521646681A8993770062516A /* compress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compress.h; path = ../../wolfssl/wolfcrypt/compress.h; sourceTree = "<group>"; };
@@ -710,7 +698,6 @@
 		521646991A8993F50062516A /* blake2-impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "blake2-impl.h"; path = "../../cyassl/ctaocrypt/blake2-impl.h"; sourceTree = "<group>"; };
 		5216469A1A8993F50062516A /* blake2-int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "blake2-int.h"; path = "../../cyassl/ctaocrypt/blake2-int.h"; sourceTree = "<group>"; };
 		5216469B1A8993F50062516A /* blake2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blake2.h; path = ../../cyassl/ctaocrypt/blake2.h; sourceTree = "<group>"; };
-		5216469C1A8993F50062516A /* camellia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = camellia.h; path = ../../cyassl/ctaocrypt/camellia.h; sourceTree = "<group>"; };
 		5216469D1A8993F50062516A /* chacha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chacha.h; path = ../../cyassl/ctaocrypt/chacha.h; sourceTree = "<group>"; };
 		5216469E1A8993F50062516A /* coding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coding.h; path = ../../cyassl/ctaocrypt/coding.h; sourceTree = "<group>"; };
 		5216469F1A8993F50062516A /* compress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compress.h; path = ../../cyassl/ctaocrypt/compress.h; sourceTree = "<group>"; };
@@ -807,7 +794,6 @@
 				521646991A8993F50062516A /* blake2-impl.h */,
 				5216469A1A8993F50062516A /* blake2-int.h */,
 				5216469B1A8993F50062516A /* blake2.h */,
-				5216469C1A8993F50062516A /* camellia.h */,
 				5216469D1A8993F50062516A /* chacha.h */,
 				5216469E1A8993F50062516A /* coding.h */,
 				5216469F1A8993F50062516A /* compress.h */,
@@ -872,7 +858,6 @@
 				521646621A8993770062516A /* blake2-impl.h */,
 				521646631A8993770062516A /* blake2-int.h */,
 				521646641A8993770062516A /* blake2.h */,
-				521646651A8993770062516A /* camellia.h */,
 				521646661A8993770062516A /* chacha.h */,
 				521646671A8993770062516A /* coding.h */,
 				521646681A8993770062516A /* compress.h */,
@@ -947,7 +932,6 @@
 				521646121A8992CC0062516A /* arc4.c */,
 				521646131A8992CC0062516A /* asn.c */,
 				521646141A8992CC0062516A /* blake2b.c */,
-				521646151A8992CC0062516A /* camellia.c */,
 				521646161A8992CC0062516A /* chacha.c */,
 				521646171A8992CC0062516A /* coding.c */,
 				521646181A8992CC0062516A /* des3.c */,
@@ -1127,7 +1111,6 @@
 				5216464E1A8992CC0062516A /* sha.c in Sources */,
 				521646481A8992CC0062516A /* poly1305.c in Sources */,
 				5216463A1A8992CC0062516A /* dh.c in Sources */,
-				521646361A8992CC0062516A /* camellia.c in Sources */,
 				521646521A8992CC0062516A /* wc_port.c in Sources */,
 				521646491A8992CC0062516A /* pwdbased.c in Sources */,
 				521646461A8992CC0062516A /* misc.c in Sources */,
@@ -1188,7 +1171,6 @@
 				A4A54E061BC5C3E0002866CD /* sha.c in Sources */,
 				A4A54E071BC5C3E0002866CD /* poly1305.c in Sources */,
 				A4A54E081BC5C3E0002866CD /* dh.c in Sources */,
-				A4A54E091BC5C3E0002866CD /* camellia.c in Sources */,
 				A4A54E0A1BC5C3E0002866CD /* wc_port.c in Sources */,
 				A4A54E0B1BC5C3E0002866CD /* pwdbased.c in Sources */,
 				A4A54E0C1BC5C3E0002866CD /* misc.c in Sources */,

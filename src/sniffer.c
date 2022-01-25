@@ -4291,12 +4291,6 @@ static int Decrypt(WOLFSSL* ssl, byte* output, const byte* input, word32 sz)
             break;
         #endif
 
-        #ifdef HAVE_CAMELLIA
-        case wolfssl_camellia:
-            wc_CamelliaCbcDecrypt(ssl->decrypt.cam, output, input, sz);
-            break;
-        #endif
-
         #if defined(HAVE_AESGCM) || defined(HAVE_AESCCM)
         case wolfssl_aes_gcm:
         case wolfssl_aes_ccm: /* GCM AEAD macros use same size as CCM */

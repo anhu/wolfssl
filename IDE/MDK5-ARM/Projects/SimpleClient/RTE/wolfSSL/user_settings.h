@@ -274,13 +274,6 @@
 #endif
 //  </e>
 
-//      <e>CAMELLIA
-#define MDK_CONF_CAMELLIA 1
-#if MDK_CONF_CAMELLIA == 1
-#define HAVE_CAMELLIA
-#endif
-//  </e>
-
 //      <e>DH
 #define MDK_CONF_DH 1
 #if MDK_CONF_DH == 0

@@ -133,13 +133,6 @@
       <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
       <ParentItem>2170607d-803e-45b0-80af-6507d495a8de</ParentItem>
     </Instance>
-    <Instance Guid="ad6d521e-8d24-4e7f-b731-6c09014373d6">
-      <Name>camellia.c</Name>
-      <Type>File</Type>
-      <RelativePath>..\..\..\..\..\wolfcrypt\src\camellia.c</RelativePath>
-      <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
-      <ParentItem>2170607d-803e-45b0-80af-6507d495a8de</ParentItem>
-    </Instance>
     <Instance Guid="2ae5859b-d47d-4473-8868-5f8d4ccc13fd">
       <Name>chacha.c</Name>
       <Type>File</Type>
@@ -581,8 +574,6 @@
       <SourceItemType12>CSource</SourceItemType12>
       <SourceItemGuid13>8dfd13ae-48b6-4617-823d-c9d47886b2f1</SourceItemGuid13>
       <SourceItemType13>CSource</SourceItemType13>
-      <SourceItemGuid14>ad6d521e-8d24-4e7f-b731-6c09014373d6</SourceItemGuid14>
-      <SourceItemType14>CSource</SourceItemType14>
       <SourceItemGuid15>2ae5859b-d47d-4473-8868-5f8d4ccc13fd</SourceItemGuid15>
       <SourceItemType15>CSource</SourceItemType15>
       <SourceItemGuid16>7a86f97b-01cd-4d3f-8266-1a51e412c9eb</SourceItemGuid16>
@@ -1623,10 +1614,6 @@
     <Instance Guid="8dfd13ae-48b6-4617-823d-c9d47886b2f1">
       <ItemAddTime>636575488940589048</ItemAddTime>
       <ItemAddTimeCount>5</ItemAddTimeCount>
-    </Instance>
-    <Instance Guid="ad6d521e-8d24-4e7f-b731-6c09014373d6">
-      <ItemAddTime>636575488940589048</ItemAddTime>
-      <ItemAddTimeCount>6</ItemAddTimeCount>
     </Instance>
     <Instance Guid="2ae5859b-d47d-4473-8868-5f8d4ccc13fd">
       <ItemAddTime>636575488940589048</ItemAddTime>

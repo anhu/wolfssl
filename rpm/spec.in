@@ -90,7 +90,6 @@ mkdir -p $RPM_BUILD_ROOT/
 %{_includedir}/cyassl/ctaocrypt/blake2-impl.h
 %{_includedir}/cyassl/ctaocrypt/blake2-int.h
 %{_includedir}/cyassl/ctaocrypt/blake2.h
-%{_includedir}/cyassl/ctaocrypt/camellia.h
 %{_includedir}/cyassl/ctaocrypt/chacha.h
 %{_includedir}/cyassl/ctaocrypt/coding.h
 %{_includedir}/cyassl/ctaocrypt/compress.h
@@ -183,7 +182,6 @@ mkdir -p $RPM_BUILD_ROOT/
 %{_includedir}/wolfssl/openssl/bn.h
 %{_includedir}/wolfssl/openssl/cms.h
 %{_includedir}/wolfssl/openssl/buffer.h
-%{_includedir}/wolfssl/openssl/camellia.h
 %{_includedir}/wolfssl/openssl/cmac.h
 %{_includedir}/wolfssl/openssl/compat_types.h
 %{_includedir}/wolfssl/openssl/conf.h
@@ -244,7 +242,6 @@ mkdir -p $RPM_BUILD_ROOT/
 %{_includedir}/wolfssl/wolfcrypt/blake2-impl.h
 %{_includedir}/wolfssl/wolfcrypt/blake2-int.h
 %{_includedir}/wolfssl/wolfcrypt/blake2.h
-%{_includedir}/wolfssl/wolfcrypt/camellia.h
 %{_includedir}/wolfssl/wolfcrypt/chacha.h
 %{_includedir}/wolfssl/wolfcrypt/chacha20_poly1305.h
 %{_includedir}/wolfssl/wolfcrypt/cmac.h

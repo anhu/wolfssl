@@ -191,10 +191,6 @@
     #include <wolfssl/wolfcrypt/chacha20_poly1305.h>
 #endif
 
-#ifdef HAVE_CAMELLIA
-    #include <wolfssl/wolfcrypt/camellia.h>
-#endif
-
 #ifndef NO_RC4
     #include <wolfssl/wolfcrypt/arc4.h>
 #endif
@@ -668,36 +664,39 @@ static void test_for_double_Free(void)
     int skipTest = 0;
     const char* testCertFile;
     const char* testKeyFile;
-    char optionsCiphers[] = "RC4-SHA:RC4-MD5:DES-CBC3-SHA:AES128-SHA:AES256-SHA"
-":NULL-SHA:NULL-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-PSK-AES256-GCM"
-"-SHA384:DHE-PSK-AES128-GCM-SHA256:PSK-AES256-GCM-SHA384:PSK-AES128-GCM-SHA256:"
-"DHE-PSK-AES256-CBC-SHA384:DHE-PSK-AES128-CBC-SHA256:PSK-AES256-CBC-SHA384:PSK-"
-"AES128-CBC-SHA256:PSK-AES128-CBC-SHA:PSK-AES256-CBC-SHA:DHE-PSK-AES128-CCM:DHE"
-"-PSK-AES256-CCM:PSK-AES128-CCM:PSK-AES256-CCM:PSK-AES128-CCM-8:PSK-AES256-CCM-"
-"8:DHE-PSK-NULL-SHA384:DHE-PSK-NULL-SHA256:PSK-NULL-SHA384:PSK-NULL-SHA256:PSK-"
-"NULL-SHA:AES128-CCM-8:AES256-CCM-8:ECDHE-ECDSA-"
-"AES128-CCM:ECDHE-ECDSA-AES128-CCM-8:ECDHE-ECDSA-AES256-CCM-8:ECDHE-RSA-AES128-"
-"SHA:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA:ECDHE-R"
-"SA-RC4-SHA:ECDHE-RSA-DES-CBC3-SHA:ECDHE-ECDSA-RC4-SHA:ECDHE-ECDSA-DES-CBC3-SHA"
-":AES128-SHA256:AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:ECDH-"
-"RSA-AES128-SHA:ECDH-RSA-AES256-SHA:ECDH-ECDSA-AES128-SHA:ECDH-ECDSA-AES256-SHA"
-":ECDH-RSA-RC4-SHA:ECDH-RSA-DES-CBC3-SHA:ECDH-ECDSA-RC4-SHA:ECDH-ECDSA-DES-CBC3"
-"-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES"
-"256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-E"
-"CDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDH-RSA-AES128-GCM-SHA25"
-"6:ECDH-RSA-AES256-GCM-SHA384:ECDH-ECDSA-AES128-GCM-SHA256:ECDH-ECDSA-AES256-GC"
-"M-SHA384:CAMELLIA128-SHA:DHE-RSA-CAMELLIA128-SHA:CAMELLIA256-SHA:DHE-RSA-CAMEL"
-"LIA256-SHA:CAMELLIA128-SHA256:DHE-RSA-CAMELLIA128-SHA256:CAMELLIA256-SHA256:DH"
-"E-RSA-CAMELLIA256-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECD"
-"H-RSA-AES128-SHA256:ECDH-ECDSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-ECD"
-"SA-AES256-SHA384:ECDH-RSA-AES256-SHA384:ECDH-ECDSA-AES256-SHA384:ECDHE-RSA-CHA"
-"CHA20-POLY1305:ECDHE-ECDSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-R"
-"SA-CHACHA20-POLY1305-OLD:ECDHE-ECDSA-CHACHA20-POLY1305-OLD:DHE-RSA-CHACHA20-PO"
-"LY1305-OLD:ECDHE-ECDSA-NULL-SHA:ECDHE-PSK-NULL-SHA256:ECDHE-PSK-A"
-"ES128-CBC-SHA256:PSK-CHACHA20-POLY1305:ECDHE-PSK-CHACHA20-POLY1305:DHE-PSK-CHA"
-"CHA20-POLY1305:EDH-RSA-DES-CBC3-SHA:TLS13-AES128-GCM-SHA256:TLS13-AES256-GCM-S"
-"HA384:TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES128-CCM-SHA256:TLS13-AES128-CCM-"
-"8-SHA256:TLS13-SHA256-SHA256:TLS13-SHA384-SHA384";
+    char optionsCiphers[] = "RC4-SHA:RC4-MD5:DES-CBC3-SHA:AES128-SHA:"
+"AES256-SHA:NULL-SHA:NULL-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:"
+"DHE-PSK-AES256-GCM-SHA384:DHE-PSK-AES128-GCM-SHA256:PSK-AES256-GCM-SHA384:"
+"PSK-AES128-GCM-SHA256:DHE-PSK-AES256-CBC-SHA384:DHE-PSK-AES128-CBC-SHA256:"
+"PSK-AES256-CBC-SHA384:PSK-AES128-CBC-SHA256:PSK-AES128-CBC-SHA:"
+"PSK-AES256-CBC-SHA:DHE-PSK-AES128-CCM:DHE-PSK-AES256-CCM:PSK-AES128-CCM:"
+"PSK-AES256-CCM:PSK-AES128-CCM-8:PSK-AES256-CCM-8:DHE-PSK-NULL-SHA384:"
+"DHE-PSK-NULL-SHA256:PSK-NULL-SHA384:PSK-NULL-SHA256:PSK-NULL-SHA:AES128-CCM-8:"
+"AES256-CCM-8:ECDHE-ECDSA-AES128-CCM:ECDHE-ECDSA-AES128-CCM-8:"
+"ECDHE-ECDSA-AES256-CCM-8:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:"
+"ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-RC4-SHA:"
+"ECDHE-RSA-DES-CBC3-SHA:ECDHE-ECDSA-RC4-SHA:ECDHE-ECDSA-DES-CBC3-SHA:"
+"AES128-SHA256:AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:"
+"ECDH-RSA-AES128-SHA:ECDH-RSA-AES256-SHA:ECDH-ECDSA-AES128-SHA:"
+"ECDH-ECDSA-AES256-SHA:ECDH-RSA-RC4-SHA:ECDH-RSA-DES-CBC3-SHA:"
+"ECDH-ECDSA-RC4-SHA:ECDH-ECDSA-DES-CBC3-SHA:AES128-GCM-SHA256:"
+"AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:"
+"ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:"
+"ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:"
+"ECDH-RSA-AES128-GCM-SHA256:ECDH-RSA-AES256-GCM-SHA384:"
+"ECDH-ECDSA-AES128-GCM-SHA256:ECDH-ECDSA-AES256-GCM-SHA384:"
+"ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDH-RSA-AES128-SHA256:"
+"ECDH-ECDSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:"
+"ECDH-RSA-AES256-SHA384:ECDH-ECDSA-AES256-SHA384:ECDHE-RSA-CHACHA20-POLY1305:"
+"ECDHE-ECDSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:"
+"ECDHE-RSA-CHACHA20-POLY1305-OLD:ECDHE-ECDSA-CHACHA20-POLY1305-OLD:"
+"DHE-RSA-CHACHA20-POLY1305-OLD:ECDHE-ECDSA-NULL-SHA:ECDHE-PSK-NULL-SHA256:"
+"ECDHE-PSK-AES128-CBC-SHA256:PSK-CHACHA20-POLY1305:ECDHE-PSK-CHACHA20-POLY1305:"
+"DHE-PSK-CHACHA20-POLY1305:EDH-RSA-DES-CBC3-SHA:TLS13-AES128-GCM-SHA256:"
+"TLS13-AES256-GCM-SHA384:TLS13-CHACHA20-POLY1305-SHA256:"
+"TLS13-AES128-CCM-SHA256:TLS13-AES128-CCM-8-SHA256:TLS13-SHA256-SHA256:"
+"TLS13-SHA384-SHA384";
+
 #ifndef NO_RSA
         testCertFile = svrCertFile;
         testKeyFile = svrKeyFile;
@@ -17328,307 +17327,6 @@ static int test_wc_GmacUpdate (void)
     return ret;
 
 } /* END test_wc_GmacUpdate */
-
-
-/*
- * testing wc_CamelliaSetKey
- */
-static int test_wc_CamelliaSetKey (void)
-{
-    int ret = 0;
-#ifdef HAVE_CAMELLIA
-    Camellia camellia;
-    /*128-bit key*/
-    static const byte key16[] =
-    {
-        0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
-        0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10
-    };
-    /* 192-bit key */
-    static const byte key24[] =
-    {
-        0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
-        0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10,
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77
-    };
-    /* 256-bit key */
-    static const byte key32[] =
-    {
-        0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
-        0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10,
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-        0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
-    };
-    static const byte iv[] =
-    {
-        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-        0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
-    };
-
-    printf(testingFmt, "wc_CamelliaSetKey()");
-
-    ret = wc_CamelliaSetKey(&camellia, key16, (word32)sizeof(key16), iv);
-    if (ret == 0) {
-        ret = wc_CamelliaSetKey(&camellia, key16,
-                                        (word32)sizeof(key16), NULL);
-        if (ret == 0) {
-            ret = wc_CamelliaSetKey(&camellia, key24,
-                                        (word32)sizeof(key24), iv);
-        }
-        if (ret == 0) {
-            ret = wc_CamelliaSetKey(&camellia, key24,
-                                        (word32)sizeof(key24), NULL);
-        }
-        if (ret == 0) {
-            ret = wc_CamelliaSetKey(&camellia, key32,
-                                        (word32)sizeof(key32), iv);
-        }
-        if (ret == 0) {
-            ret = wc_CamelliaSetKey(&camellia, key32,
-                                        (word32)sizeof(key32), NULL);
-        }
-    }
-    /* Bad args. */
-    if (ret == 0) {
-        ret = wc_CamelliaSetKey(NULL, key32, (word32)sizeof(key32), iv);
-        if (ret != BAD_FUNC_ARG) {
-            ret = WOLFSSL_FATAL_ERROR;
-        } else {
-            ret = 0;
-        }
-    } /* END bad args. */
-
-
-#endif
-    return ret;
-
-} /* END test_wc_CammeliaSetKey */
-
-/*
- * Testing wc_CamelliaSetIV()
- */
-static int test_wc_CamelliaSetIV (void)
-{
-    int ret = 0;
-#ifdef HAVE_CAMELLIA
-    Camellia    camellia;
-    static const byte iv[] =
-    {
-        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-        0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
-    };
-
-    printf(testingFmt, "wc_CamelliaSetIV()");
-
-    ret = wc_CamelliaSetIV(&camellia, iv);
-    if (ret == 0) {
-        ret = wc_CamelliaSetIV(&camellia, NULL);
-    }
-    /* Bad args. */
-    if (ret == 0) {
-        ret = wc_CamelliaSetIV(NULL, NULL);
-        if (ret != BAD_FUNC_ARG) {
-            ret = WOLFSSL_FATAL_ERROR;
-        } else {
-            ret = 0;
-        }
-    }
-
-    printf(resultFmt, ret == 0 ? passed : failed);
-
-#endif
-    return ret;
-} /*END test_wc_CamelliaSetIV*/
-
-/*
- * Test wc_CamelliaEncryptDirect and wc_CamelliaDecryptDirect
- */
-static int test_wc_CamelliaEncryptDecryptDirect (void)
-{
-    int     ret = 0;
-#ifdef HAVE_CAMELLIA
-    Camellia camellia;
-    static const byte key24[] =
-    {
-        0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
-        0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10,
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77
-    };
-    static const byte iv[] =
-    {
-        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-        0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
-    };
-    static const byte plainT[] =
-    {
-        0x6B, 0xC1, 0xBE, 0xE2, 0x2E, 0x40, 0x9F, 0x96,
-        0xE9, 0x3D, 0x7E, 0x11, 0x73, 0x93, 0x17, 0x2A
-    };
-    byte    enc[sizeof(plainT)];
-    byte    dec[sizeof(enc)];
-    int     camE = WOLFSSL_FATAL_ERROR;
-    int     camD = WOLFSSL_FATAL_ERROR;
-
-    /*Init stack variables.*/
-    XMEMSET(enc, 0, 16);
-    XMEMSET(enc, 0, 16);
-
-    ret = wc_CamelliaSetKey(&camellia, key24, (word32)sizeof(key24), iv);
-    if (ret == 0) {
-        ret = wc_CamelliaEncryptDirect(&camellia, enc, plainT);
-        if (ret == 0) {
-            ret = wc_CamelliaDecryptDirect(&camellia, dec, enc);
-            if (XMEMCMP(plainT, dec, CAMELLIA_BLOCK_SIZE)) {
-                ret = WOLFSSL_FATAL_ERROR;
-            }
-        }
-    }
-    printf(testingFmt, "wc_CamelliaEncryptDirect()");
-    /* Pass bad args. */
-    if (ret == 0) {
-        camE = wc_CamelliaEncryptDirect(NULL, enc, plainT);
-        if (camE == BAD_FUNC_ARG) {
-            camE = wc_CamelliaEncryptDirect(&camellia, NULL, plainT);
-        }
-        if (camE == BAD_FUNC_ARG) {
-            camE = wc_CamelliaEncryptDirect(&camellia, enc, NULL);
-        }
-        if (camE == BAD_FUNC_ARG) {
-            camE = 0;
-        } else {
-            camE = WOLFSSL_FATAL_ERROR;
-        }
-    }
-
-    printf(resultFmt, camE == 0 ? passed : failed);
-    if (camE != 0) {
-        return camE;
-    }
-
-    printf(testingFmt, "wc_CamelliaDecryptDirect()");
-
-    if (ret == 0) {
-        camD = wc_CamelliaDecryptDirect(NULL, dec, enc);
-        if (camD == BAD_FUNC_ARG) {
-            camD = wc_CamelliaDecryptDirect(&camellia, NULL, enc);
-        }
-        if (camD == BAD_FUNC_ARG) {
-            camD = wc_CamelliaDecryptDirect(&camellia, dec, NULL);
-        }
-        if (camD == BAD_FUNC_ARG) {
-            camD = 0;
-        } else {
-            camD = WOLFSSL_FATAL_ERROR;
-        }
-    }
-
-    printf(resultFmt, camD == 0 ? passed : failed);
-    if (camD != 0) {
-        return camD;
-    }
-
-#endif
-    return ret;
-
-} /* END test-wc_CamelliaEncryptDecryptDirect */
-
-/*
- * Testing wc_CamelliaCbcEncrypt and wc_CamelliaCbcDecrypt
- */
-static int test_wc_CamelliaCbcEncryptDecrypt (void)
-{
-    int     ret = 0;
-#ifdef HAVE_CAMELLIA
-    Camellia camellia;
-    static const byte key24[] =
-    {
-        0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
-        0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10,
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77
-    };
-    static const byte plainT[] =
-    {
-        0x6B, 0xC1, 0xBE, 0xE2, 0x2E, 0x40, 0x9F, 0x96,
-        0xE9, 0x3D, 0x7E, 0x11, 0x73, 0x93, 0x17, 0x2A
-    };
-    byte    enc[CAMELLIA_BLOCK_SIZE];
-    byte    dec[CAMELLIA_BLOCK_SIZE];
-    int     camCbcE = WOLFSSL_FATAL_ERROR;
-    int     camCbcD = WOLFSSL_FATAL_ERROR;
-
-    /* Init stack variables. */
-    XMEMSET(enc, 0, CAMELLIA_BLOCK_SIZE);
-    XMEMSET(enc, 0, CAMELLIA_BLOCK_SIZE);
-
-    ret = wc_CamelliaSetKey(&camellia, key24, (word32)sizeof(key24), NULL);
-    if (ret == 0) {
-        ret = wc_CamelliaCbcEncrypt(&camellia, enc, plainT, CAMELLIA_BLOCK_SIZE);
-        if (ret != 0) {
-            ret = WOLFSSL_FATAL_ERROR;
-        }
-    }
-    if (ret == 0) {
-        ret = wc_CamelliaSetKey(&camellia, key24, (word32)sizeof(key24), NULL);
-        if (ret == 0) {
-            ret = wc_CamelliaCbcDecrypt(&camellia, dec, enc, CAMELLIA_BLOCK_SIZE);
-            if (XMEMCMP(plainT, dec, CAMELLIA_BLOCK_SIZE)) {
-                ret = WOLFSSL_FATAL_ERROR;
-            }
-        }
-    }
-
-    printf(testingFmt, "wc_CamelliaCbcEncrypt");
-    /* Pass in bad args. */
-    if (ret == 0) {
-        camCbcE = wc_CamelliaCbcEncrypt(NULL, enc, plainT, CAMELLIA_BLOCK_SIZE);
-        if (camCbcE == BAD_FUNC_ARG) {
-            camCbcE = wc_CamelliaCbcEncrypt(&camellia, NULL, plainT,
-                                                    CAMELLIA_BLOCK_SIZE);
-        }
-        if (camCbcE == BAD_FUNC_ARG) {
-            camCbcE = wc_CamelliaCbcEncrypt(&camellia, enc, NULL,
-                                                    CAMELLIA_BLOCK_SIZE);
-        }
-        if (camCbcE == BAD_FUNC_ARG) {
-            camCbcE = 0;
-        } else {
-            camCbcE = WOLFSSL_FATAL_ERROR;
-        }
-    }
-
-    printf(resultFmt, camCbcE == 0 ? passed : failed);
-    if (camCbcE != 0) {
-        return camCbcE;
-    }
-
-    printf(testingFmt, "wc_CamelliaCbcDecrypt()");
-
-    if (ret == 0) {
-        camCbcD = wc_CamelliaCbcDecrypt(NULL, dec, enc, CAMELLIA_BLOCK_SIZE);
-        if (camCbcD == BAD_FUNC_ARG) {
-            camCbcD = wc_CamelliaCbcDecrypt(&camellia, NULL, enc,
-                                                    CAMELLIA_BLOCK_SIZE);
-        }
-        if (camCbcD == BAD_FUNC_ARG) {
-            camCbcD = wc_CamelliaCbcDecrypt(&camellia, dec, NULL,
-                                                    CAMELLIA_BLOCK_SIZE);
-        }
-        if (camCbcD == BAD_FUNC_ARG) {
-            camCbcD = 0;
-        } else {
-            camCbcD = WOLFSSL_FATAL_ERROR;
-        }
-    } /* END bad args. */
-
-    printf(resultFmt, camCbcD == 0 ? passed : failed);
-    if (camCbcD != 0) {
-        return camCbcD;
-    }
-
-#endif
-    return ret;
-
-} /* END test_wc_CamelliaCbcEncryptDecrypt */
 
 
 /*
@@ -52350,11 +52048,6 @@ void ApiTest(void)
     AssertIntEQ(test_wc_Chacha_Process(), 0);
     AssertIntEQ(test_wc_ChaCha20Poly1305_aead(), 0);
     AssertIntEQ(test_wc_Poly1305SetKey(), 0);
-
-    AssertIntEQ(test_wc_CamelliaSetKey(), 0);
-    AssertIntEQ(test_wc_CamelliaSetIV(), 0);
-    AssertIntEQ(test_wc_CamelliaEncryptDecryptDirect(), 0);
-    AssertIntEQ(test_wc_CamelliaCbcEncryptDecrypt(), 0);
 
     AssertIntEQ(test_wc_Arc4SetKey(), 0);
     AssertIntEQ(test_wc_Arc4Process(), 0);

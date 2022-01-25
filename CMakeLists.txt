@@ -453,7 +453,6 @@ endif()
 #       - Intel RDRAND
 #       - Linux af_alg
 #       - Linux dev crpyto calls
-#       - Camellia
 #       - MD2
 #       - NULL cipher
 #       - RIPEMD

@@ -47,7 +47,6 @@
     <ClCompile Include="..\..\wolfcrypt\src\arc4.c" />
     <ClCompile Include="..\..\wolfcrypt\src\asn.c" />
     <ClCompile Include="..\..\wolfcrypt\src\blake2b.c" />
-    <ClCompile Include="..\..\wolfcrypt\src\camellia.c" />
     <ClCompile Include="..\..\wolfcrypt\src\chacha.c" />
     <ClCompile Include="..\..\wolfcrypt\src\chacha20_poly1305.c" />
     <ClCompile Include="..\..\wolfcrypt\src\cmac.c" />

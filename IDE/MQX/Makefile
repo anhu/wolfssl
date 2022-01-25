@@ -77,7 +77,6 @@ $(WOLF_ROOT)/wolfcrypt/src/asm.o\
 $(WOLF_ROOT)/wolfcrypt/src/asn.o\
 $(WOLF_ROOT)/wolfcrypt/src/blake2b.o\
 $(WOLF_ROOT)/wolfcrypt/src/blake2s.o\
-$(WOLF_ROOT)/wolfcrypt/src/camellia.o\
 $(WOLF_ROOT)/wolfcrypt/src/chacha20_poly1305.o\
 $(WOLF_ROOT)/wolfcrypt/src/chacha.o\
 $(WOLF_ROOT)/wolfcrypt/src/cmac.o\

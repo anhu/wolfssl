@@ -77,7 +77,6 @@ libwolfssl_C_SRCS += \
 	../../wolfcrypt/src/pkcs12 \
 	../../wolfcrypt/src/blake2s \
 	../../wolfcrypt/src/pkcs7 \
-	../../wolfcrypt/src/camellia \
 	../../wolfcrypt/src/poly1305 \
 	../../wolfcrypt/src/chacha20_poly1305 \
 	../../wolfcrypt/src/pwdbased \

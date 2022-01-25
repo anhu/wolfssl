@@ -62,11 +62,6 @@
 			<locationURI>PARENT-5-PROJECT_LOC/wolfcrypt/src/blake2b.c</locationURI>
 		</link>
 		<link>
-			<name>wolfCrypt/camellia.c</name>
-			<type>1</type>
-			<locationURI>PARENT-5-PROJECT_LOC/wolfcrypt/src/camellia.c</locationURI>
-		</link>
-		<link>
 			<name>wolfCrypt/chacha.c</name>
 			<type>1</type>
 			<locationURI>PARENT-5-PROJECT_LOC/wolfcrypt/src/chacha.c</locationURI>

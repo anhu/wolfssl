@@ -324,8 +324,6 @@ enum {
     NID_aes_256_ofb = 428,
     NID_aes_128_xts = 913,
     NID_aes_256_xts = 914,
-    NID_camellia_128_cbc = 751,
-    NID_camellia_256_cbc = 753,
     NID_chacha20_poly1305 = 1018
 };
 

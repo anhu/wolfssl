@@ -437,11 +437,6 @@
               <FilePath>..\..\..\wolfcrypt\src\blake2b.c</FilePath>
             </File>
             <File>
-              <FileName>camellia.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\wolfcrypt\src\camellia.c</FilePath>
-            </File>
-            <File>
               <FileName>chacha.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\wolfcrypt\src\chacha.c</FilePath>
@@ -1141,11 +1136,6 @@
               <FilePath>..\..\..\wolfcrypt\src\blake2b.c</FilePath>
             </File>
             <File>
-              <FileName>camellia.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\wolfcrypt\src\camellia.c</FilePath>
-            </File>
-            <File>
               <FileName>chacha.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\wolfcrypt\src\chacha.c</FilePath>
@@ -1843,11 +1833,6 @@
               <FileName>blake2b.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\wolfcrypt\src\blake2b.c</FilePath>
-            </File>
-            <File>
-              <FileName>camellia.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\wolfcrypt\src\camellia.c</FilePath>
             </File>
             <File>
               <FileName>chacha.c</FileName>

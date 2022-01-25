@@ -55,9 +55,6 @@
 #if defined(HAVE_CHACHA) && defined(HAVE_POLY1305) && defined(OPENSSL_EXTRA)
     #include <wolfssl/wolfcrypt/chacha20_poly1305.h>
 #endif
-#ifdef HAVE_CAMELLIA
-    #include <wolfssl/wolfcrypt/camellia.h>
-#endif
 #include <wolfssl/wolfcrypt/logging.h>
 #ifndef NO_HMAC
     #include <wolfssl/wolfcrypt/hmac.h>
@@ -349,31 +346,6 @@
                 #endif
                 #ifdef WOLFSSL_AES_256
                     #define BUILD_TLS_RSA_WITH_AES_256_CCM_8
-                #endif
-            #endif
-        #endif
-    #endif
-
-    #if defined(HAVE_CAMELLIA) && !defined(NO_TLS) && !defined(NO_CAMELLIA_CBC)
-        #ifndef NO_RSA
-          #if defined(WOLFSSL_STATIC_RSA)
-            #if !defined(NO_SHA)
-                #define BUILD_TLS_RSA_WITH_CAMELLIA_128_CBC_SHA
-                #define BUILD_TLS_RSA_WITH_CAMELLIA_256_CBC_SHA
-            #endif
-            #ifndef NO_SHA256
-                #define BUILD_TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256
-                #define BUILD_TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256
-            #endif
-          #endif
-            #if !defined(NO_DH)
-              #if !defined(NO_SHA)
-                #define BUILD_TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA
-                #define BUILD_TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA
-              #endif
-                #ifndef NO_SHA256
-                    #define BUILD_TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256
-                    #define BUILD_TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256
                 #endif
             #endif
         #endif
@@ -1027,16 +999,6 @@ enum {
     TLS_DHE_PSK_WITH_AES_128_CCM       = 0xa6,
     TLS_DHE_PSK_WITH_AES_256_CCM       = 0xa7,
 
-    /* Camellia */
-    TLS_RSA_WITH_CAMELLIA_128_CBC_SHA        = 0x41,
-    TLS_RSA_WITH_CAMELLIA_256_CBC_SHA        = 0x84,
-    TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256     = 0xba,
-    TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256     = 0xc0,
-    TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA    = 0x45,
-    TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA    = 0x88,
-    TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256 = 0xbe,
-    TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256 = 0xc4,
-
     /* chacha20-poly1305 suites first byte is 0xCC (CHACHA_BYTE) */
     TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256   = 0xa8,
     TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 = 0xa9,
@@ -1374,11 +1336,6 @@ enum Misc {
     AES_CCM_16_AUTH_SZ  = 16, /* AES-CCM-16 Auth Tag length */
     AES_CCM_8_AUTH_SZ   = 8,  /* AES-CCM-8 Auth Tag Length  */
     AESCCM_NONCE_SZ     = 12,
-
-    CAMELLIA_128_KEY_SIZE = 16, /* for 128 bit */
-    CAMELLIA_192_KEY_SIZE = 24, /* for 192 bit */
-    CAMELLIA_256_KEY_SIZE = 32, /* for 256 bit */
-    CAMELLIA_IV_SIZE      = 16, /* always block size */
 
     CHACHA20_256_KEY_SIZE = 32,  /* for 256 bit             */
     CHACHA20_128_KEY_SIZE = 16,  /* for 128 bit             */
@@ -3208,9 +3165,6 @@ typedef struct Ciphers {
 #endif
 #ifdef CIPHER_NONCE
     byte* nonce;
-#endif
-#ifdef HAVE_CAMELLIA
-    Camellia* cam;
 #endif
 #ifdef HAVE_CHACHA
     ChaCha*   chacha;

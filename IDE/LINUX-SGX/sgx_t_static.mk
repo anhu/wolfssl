@@ -50,7 +50,6 @@ Wolfssl_C_Files :=$(WOLFSSL_ROOT)/wolfcrypt/src/aes.c\
 					$(WOLFSSL_ROOT)/wolfcrypt/src/arc4.c\
 					$(WOLFSSL_ROOT)/wolfcrypt/src/asn.c\
 					$(WOLFSSL_ROOT)/wolfcrypt/src/blake2b.c\
-					$(WOLFSSL_ROOT)/wolfcrypt/src/camellia.c\
 					$(WOLFSSL_ROOT)/wolfcrypt/src/coding.c\
 					$(WOLFSSL_ROOT)/wolfcrypt/src/chacha.c\
 					$(WOLFSSL_ROOT)/wolfcrypt/src/chacha20_poly1305.c\

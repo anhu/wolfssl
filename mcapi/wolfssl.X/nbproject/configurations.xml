@@ -19,7 +19,6 @@
         <itemPath>../../wolfcrypt/src/asm.c</itemPath>
         <itemPath>../../wolfcrypt/src/asn.c</itemPath>
         <itemPath>../../wolfcrypt/src/blake2b.c</itemPath>
-        <itemPath>../../wolfcrypt/src/camellia.c</itemPath>
         <itemPath>../../wolfcrypt/src/chacha.c</itemPath>
         <itemPath>../../wolfcrypt/src/coding.c</itemPath>
         <itemPath>../../wolfcrypt/src/compress.c</itemPath>

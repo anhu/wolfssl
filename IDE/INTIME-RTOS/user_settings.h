@@ -377,9 +377,6 @@ extern "C" {
 #undef  WOLFSSL_DES_ECB
 //#define WOLFSSL_DES_ECB
 
-#undef  HAVE_CAMELLIA
-//#define HAVE_CAMELLIA
-
 #undef  HAVE_NULL_CIPHER
 //#define HAVE_NULL_CIPHER
 

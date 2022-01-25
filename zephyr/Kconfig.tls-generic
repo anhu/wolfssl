@@ -158,7 +158,6 @@ comment "Supported cipher modes"
 config WOLFSSL_CIPHER_ALL_ENABLED
 	bool "Enable all available ciphers"
 	select WOLFSSL_CIPHER_AES_ENABLED
-	select WOLFSSL_CIPHER_CAMELLIA_ENABLED
 	select WOLFSSL_CIPHER_DES_ENABLED
 	select WOLFSSL_CIPHER_ARC4_ENABLED
 	select WOLFSSL_CIPHER_CHACHA20_ENABLED
@@ -178,9 +177,6 @@ config WOLFSSL_AES_ROM_TABLES
 	bool "Use precomputed AES tables stored in ROM."
 	default y
 
-config WOLFSSL_CIPHER_CAMELLIA_ENABLED
-	bool "Enable the Camellia block cipher"
-
 config WOLFSSL_CIPHER_DES_ENABLED
 	bool "Enable the DES block cipher"
 	default y
@@ -196,15 +192,15 @@ config WOLFSSL_CIPHER_BLOWFISH_ENABLED
 
 config WOLFSSL_CIPHER_CCM_ENABLED
 	bool "Enable the Counter with CBC-MAC (CCM) mode for 128-bit block cipher"
-	depends on WOLFSSL_CIPHER_AES_ENABLED || WOLFSSL_CIPHER_CAMELLIA_ENABLED
+	depends on WOLFSSL_CIPHER_AES_ENABLED
 
 config WOLFSSL_CIPHER_MODE_XTS_ENABLED
 	bool "Enable Xor-encrypt-xor with ciphertext stealing mode (XTS) for AES"
-	depends on WOLFSSL_CIPHER_AES_ENABLED || WOLFSSL_CIPHER_CAMELLIA_ENABLED
+	depends on WOLFSSL_CIPHER_AES_ENABLED
 
 config WOLFSSL_CIPHER_MODE_GCM_ENABLED
 	bool "Enable the Galois/Counter Mode (GCM) for AES"
-	depends on WOLFSSL_CIPHER_AES_ENABLED || WOLFSSL_CIPHER_CAMELLIA_ENABLED
+	depends on WOLFSSL_CIPHER_AES_ENABLED
 
 config WOLFSSL_CIPHER_CBC_ENABLED
 	bool "Enable Cipher Block Chaining mode (CBC) for symmetric ciphers"

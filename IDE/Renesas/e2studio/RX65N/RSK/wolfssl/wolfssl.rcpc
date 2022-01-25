@@ -31,7 +31,6 @@
           <Path>..\..\..\..\..\..\wolfcrypt\src\asm.c</Path>
           <Path>..\..\..\..\..\..\wolfcrypt\src\asn.c</Path>
           <Path>..\..\..\..\..\..\wolfcrypt\src\blake2b.c</Path>
-          <Path>..\..\..\..\..\..\wolfcrypt\src\camellia.c</Path>
           <Path>..\..\..\..\..\..\wolfcrypt\src\chacha.c</Path>
           <Path>..\..\..\..\..\..\wolfcrypt\src\chacha20_poly1305.c</Path>
           <Path>..\..\..\..\..\..\wolfcrypt\src\cmac.c</Path>
@@ -150,7 +149,6 @@
           <Path>Debug\asm.obj</Path>
           <Path>Debug\asn.obj</Path>
           <Path>Debug\blake2b.obj</Path>
-          <Path>Debug\camellia.obj</Path>
           <Path>Debug\chacha.obj</Path>
           <Path>Debug\chacha20_poly1305.obj</Path>
           <Path>Debug\cmac.obj</Path>

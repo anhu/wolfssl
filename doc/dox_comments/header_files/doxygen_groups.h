@@ -3,7 +3,6 @@
     \defgroup AES Algorithms - AES
     \defgroup ARC4 Algorithms - ARC4
     \defgroup BLAKE2 Algorithms - BLAKE2
-    \defgroup Camellia Algorithms - Camellia
     \defgroup ChaCha Algorithms - ChaCha
     \defgroup ChaCha20Poly1305 Algorithms - ChaCha20_Poly1305
     \defgroup Crypto Callbacks - CryptoCb

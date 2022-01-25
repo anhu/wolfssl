@@ -168,9 +168,6 @@ extern void aesccm_test(void *arg) ;
 #endif
 #endif
 
-#ifdef HAVE_CAMELLIA
-extern void camellia_test(void *arg) ;
-#endif
 extern void random_test(void *arg) ;
 
 #ifndef NO_RSA
@@ -278,10 +275,6 @@ static struct {
     #ifdef HAVE_AESCCM
   "aesccm",  aesccm_test,
     #endif
-#endif
-
-#ifdef HAVE_CAMELLIA
-  "camellia",  camellia_test,
 #endif
   "random",  random_test,
 #ifndef NO_RSA
