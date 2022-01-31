@@ -5142,6 +5142,145 @@ then
     AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_DES_ECB -DWOLFSSL_SIGNER_DER_CERT"
 fi
 
+# wolfEngine Options
+AC_ARG_ENABLE([engine],
+    [AS_HELP_STRING([--enable-engine],[Enable wolfEngine options (default: disabled)])],
+    [ ENABLED_WOLFENGINE=$enableval ],
+    [ ENABLED_WOLFENGINE=no ]
+    )
+
+AS_IF([test "x$ENABLED_WOLFENGINE" = "xyes"],[AM_CPPFLAGS="$AM_CPPFLAGS -DWOLFSSL_WOLFENGINE"])
+
+if test "x$ENABLED_WOLFENGINE" = "xyes"; then
+    if test "x$ENABLED_OPENSSLCOEXIST" = "xno"
+    then
+        ENABLED_OPENSSLCOEXIST="yes"
+        # make sure old names are disabled
+        enable_oldnames=no
+
+        AM_CFLAGS="$AM_CFLAGS -DOPENSSL_COEXIST"
+    fi
+
+    if test "x$ENABLED_AESCTR" = "xno"
+    then
+        ENABLED_AESCTR="yes"
+        AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_AES_COUNTER"
+    fi
+
+    if test "x$ENABLED_AESCCM" = "xno"
+    then
+        ENABLED_AESCCM="yes"
+        AM_CFLAGS="$AM_CFLAGS -DHAVE_AESCCM"
+    fi
+
+    if test "x$ENABLED_X963KDF" = "xno"
+    then
+        ENABLED_X963KDF="yes"
+        AM_CFLAGS="$AM_CFLAGS -DHAVE_X963_KDF"
+    fi
+
+    if test "x$ENABLED_SHA" = "xno"
+    then
+        ENABLED_SHA="yes"
+    fi
+
+    if test "x$ENABLED_DES3" = "xno"
+    then
+        ENABLED_DES3="yes"
+    fi
+
+    if test "x$ENABLED_KEYGEN" = "xno"
+    then
+        ENABLED_KEYGEN="yes"
+        AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_KEY_GEN"
+    fi
+
+    if test "x$ENABLED_CMAC" = "xno"
+    then
+        ENABLED_CMAC="yes"
+        AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_CMAC"
+    fi
+
+    AM_CFLAGS="$AM_CFLAGS -DHAVE_AES_ECB"
+    AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_AES_DIRECT"
+    AM_CFLAGS="$AM_CFLAGS -DWC_RSA_NO_PADDING"
+    AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_PUBLIC_MP"
+    AM_CFLAGS="$AM_CFLAGS -DECC_MIN_KEY_SZ=192"
+    AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_PSS_LONG_SALT"
+    AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_PSS_SALT_LEN_DISCOVER"
+fi
+
+# wolfEngine for FiPS Options
+# User is expected to add `--enable-fips=v2` or `--enable-fips=ready` and use
+# a FIPS source code bundle.
+AC_ARG_ENABLE([fips-engine],
+    [AS_HELP_STRING([--enable-fips-engine],[Enable FIPS wolfEngine options (default: disabled)])],
+    [ ENABLED_WOLFFIPSENGINE=$enableval ],
+    [ ENABLED_WOLFFIPSENGINE=no ]
+    )
+
+AS_IF([test "x$ENABLED_WOLFFIPSENGINE" = "xyes"],[AM_CPPFLAGS="$AM_CPPFLAGS -DWOLFSSL_WOLFFIPSENGINE"])
+
+if test "x$ENABLED_WOLFFIPSENGINE" = "xyes"; then
+    if test "x$ENABLED_OPENSSLCOEXIST" = "xno"
+    then
+        ENABLED_OPENSSLCOEXIST="yes"
+        # make sure old names are disabled
+        enable_oldnames=no
+
+        AM_CFLAGS="$AM_CFLAGS -DOPENSSL_COEXIST"
+    fi
+
+    if test "x$ENABLED_AESCTR" = "xno"
+    then
+        ENABLED_AESCTR="yes"
+        AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_AES_COUNTER"
+    fi
+
+    if test "x$ENABLED_AESCCM" = "xno"
+    then
+        ENABLED_AESCCM="yes"
+        AM_CFLAGS="$AM_CFLAGS -DHAVE_AESCCM"
+    fi
+
+    if test "x$ENABLED_X963KDF" = "xno"
+    then
+        ENABLED_X963KDF="yes"
+        AM_CFLAGS="$AM_CFLAGS -DHAVE_X963_KDF"
+    fi
+
+    if test "x$ENABLED_SHA" = "xno"
+    then
+        ENABLED_SHA="yes"
+    fi
+
+    if test "x$ENABLED_DES3" = "xno"
+    then
+        ENABLED_DES3="yes"
+    fi
+
+    if test "x$ENABLED_KEYGEN" = "xno"
+    then
+        ENABLED_KEYGEN="yes"
+        AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_KEY_GEN"
+    fi
+
+    if test "x$ENABLED_CMAC" = "xno"
+    then
+        ENABLED_CMAC="yes"
+        AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_CMAC"
+    fi
+
+    AM_CFLAGS="$AM_CFLAGS -DHAVE_AES_ECB"
+    AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_AES_DIRECT"
+    AM_CFLAGS="$AM_CFLAGS -DWC_RSA_NO_PADDING"
+    AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_PUBLIC_MP"
+    AM_CFLAGS="$AM_CFLAGS -DECC_MIN_KEY_SZ=192"
+    AM_CFLAGS="$AM_CFLAGS -DSha3=wc_Sha3"
+    AM_CFLAGS="$AM_CFLAGS -DNO_OLD_SHA256_NAMES"
+    AM_CFLAGS="$AM_CFLAGS -DNO_OLD_MD5_NAME"
+fi
+
 # curl Support
 AC_ARG_ENABLE([curl],
     [AS_HELP_STRING([--enable-curl],[Enable curl (default: disabled)])],
@@ -7868,6 +8007,8 @@ echo "   * All TLS Extensions:         $ENABLED_TLSX"
 echo "   * PKCS#7:                     $ENABLED_PKCS7"
 echo "   * S/MIME:                     $ENABLED_SMIME"
 echo "   * wolfSSH:                    $ENABLED_WOLFSSH"
+echo "   * wolfEngine:                 $ENABLED_WOLFENGINE"
+echo "   * wolf FIPS Engine:           $ENABLED_WOLFFIPSENGINE"
 echo "   * wolfTPM:                    $ENABLED_WOLFTPM"
 echo "   * wolfCLU:                    $ENABLED_WOLFCLU"
 echo "   * wolfSCEP:                   $ENABLED_WOLFSCEP"
