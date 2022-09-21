@@ -5206,6 +5206,9 @@ struct WOLFSSL {
 #ifdef WOLFSSL_STATIC_EPHEMERAL
     StaticKeyExchangeInfo_t staticKE;
 #endif
+#ifdef WOLFSSL_MAXQ10XX_TLS
+    maxq_ssl_t maxq_ctx;
+#endif
 #ifdef WOLFSSL_HAVE_TLS_UNIQUE
     /* Added in libest port: allow applications to get the 'tls-unique' Channel
      * Binding Type (https://tools.ietf.org/html/rfc5929#section-3). This is

@@ -256,6 +256,16 @@
 /* Uncomment next line if building for Dolphin Emulator */
 /* #define DOLPHIN_EMULATOR */
 
+/* Uncomment next line if using MAXQ1061 */
+/* #define WOLFSSL_MAXQ1061 */
+
+/* Uncomment next line if using MAXQ1065 */
+/* #define WOLFSSL_MAXQ1065 */
+
+/* Uncomment next line if using MAXQ108x */
+/* #define WOLFSSL_MAXQ108x */
+
+
 #include <wolfssl/wolfcrypt/visibility.h>
 
 #ifdef WOLFSSL_USER_SETTINGS
@@ -1317,6 +1327,40 @@ extern void uITRON4_free(void *p) ;
 #if defined(FREESCALE_USE_LTC) && !defined(FREESCALE_LTC_AES_GCM)
     #define GCM_TABLE
 #endif
+
+#if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || \
+    defined(WOLFSSL_MAXQ108x)
+    /* --enable-cryptocb --disable-extended-master --enable-psk --enable-aesccm */
+
+    //#define DEBUG_WOLFSSL
+    #define WOLFSSL_DEBUG_TLS
+    //#define FORCE_MAXQ10XX_CB
+
+    #define WOLFSSL_USER_MUTEX
+    #define MAXQ10XX_MODULE_INIT
+    #define WOLFSSL_MAXQ10XX_CRYPTO
+
+    #define WOLFSSL_MAXQ10XX_TLS
+    #define WOLFSSL_STATIC_PSK
+
+    #ifdef WOLFSSL_MAXQ10XX_TLS
+        #define DISABLE_PEER_CERT_VERS_CHECK
+    #endif
+
+    #ifdef WOLFSSL_USER_MUTEX
+        #define WOLFSSL_CRYPT_HW_MUTEX 1
+        #define MAXQ10XX_MUTEX
+    #endif
+
+    #if defined(WOLFSSL_MAXQ1061)
+        #define MAXQ_DEVICE_ID 1061
+    #elif defined(WOLFSSL_MAXQ1065)
+        #define MAXQ_DEVICE_ID 1065
+    #elif defined(WOLFSSL_MAXQ108x)
+        #define MAXQ_DEVICE_ID 1080
+    #endif
+
+#endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108x */
 
 #if defined(WOLFSSL_STM32F2) || defined(WOLFSSL_STM32F4) || \
     defined(WOLFSSL_STM32F7) || defined(WOLFSSL_STM32F1) || \

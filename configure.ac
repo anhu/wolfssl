@@ -1869,6 +1869,39 @@ then
 fi
 
 
+# Maxim Integrated MAXQ10XX
+ENABLED_MAXQ10XX="no"
+maxqpartnumber=""
+AC_ARG_WITH([maxq10xx],
+    [AS_HELP_STRING([--with-maxq10xx=PART],[MAXQ10XX PART Number])],
+    [
+        AC_MSG_CHECKING([for maxq10xx])
+
+        # Read the part number
+        maxqpartnumber=$withval
+
+        if test "$maxqpartnumber" = "MAXQ1065"; then
+            LIB_ADD="$LIB_ADD -lrt"
+            LIB_STATIC_ADD="$LIB_STATIC_ADD lib/libmaxq1065_api.a"
+            AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_MAXQ1065"
+            ENABLED_MAXQ10XX="yes"
+        fi
+
+        if test "$maxqpartnumber" = "MAXQ108x"; then
+            LIB_ADD="$LIB_ADD -lrt"
+            LIB_STATIC_ADD="$LIB_STATIC_ADD lib/libmaxq108x_api.a"
+            AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_MAXQ108x"
+            ENABLED_MAXQ10XX="yes"
+        fi
+
+        if test "$ENABLED_MAXQ10XX" = "no"; then
+            AC_MSG_ERROR([need a valid MAXQ part number])
+        fi
+
+        AC_MSG_RESULT([yes])
+    ]
+)
+
 # Microchip/Atmel CryptoAuthLib
 ENABLED_CRYPTOAUTHLIB="no"
 trylibatcadir=""
@@ -8271,6 +8304,7 @@ AM_CONDITIONAL([BUILD_QNXCAAM],[test "x$ENABLED_CAAM" = "xqnx"])
 AM_CONDITIONAL([BUILD_IOTSAFE],[test "x$ENABLED_IOTSAFE" = "xyes"])
 AM_CONDITIONAL([BUILD_IOTSAFE_HWRNG],[test "x$ENABLED_IOTSAFE_HWRNG" = "xyes"])
 AM_CONDITIONAL([BUILD_SE050],[test "x$ENABLED_SE050" = "xyes"])
+AM_CONDITIONAL([BUILD_MAXQ10XX],[test "x$ENABLED_MAXQ10XX" = "xyes"])
 AM_CONDITIONAL([BUILD_KDF],[test "x$ENABLED_KDF" = "xyes"])
 AM_CONDITIONAL([BUILD_HMAC],[test "x$ENABLED_HMAC" = "xyes"])
 AM_CONDITIONAL([BUILD_ERROR_STRINGS],[test "x$ENABLED_ERROR_STRINGS" = "xyes"])
@@ -8701,6 +8735,7 @@ echo "   * i.MX CAAM:                  $ENABLED_CAAM"
 echo "   * IoT-Safe:                   $ENABLED_IOTSAFE"
 echo "   * IoT-Safe HWRNG:             $ENABLED_IOTSAFE_HWRNG"
 echo "   * NXP SE050:                  $ENABLED_SE050"
+echo "   * Maxim Integrated MAXQ10XX:  $ENABLED_MAXQ10XX"
 echo "   * PSA:                        $ENABLED_PSA"
 echo "   * System CA certs:            $ENABLED_SYS_CA_CERTS"
 echo ""
