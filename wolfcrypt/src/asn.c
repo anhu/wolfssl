@@ -11370,6 +11370,9 @@ static int StoreRsaKey(DecodedCert* cert, const byte* source, word32* srcIdx,
 #endif
     cert->pubKeySize = pubLen;
     cert->publicKey = source + pubIdx;
+#ifdef WOLFSSL_MAXQ10XX_TLS
+    cert->publicKeyIndex = pubIdx;
+#endif
     *srcIdx += length;
 
 #ifdef HAVE_OCSP
@@ -11491,6 +11494,10 @@ static int StoreEccKey(DecodedCert* cert, const byte* source, word32* srcIdx,
         cert->sigCtx.CertAtt.pubkey_e_len   =
                 cert->sigCtx.CertAtt.pubkey_n_len;
     #endif
+    #ifdef WOLFSSL_MAXQ10XX_TLS
+        cert->publicKeyIndex = *srcIdx + 1;
+    #endif
+
     #ifdef HAVE_OCSP
         ret = CalcHashId(source + *srcIdx, length, cert->subjectKeyHash);
         if (ret != 0)

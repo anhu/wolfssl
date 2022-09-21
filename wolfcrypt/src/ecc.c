@@ -6171,6 +6171,12 @@ int wc_ecc_sign_hash(const byte* in, word32 inlen, byte* out, word32 *outlen,
     }
 
 #ifdef WOLF_CRYPTO_CB
+    #ifdef FORCE_MAXQ10XX_CB
+        if (key->devId == INVALID_DEVID) {
+            key->devId = MAXQ_DEVICE_ID;
+        }
+    #endif
+
     if (key->devId != INVALID_DEVID) {
         err = wc_CryptoCb_EccSign(in, inlen, out, outlen, rng, key);
     #ifndef WOLF_CRYPTO_CB_ONLY_ECC
@@ -7320,6 +7326,10 @@ int wc_ecc_free(ecc_key* key)
     ForceZero(&key->xSec, sizeof(key->xSec));
 #endif
 
+#ifdef WOLFSSL_MAXQ10XX_CRYPTO
+    wc_MAXQ10XX_EccFree(key);
+#endif
+
     mp_clear(key->pubkey.x);
     mp_clear(key->pubkey.y);
     mp_clear(key->pubkey.z);
@@ -7843,6 +7853,12 @@ int wc_ecc_verify_hash(const byte* sig, word32 siglen, const byte* hash,
     }
 
 #ifdef WOLF_CRYPTO_CB
+    #ifdef FORCE_MAXQ10XX_CB
+        if (key->devId == INVALID_DEVID) {
+            key->devId = MAXQ_DEVICE_ID;
+        }
+    #endif
+
     if (key->devId != INVALID_DEVID) {
         err = wc_CryptoCb_EccVerify(sig, siglen, hash, hashlen, res, key);
     #ifndef WOLF_CRYPTO_CB_ONLY_ECC
@@ -10058,6 +10074,12 @@ int wc_ecc_import_x963_ex(const byte* in, word32 inLen, ecc_key* key,
         err = wc_ecc_check_key(key);
 #endif
 
+#ifdef WOLFSSL_MAXQ10XX_CRYPTO
+    if (err == MP_OKAY) {
+        wc_MAXQ10XX_EccSetKey(key, keysize);
+    }
+#endif
+
     if (err != MP_OKAY) {
         mp_clear(key->pubkey.x);
         mp_clear(key->pubkey.y);
@@ -10400,6 +10422,12 @@ int wc_ecc_import_private_key_ex(const byte* priv, word32 privSz,
 
 #ifdef WOLFSSL_VALIDATE_ECC_IMPORT
     RESTORE_VECTOR_REGISTERS();
+#endif
+
+#ifdef WOLFSSL_MAXQ10XX_CRYPTO
+    if (ret == 0) {
+        wc_MAXQ10XX_EccSetKey(key, key->dp->size);
+    }
 #endif
 
     return ret;
@@ -10790,6 +10818,12 @@ static int wc_ecc_import_raw_private(ecc_key* key, const char* qx,
 
 #ifdef WOLFSSL_VALIDATE_ECC_IMPORT
     RESTORE_VECTOR_REGISTERS();
+#endif
+
+#ifdef WOLFSSL_MAXQ10XX_CRYPTO
+    if (err == MP_OKAY) {
+        wc_MAXQ10XX_EccSetKey(key, key->dp->size);
+    }
 #endif
 
     if (err != MP_OKAY) {

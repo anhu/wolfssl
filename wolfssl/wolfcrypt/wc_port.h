@@ -223,6 +223,12 @@
         typedef TX_MUTEX wolfSSL_Mutex;
     #elif defined(WOLFSSL_DEOS)
         typedef mutex_handle_t wolfSSL_Mutex;
+    #elif defined(MAXQ10XX_MUTEX)
+        #include <sys/mman.h>
+        #include <fcntl.h>
+        #include <pthread.h>
+        typedef pthread_mutex_t wolfSSL_Mutex;
+        int maxq_CryptHwMutexTryLock(void);
     #elif defined(MICRIUM)
         typedef OS_MUTEX wolfSSL_Mutex;
     #elif defined(EBSNET)
