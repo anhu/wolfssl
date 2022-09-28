@@ -27,13 +27,6 @@
 #if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || \
     defined(WOLFSSL_MAXQ108x)
 
-#ifdef WOLFSSL_MAXQ10XX_TLS
-#define ROOT_CA_CERT_OBJ_ID (0x1003)
-#define DEVICE_CERT_OBJ_ID (0x1002)
-#define DEVICE_KEY_PAIR_OBJ_ID (0x1004)
-#define PSK_OBJ_ID (0x1234)
-#endif
-
 #ifdef WOLF_CRYPTO_CB
     #ifdef WOLFSSL_MAXQ1061
     #endif /* WOLFSSL_MAXQ1061 */

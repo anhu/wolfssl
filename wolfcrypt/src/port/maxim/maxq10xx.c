@@ -48,7 +48,12 @@ void dbg_dumphex(const char *identifier, const uint8_t* pdata, uint32_t plen);
 #else
 #define TEMP_KEY_ID_MAX_NUM   (2)
 #endif
-#define PUBKEY_IMPORT_OBJID 0x1000
+
+#define PUBKEY_IMPORT_OBJID    0x1000
+#define ROOT_CA_CERT_OBJ_ID    0x1003
+#define DEVICE_CERT_OBJ_ID     0x1002
+#define DEVICE_KEY_PAIR_OBJ_ID 0x1004
+#define PSK_OBJ_ID             0x1234
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
 #define PSK_KID (0x1235)
