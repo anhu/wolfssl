@@ -1035,7 +1035,7 @@ int wc_RNG_GenerateBlock(WC_RNG* rng, byte* output, word32 sz)
         return 0;
 
 #ifdef WOLF_CRYPTO_CB
-    #if defined(FORCE_MAXQ10XX_CB) || defined(WOLFSSL_MAXQ108x)
+    #if defined(WOLFSSL_MAXQ108x)
     if (rng->devId == INVALID_DEVID) {
         rng->devId = MAXQ_DEVICE_ID;
     }
@@ -1781,11 +1781,6 @@ int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
 {
 #ifdef WOLF_CRYPTO_CB
     int ret;
-    #ifdef FORCE_MAXQ10XX_CB
-    if (os != NULL && os->devId == INVALID_DEVID) {
-        os->devId = MAXQ_DEVICE_ID;
-    }
-    #endif
     if (os != NULL && os->devId != INVALID_DEVID) {
         ret = wc_CryptoCb_RandomSeed(os, output, sz);
         if (ret != CRYPTOCB_UNAVAILABLE)
@@ -2899,11 +2894,6 @@ int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
         }
 
     #ifdef WOLF_CRYPTO_CB
-        #ifdef FORCE_MAXQ10XX_CB
-        if (os->devId == INVALID_DEVID) {
-            os->devId = MAXQ_DEVICE_ID;
-        }
-        #endif
         if (os->devId != INVALID_DEVID) {
             ret = wc_CryptoCb_RandomSeed(os, output, sz);
             if (ret != CRYPTOCB_UNAVAILABLE)
