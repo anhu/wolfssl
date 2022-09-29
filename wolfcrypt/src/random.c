@@ -838,6 +838,11 @@ static int _InitRng(WC_RNG* rng, byte* nonce, word32 nonceSz,
     rng->status = DRBG_NOT_INIT;
 #endif
 
+#if defined (WOLF_CRYPTO_CB) && defined(WOLFSSL_MAXQ108x)
+    /* Override the devId with the hardware ID. */
+    rng->devId = MAXQ_DEVICE_ID;
+#endif
+
 #if defined(HAVE_INTEL_RDSEED) || defined(HAVE_INTEL_RDRAND) || \
     defined(HAVE_AMD_RDSEED)
     /* init the intel RD seed and/or rand */
@@ -1035,11 +1040,6 @@ int wc_RNG_GenerateBlock(WC_RNG* rng, byte* output, word32 sz)
         return 0;
 
 #ifdef WOLF_CRYPTO_CB
-    #if defined(WOLFSSL_MAXQ108x)
-    if (rng->devId == INVALID_DEVID) {
-        rng->devId = MAXQ_DEVICE_ID;
-    }
-    #endif
     if (rng->devId != INVALID_DEVID) {
         ret = wc_CryptoCb_RandomBlock(rng, output, sz);
         if (ret != CRYPTOCB_UNAVAILABLE)
