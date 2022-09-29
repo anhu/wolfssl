@@ -1333,6 +1333,7 @@ extern void uITRON4_free(void *p) ;
 
     #define MAXQ10XX_MODULE_INIT
 
+    #define WOLFSSL_STATIC_PSK
     #define WOLFSSL_USER_MUTEX
     #ifdef WOLFSSL_USER_MUTEX
         #define WOLFSSL_CRYPT_HW_MUTEX 1
@@ -1341,10 +1342,12 @@ extern void uITRON4_free(void *p) ;
 
     #define WOLFSSL_MAXQ10XX_CRYPTO
     #define WOLFSSL_MAXQ10XX_TLS
-    #define WOLFSSL_STATIC_PSK
-
     #ifdef WOLFSSL_MAXQ10XX_TLS
         #define DISABLE_PEER_CERT_VERS_CHECK
+    #endif
+
+    #if defined(WOLFSSL_ASN_TEMPLATE) && defined(WOLFSSL_MAXQ10XX_TLS)
+        #error "Changes to the ASN Template code have not be done yet."
     #endif
 
     #if defined(WOLFSSL_MAXQ1061)
