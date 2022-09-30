@@ -6172,9 +6172,9 @@ int wc_ecc_sign_hash(const byte* in, word32 inlen, byte* out, word32 *outlen,
 
 #ifdef WOLF_CRYPTO_CB
     #ifdef FORCE_MAXQ10XX_CB
-        if (key->devId == INVALID_DEVID) {
-            key->devId = MAXQ_DEVICE_ID;
-        }
+    if (key->devId == INVALID_DEVID) {
+        key->devId = MAXQ_DEVICE_ID;
+    }
     #endif
 
     if (key->devId != INVALID_DEVID) {

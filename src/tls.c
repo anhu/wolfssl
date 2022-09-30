@@ -221,22 +221,21 @@ int BuildTlsFinished(WOLFSSL* ssl, Hashes* hashes, const byte* sender)
         if (!ssl->ctx->TlsFinishedCb || ret == PROTOCOLCB_UNAVAILABLE)
 #endif
         {
-        #ifdef WOLFSSL_MAXQ10XX_TLS
+#ifdef WOLFSSL_MAXQ10XX_TLS
             if (ssl->options.side == WOLFSSL_CLIENT_END) {
             ret = maxq10xx_perform_client_finished(ssl, side, FINISHED_LABEL_SZ,
                     handshake_hash, hashSz, (byte*)hashes, TLS_FINISHED_SZ);
-            } else {
-        #endif /* WOLFSSL_MAXQ10XX_TLS */
-            PRIVATE_KEY_UNLOCK();
-            ret = wc_PRF_TLS((byte*)hashes, TLS_FINISHED_SZ,
-                    ssl->arrays->masterSecret,
-                   SECRET_LEN, side, FINISHED_LABEL_SZ, handshake_hash, hashSz,
-                   IsAtLeastTLSv1_2(ssl), ssl->specs.mac_algorithm,
-                   ssl->heap, ssl->devId);
-            PRIVATE_KEY_LOCK();
-        #ifdef WOLFSSL_MAXQ10XX_TLS
+            } else
+#endif /* WOLFSSL_MAXQ10XX_TLS */
+            {
+                PRIVATE_KEY_UNLOCK();
+                ret = wc_PRF_TLS((byte*)hashes, TLS_FINISHED_SZ,
+                          ssl->arrays->masterSecret, SECRET_LEN, side,
+                          FINISHED_LABEL_SZ, handshake_hash, hashSz,
+                          IsAtLeastTLSv1_2(ssl), ssl->specs.mac_algorithm,
+                          ssl->heap, ssl->devId);
+                PRIVATE_KEY_LOCK();
             }
-        #endif
         }
         ForceZero(handshake_hash, hashSz);
 #else
@@ -576,7 +575,7 @@ int MakeTlsMasterSecret(WOLFSSL* ssl)
         if (!ssl->ctx->GenMasterCb || ret == PROTOCOLCB_UNAVAILABLE)
 #endif
         {
-    #ifdef WOLFSSL_MAXQ10XX_TLS
+#ifdef WOLFSSL_MAXQ10XX_TLS
             if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
                 (ssl->specs.kea == ecc_diffie_hellman_kea) &&
                 (ssl->hsKey) &&
@@ -595,16 +594,15 @@ int MakeTlsMasterSecret(WOLFSSL* ssl)
                             ssl->arrays->serverRandom,
                             1);
                 return ret;
-            } else {
-    #endif /* WOLFSSL_MAXQ10XX_TLS */
-        ret = _MakeTlsMasterSecret(ssl->arrays->masterSecret, SECRET_LEN,
-              ssl->arrays->preMasterSecret, ssl->arrays->preMasterSz,
-              ssl->arrays->clientRandom, ssl->arrays->serverRandom,
-              IsAtLeastTLSv1_2(ssl), ssl->specs.mac_algorithm,
-              ssl->heap, ssl->devId);
-    #ifdef WOLFSSL_MAXQ10XX_TLS
+            } else
+#endif /* WOLFSSL_MAXQ10XX_TLS */
+            {
+                ret = _MakeTlsMasterSecret(ssl->arrays->masterSecret,
+                          SECRET_LEN, ssl->arrays->preMasterSecret,
+                          ssl->arrays->preMasterSz, ssl->arrays->clientRandom,
+                          ssl->arrays->serverRandom, IsAtLeastTLSv1_2(ssl),
+                          ssl->specs.mac_algorithm, ssl->heap, ssl->devId);
             }
-    #endif
         }
     }
     if (ret == 0) {

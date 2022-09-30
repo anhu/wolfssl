@@ -1330,26 +1330,21 @@ extern void uITRON4_free(void *p) ;
 
 #if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || \
     defined(WOLFSSL_MAXQ108x)
-    /* --enable-cryptocb --disable-extended-master --enable-psk --enable-aesccm */
 
-    //#define DEBUG_WOLFSSL
-    #define WOLFSSL_DEBUG_TLS
-    //#define FORCE_MAXQ10XX_CB
+    #define MAXQ10XX_MODULE_INIT
 
     #define WOLFSSL_USER_MUTEX
-    #define MAXQ10XX_MODULE_INIT
-    #define WOLFSSL_MAXQ10XX_CRYPTO
+    #ifdef WOLFSSL_USER_MUTEX
+        #define WOLFSSL_CRYPT_HW_MUTEX 1
+        #define MAXQ10XX_MUTEX
+    #endif
 
+    #define WOLFSSL_MAXQ10XX_CRYPTO
     #define WOLFSSL_MAXQ10XX_TLS
     #define WOLFSSL_STATIC_PSK
 
     #ifdef WOLFSSL_MAXQ10XX_TLS
         #define DISABLE_PEER_CERT_VERS_CHECK
-    #endif
-
-    #ifdef WOLFSSL_USER_MUTEX
-        #define WOLFSSL_CRYPT_HW_MUTEX 1
-        #define MAXQ10XX_MUTEX
     #endif
 
     #if defined(WOLFSSL_MAXQ1061)

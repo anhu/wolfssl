@@ -312,9 +312,9 @@ int wc_HmacSetKey(Hmac* hmac, int type, const byte* key, word32 length)
     }
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-	ret = wc_MAXQ10XX_HmacSetKey(type);
-	if(ret != NOT_COMPILED_IN)
-		return ret;
+    ret = wc_MAXQ10XX_HmacSetKey(type);
+    if(ret != NOT_COMPILED_IN)
+        return ret;
 #endif
 
 #ifndef HAVE_FIPS
@@ -684,10 +684,11 @@ int wc_HmacUpdate(Hmac* hmac, const byte* msg, word32 length)
     if (hmac == NULL || (msg == NULL && length > 0)) {
         return BAD_FUNC_ARG;
     }
+
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-	ret = wc_MAXQ10XX_HmacUpdate(msg, length);
-	if(ret != NOT_COMPILED_IN)
-		return ret;
+    ret = wc_MAXQ10XX_HmacUpdate(msg, length);
+    if(ret != NOT_COMPILED_IN)
+        return ret;
 #endif
 
 #ifdef WOLF_CRYPTO_CB
@@ -792,12 +793,12 @@ int wc_HmacFinal(Hmac* hmac, byte* hash)
     if (hmac == NULL || hash == NULL) {
         return BAD_FUNC_ARG;
     }
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-	ret = wc_MAXQ10XX_HmacFinal(hash);
-	if(ret != NOT_COMPILED_IN)
-		return ret;
-#endif
 
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+    ret = wc_MAXQ10XX_HmacFinal(hash);
+    if(ret != NOT_COMPILED_IN)
+        return ret;
+#endif
 
 #ifdef WOLF_CRYPTO_CB
     if (hmac->devId != INVALID_DEVID) {

@@ -2834,13 +2834,13 @@ static WARN_UNUSED_RESULT int wc_AesDecrypt(
         unsigned int i = 0;
     #endif
 
-    #ifdef WOLFSSL_MAXQ10XX_CRYPTO
-        wc_MAXQ10XX_AesSetKey(aes, userKey, keylen);
-    #endif
-
     #ifdef WOLFSSL_IMX6_CAAM_BLOB
         byte   local[32];
         word32 localSz = 32;
+    #endif
+
+    #ifdef WOLFSSL_MAXQ10XX_CRYPTO
+        wc_MAXQ10XX_AesSetKey(aes, userKey, keylen);
     #endif
 
     #ifdef WOLFSSL_IMX6_CAAM_BLOB
@@ -8354,9 +8354,9 @@ int wc_AesGcmDecrypt(Aes* aes, byte* out, const byte* in, word32 sz,
 
 #ifdef WOLF_CRYPTO_CB
     #ifdef FORCE_MAXQ10XX_CB
-        if (aes->devId == INVALID_DEVID) {
-            aes->devId = MAXQ_DEVICE_ID;
-        }
+    if (aes->devId == INVALID_DEVID) {
+        aes->devId = MAXQ_DEVICE_ID;
+    }
     #endif
     if (aes->devId != INVALID_DEVID) {
         int crypto_cb_ret =
@@ -10831,11 +10831,12 @@ void wc_AesFree(Aes* aes)
     wc_psa_aes_free(aes);
 #endif
 
-#ifdef WOLFSSL_CHECK_MEM_ZERO
-    wc_MemZero_Check(aes, sizeof(Aes));
-#endif
 #ifdef WOLFSSL_MAXQ10XX_CRYPTO
     wc_MAXQ10XX_AesFree(aes);
+#endif
+
+#ifdef WOLFSSL_CHECK_MEM_ZERO
+    wc_MemZero_Check(aes, sizeof(Aes));
 #endif
 }
 

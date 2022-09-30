@@ -261,11 +261,11 @@ static int DeriveKeyMsg(WOLFSSL* ssl, byte* output, int outputLen,
     if (outputLen == -1)
         outputLen = hashSz;
 
-    #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
     if (ssl->options.side == WOLFSSL_CLIENT_END) {
         maxq10xx_SetupPkCallbacks(ssl->ctx);
     }
-    #endif
+#endif
 
     PRIVATE_KEY_UNLOCK();
     ret = wc_Tls13_HKDF_Expand_Label(output, outputLen, secret, hashSz,
@@ -349,11 +349,11 @@ int Tls13DeriveKey(WOLFSSL* ssl, byte* output, int outputLen,
     if (includeMsgs)
         hashOutSz = hashSz;
 
-    #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
     if (ssl->options.side == WOLFSSL_CLIENT_END) {
         maxq10xx_SetupPkCallbacks(ssl->ctx);
     }
-    #endif
+#endif
 
     /* hash buffer may not be fully initialized, but the sending length won't
      * extend beyond the initialized span.
@@ -816,11 +816,11 @@ int Tls13_Exporter(WOLFSSL* ssl, unsigned char *out, size_t outLen,
         #endif
     }
 
-    #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
     if (ssl->options.side == WOLFSSL_CLIENT_END) {
         maxq10xx_SetupPkCallbacks(ssl->ctx);
     }
-    #endif
+#endif
 
     /* Derive-Secret(Secret, label, "") */
     PRIVATE_KEY_UNLOCK();
@@ -923,11 +923,11 @@ static int Tls13_HKDF_Extract(WOLFSSL *ssl, byte* prk, const byte* salt, int sal
 {
     int ret;
 #ifdef HAVE_PK_CALLBACKS
-    #ifdef WOLFSSL_MAXQ108x
+#ifdef WOLFSSL_MAXQ108x
     if (ssl->options.side == WOLFSSL_CLIENT_END) {
         maxq10xx_SetupPkCallbacks(ssl->ctx);
     }
-    #endif
+#endif
 
     void *cb_ctx = ssl->HkdfExtractCtx;
     CallbackHKDFExtract cb = ssl->ctx->HkdfExtractCb;
@@ -1102,11 +1102,11 @@ int DeriveResumptionPSK(WOLFSSL* ssl, byte* nonce, byte nonceLen, byte* secret)
             return BAD_FUNC_ARG;
     }
 
-    #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
     if (ssl->options.side == WOLFSSL_CLIENT_END) {
         maxq10xx_SetupPkCallbacks(ssl->ctx);
     }
-    #endif
+#endif
 
     PRIVATE_KEY_UNLOCK();
 #if defined(WOLFSSL_TICKET_NONCE_MALLOC) &&                                    \
@@ -1321,7 +1321,7 @@ int DeriveTls13Keys(WOLFSSL* ssl, int secret, int side, int store)
 
         case traffic_key:
             if (provision & PROVISION_CLIENT) {
- #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
                 if (ssl->options.side == WOLFSSL_CLIENT_END) {
                     maxq10xx_SetTls13Side(PROVISION_CLIENT);
                 }
@@ -2451,32 +2451,31 @@ static int EncryptTls13(WOLFSSL* ssl, byte* output, const byte* input,
                     nonceSz = AESGCM_NONCE_SZ;
 
                 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-                    ret = maxq10xx_perform_tls13_record_processing(ssl, 1, output,
+                    ret = maxq10xx_perform_tls13_record_processing(ssl, 1,
+                            output,
                             input, dataSz,
                             ssl->encrypt.nonce, nonceSz,
                             output + dataSz, macSz,
                             aad, aadSz);
-                    if (ret == NOT_COMPILED_IN) {
+                    if (ret == NOT_COMPILED_IN)
                 #endif
+                    {
 
                 #if ((defined(HAVE_FIPS) || defined(HAVE_SELFTEST)) && \
                     (!defined(HAVE_FIPS_VERSION) || (HAVE_FIPS_VERSION < 2)))
-                    ret = wc_AesGcmEncrypt(ssl->encrypt.aes, output, input,
-                        dataSz, ssl->encrypt.nonce, nonceSz,
-                        output + dataSz, macSz, aad, aadSz);
+                        ret = wc_AesGcmEncrypt(ssl->encrypt.aes, output, input,
+                            dataSz, ssl->encrypt.nonce, nonceSz,
+                            output + dataSz, macSz, aad, aadSz);
                 #else
-                    ret = wc_AesGcmSetExtIV(ssl->encrypt.aes,
-                            ssl->encrypt.nonce, nonceSz);
-                    if (ret == 0) {
-                        ret = wc_AesGcmEncrypt_ex(ssl->encrypt.aes, output,
-                                input, dataSz, ssl->encrypt.nonce, nonceSz,
-                                output + dataSz, macSz, aad, aadSz);
-                    }
+                        ret = wc_AesGcmSetExtIV(ssl->encrypt.aes,
+                                ssl->encrypt.nonce, nonceSz);
+                        if (ret == 0) {
+                            ret = wc_AesGcmEncrypt_ex(ssl->encrypt.aes, output,
+                                    input, dataSz, ssl->encrypt.nonce, nonceSz,
+                                    output + dataSz, macSz, aad, aadSz);
+                        }
                 #endif
-
-                #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
                     }
-                #endif
                     break;
             #endif
 
@@ -2492,30 +2491,27 @@ static int EncryptTls13(WOLFSSL* ssl, byte* output, const byte* input,
 
                     nonceSz = AESCCM_NONCE_SZ;
                 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-                    ret = maxq10xx_perform_tls13_record_processing(ssl, 1, output,
-                            input, dataSz,
-                            ssl->encrypt.nonce, nonceSz,
-                            output + dataSz, macSz,
-                            aad, aadSz);
-                    if (ret == NOT_COMPILED_IN) {
+                    ret = maxq10xx_perform_tls13_record_processing(ssl, 1,
+                            output, input, dataSz, ssl->encrypt.nonce, nonceSz,
+                            output + dataSz, macSz, aad, aadSz);
+                    if (ret == NOT_COMPILED_IN)
                 #endif
+                    {
                 #if ((defined(HAVE_FIPS) || defined(HAVE_SELFTEST)) && \
                     (!defined(HAVE_FIPS_VERSION) || (HAVE_FIPS_VERSION < 2)))
-                    ret = wc_AesCcmEncrypt(ssl->encrypt.aes, output, input,
-                        dataSz, ssl->encrypt.nonce, nonceSz,
-                        output + dataSz, macSz, aad, aadSz);
+                        ret = wc_AesCcmEncrypt(ssl->encrypt.aes, output, input,
+                            dataSz, ssl->encrypt.nonce, nonceSz,
+                            output + dataSz, macSz, aad, aadSz);
                 #else
-                    ret = wc_AesCcmSetNonce(ssl->encrypt.aes,
-                            ssl->encrypt.nonce, nonceSz);
-                    if (ret == 0) {
-                        ret = wc_AesCcmEncrypt_ex(ssl->encrypt.aes, output,
-                                input, dataSz, ssl->encrypt.nonce, nonceSz,
-                                output + dataSz, macSz, aad, aadSz);
-                    }
+                        ret = wc_AesCcmSetNonce(ssl->encrypt.aes,
+                                ssl->encrypt.nonce, nonceSz);
+                        if (ret == 0) {
+                            ret = wc_AesCcmEncrypt_ex(ssl->encrypt.aes, output,
+                                    input, dataSz, ssl->encrypt.nonce, nonceSz,
+                                    output + dataSz, macSz, aad, aadSz);
+                        }
                 #endif
-                #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
                     }
-                #endif
                     break;
             #endif
 
@@ -2832,28 +2828,28 @@ int DecryptTls13(WOLFSSL* ssl, byte* output, const byte* input, word16 sz,
                     nonceSz = AESGCM_NONCE_SZ;
 
                 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-                    ret = maxq10xx_perform_tls13_record_processing(ssl, 0, output,
+                    ret = maxq10xx_perform_tls13_record_processing(ssl, 0,
+                            output,
                             input, dataSz,
                             ssl->decrypt.nonce, nonceSz,
                             (byte *)(input + dataSz), macSz,
                             aad, aadSz);
-                    if (ret == NOT_COMPILED_IN) {
+                    if (ret == NOT_COMPILED_IN)
                 #endif
+                    {
 
-                    ret = wc_AesGcmDecrypt(ssl->decrypt.aes, output, input,
-                        dataSz, ssl->decrypt.nonce, nonceSz,
-                        input + dataSz, macSz, aad, aadSz);
+                        ret = wc_AesGcmDecrypt(ssl->decrypt.aes, output, input,
+                            dataSz, ssl->decrypt.nonce, nonceSz,
+                            input + dataSz, macSz, aad, aadSz);
 
                 #ifdef WOLFSSL_ASYNC_CRYPT
-                    if (ret == WC_PENDING_E) {
-                        ret = wolfSSL_AsyncPush(ssl,
-                                                   &ssl->decrypt.aes->asyncDev);
-                    }
+                        if (ret == WC_PENDING_E) {
+                            ret = wolfSSL_AsyncPush(ssl,
+                                &ssl->decrypt.aes->asyncDev);
+                        }
                 #endif
 
-                #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
                     }
-                #endif
                     break;
             #endif
 
@@ -2869,26 +2865,25 @@ int DecryptTls13(WOLFSSL* ssl, byte* output, const byte* input, word16 sz,
 
                     nonceSz = AESCCM_NONCE_SZ;
                 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-
-                    ret = maxq10xx_perform_tls13_record_processing(ssl, 0, output,
+                    ret = maxq10xx_perform_tls13_record_processing(ssl, 0,
+                            output,
                             input, dataSz,
                             ssl->decrypt.nonce, nonceSz,
                             (byte *)(input + dataSz), macSz,
                             aad, aadSz);
-                    if (ret == NOT_COMPILED_IN) {
+                    if (ret == NOT_COMPILED_IN)
                 #endif
-                    ret = wc_AesCcmDecrypt(ssl->decrypt.aes, output, input,
-                        dataSz, ssl->decrypt.nonce, nonceSz,
-                        input + dataSz, macSz, aad, aadSz);
+                    {
+                        ret = wc_AesCcmDecrypt(ssl->decrypt.aes, output, input,
+                            dataSz, ssl->decrypt.nonce, nonceSz,
+                            input + dataSz, macSz, aad, aadSz);
                 #ifdef WOLFSSL_ASYNC_CRYPT
-                    if (ret == WC_PENDING_E) {
-                        ret = wolfSSL_AsyncPush(ssl,
-                                                   &ssl->decrypt.aes->asyncDev);
-                    }
+                        if (ret == WC_PENDING_E) {
+                            ret = wolfSSL_AsyncPush(ssl,
+                                &ssl->decrypt.aes->asyncDev);
+                        }
                 #endif
-                #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
                     }
-                #endif
                     break;
             #endif
 
@@ -7103,13 +7098,13 @@ static int CheckRSASignature(WOLFSSL* ssl, int sigAlgo, int hashAlgo,
         if (ret < 0)
             return ret;
         sigSz = ret;
-    #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
         if (ssl->options.side == WOLFSSL_CLIENT_END) {
            ret =  maxq10xx_RsaPssVerify(ssl, sigData, sigSz, NULL, 0);
-           if(ret != NOT_COMPILED_IN)
+           if (ret != NOT_COMPILED_IN)
                return ret;
         }
-    #endif
+#endif
 
         ret = wc_RsaPSS_CheckPadding(sigData, sigSz, decSig, decSigSz,
                                      hashType);
@@ -7266,20 +7261,19 @@ static int SendTls13Certificate(WOLFSSL* ssl)
             WOLFSSL_MSG("Send Cert missing certificate buffer");
             return BUFFER_ERROR;
         }
+
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
         if (ssl->options.side == WOLFSSL_CLIENT_END) {
-            int m_ret;
             DerBuffer* maxq_der = NULL;
 
-            m_ret = AllocDer(&maxq_der, 4096, CERT_TYPE, ssl->heap);
-            if (m_ret) {
-                return m_ret;
-            }
+            ret = AllocDer(&maxq_der, 4096, CERT_TYPE, ssl->heap);
+            if (ret)
+                return ret;
 
-            m_ret = maxq10xx_read_device_cert_der(maxq_der->buffer, &maxq_der->length);
-            if (m_ret) {
-                return m_ret;
-            }
+            ret = maxq10xx_read_device_cert_der(maxq_der->buffer,
+                                                &maxq_der->length);
+            if (ret)
+                return ret;
 
             ssl->maxq_ctx.device_cert = maxq_der;
 
@@ -7290,6 +7284,7 @@ static int SendTls13Certificate(WOLFSSL* ssl)
             ssl->buffers.weOwnCert = 1;
         }
 #endif
+
         /* Certificate Data */
         certSz = ssl->buffers.certificate->length;
         /* Cert Req Ctx Len | Cert Req Ctx | Cert List Len | Cert Data Len */
@@ -7678,20 +7673,18 @@ static int SendTls13CertificateVerify(WOLFSSL* ssl)
                     ERROR_OUT(NO_PRIVATE_KEY, exit_scv);
             }
             else {
-             #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-                if (ssl->options.side == WOLFSSL_CLIENT_END){
-                    maxq10xx_get_device_cert_properties(&ssl->hsType, &args->length);
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+                if (ssl->options.side == WOLFSSL_CLIENT_END) {
+                    maxq10xx_get_device_cert_properties(&ssl->hsType,
+                                                        &args->length);
                 }
                 else
+#endif
                 {
-            #endif
-
-                ret = DecodePrivateKey(ssl, &args->length);
-                if (ret != 0)
-                    goto exit_scv;
-            #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+                    ret = DecodePrivateKey(ssl, &args->length);
+                    if (ret != 0)
+                        goto exit_scv;
                 }
-            #endif
             }
 
             if (rem < 0 || args->length > rem) {

@@ -477,7 +477,8 @@ int wc_PRF_TLS(byte* digest, word32 digLen, const byte* secret, word32 secLen,
 #endif
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-        ret = wc_MAXQ10XX_HKDF_Expand(digest, prk, prkLen, data, idx, okm, okmLen);
+        ret = wc_MAXQ10XX_HKDF_Expand(digest, prk, prkLen, data, idx,
+                                      okm, okmLen);
 #else
         ret = wc_HKDF_Expand(digest, prk, prkLen, data, idx, okm, okmLen);
 #endif
