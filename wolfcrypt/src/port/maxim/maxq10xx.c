@@ -2532,7 +2532,7 @@ static int crypto_hkdf_extract(byte* prk, const byte* salt, word32 saltLen,
 static char *strstr_with_size(char *str, const char *substr, size_t n)
 {
     char *p = str, *pEnd = str + n;
-    size_t substr_len = strlen(substr);
+    size_t substr_len = XSTRLEN(substr);
 
     if (substr_len == 0) {
         return str;
@@ -2541,7 +2541,7 @@ static char *strstr_with_size(char *str, const char *substr, size_t n)
     pEnd -= (substr_len - 1);
 
     for (;p < pEnd; ++p) {
-        if (0 == strncmp(p, substr, substr_len))
+        if (0 == XSTRNCMP(p, substr, substr_len))
             return p;
     }
 
