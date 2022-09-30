@@ -261,12 +261,6 @@ static int DeriveKeyMsg(WOLFSSL* ssl, byte* output, int outputLen,
     if (outputLen == -1)
         outputLen = hashSz;
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif
-
     PRIVATE_KEY_UNLOCK();
     ret = wc_Tls13_HKDF_Expand_Label(output, outputLen, secret, hashSz,
                              protocol, protocolLen, label, labelLen,
@@ -348,12 +342,6 @@ int Tls13DeriveKey(WOLFSSL* ssl, byte* output, int outputLen,
         outputLen = hashSz;
     if (includeMsgs)
         hashOutSz = hashSz;
-
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif
 
     /* hash buffer may not be fully initialized, but the sending length won't
      * extend beyond the initialized span.
@@ -816,12 +804,6 @@ int Tls13_Exporter(WOLFSSL* ssl, unsigned char *out, size_t outLen,
         #endif
     }
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif
-
     /* Derive-Secret(Secret, label, "") */
     PRIVATE_KEY_UNLOCK();
     ret = wc_Tls13_HKDF_Expand_Label(firstExpand, hashLen,
@@ -923,12 +905,6 @@ static int Tls13_HKDF_Extract(WOLFSSL *ssl, byte* prk, const byte* salt, int sal
 {
     int ret;
 #ifdef HAVE_PK_CALLBACKS
-#ifdef WOLFSSL_MAXQ108x
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif
-
     void *cb_ctx = ssl->HkdfExtractCtx;
     CallbackHKDFExtract cb = ssl->ctx->HkdfExtractCb;
     if (cb != NULL) {
@@ -1101,12 +1077,6 @@ int DeriveResumptionPSK(WOLFSSL* ssl, byte* nonce, byte nonceLen, byte* secret)
         default:
             return BAD_FUNC_ARG;
     }
-
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif
 
     PRIVATE_KEY_UNLOCK();
 #if defined(WOLFSSL_TICKET_NONCE_MALLOC) &&                                    \

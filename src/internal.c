@@ -2388,6 +2388,15 @@ int InitSSL_Ctx(WOLFSSL_CTX* ctx, WOLFSSL_METHOD* method, void* heap)
     ret = wolfEventQueue_Init(&ctx->event_queue);
 #endif /* HAVE_WOLF_EVENT */
 
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+    /* Only setup the callbacks if we're a client on TLS 1.3. */
+    if (method->side == WOLFSSL_CLIENT_END &&
+        method->version.major == SSLv3_MAJOR &&
+        method->version.minor == WOLFSSL_TLSV1_3) {
+        maxq10xx_SetupPkCallbacks(ctx);
+    }
+#endif
+
     return ret;
 }
 
@@ -4933,11 +4942,6 @@ int EccSign(WOLFSSL* ssl, const byte* in, word32 inSz, byte* out,
 #endif
 
 #if defined(HAVE_PK_CALLBACKS)
-#if defined(WOLFSSL_MAXQ108x)
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif
     if (ssl->ctx->EccSignCb) {
         void* ctx = wolfSSL_GetEccSignCtx(ssl);
         if (ctx == NULL) {
@@ -4997,12 +5001,6 @@ int EccVerify(WOLFSSL* ssl, const byte* in, word32 inSz, const byte* out,
 #endif
 
 #ifdef HAVE_PK_CALLBACKS
-#if defined(WOLFSSL_MAXQ108x)
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif /* WOLFSSL_MAXQ108x */
-
     if (ssl->ctx->EccVerifyCb) {
         void* ctx = wolfSSL_GetEccVerifyCtx(ssl);
         ret = ssl->ctx->EccVerifyCb(ssl, in, inSz, out, outSz, keyBuf, keySz,
@@ -5135,12 +5133,6 @@ int EccMakeKey(WOLFSSL* ssl, ecc_key* key, ecc_key* peer)
     }
 
 #ifdef HAVE_PK_CALLBACKS
-#ifdef WOLFSSL_MAXQ108x
-    if (ssl->options.side == WOLFSSL_CLIENT_END)
-    {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif
     if (ssl->ctx->EccKeyGenCb) {
         void* ctx = wolfSSL_GetEccKeyGenCtx(ssl);
         ret = ssl->ctx->EccKeyGenCb(ssl, key, keySz, ecc_curve, ctx);
@@ -5860,13 +5852,6 @@ int DhGenKeyPair(WOLFSSL* ssl, DhKey* dhKey,
     if (ret != 0)
         return ret;
 #endif
-
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetupPkCallbacks(ssl->ctx);
-    }
-#endif
-
     PRIVATE_KEY_UNLOCK();
     ret = wc_DhGenerateKeyPair(dhKey, ssl->rng, priv, privSz, pub, pubSz);
     PRIVATE_KEY_LOCK();
