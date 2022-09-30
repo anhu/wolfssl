@@ -2421,14 +2421,11 @@ static int crypto_hkdf_extract(byte* prk, const byte* salt, word32 saltLen,
     if (saltLen != 0 && ikmLen != 0) {
         /* handshake_secret = HKDF-Extract(salt: derived_secret,
          *                        key: shared_secret) */
-        if (tls13_handshake_secret_obj_id == -1)
-        {
+        if (tls13_handshake_secret_obj_id == -1) {
+            tls13_handshake_secret_obj_id = alloc_temp_key_id();
             if (tls13_handshake_secret_obj_id == -1) {
-                tls13_handshake_secret_obj_id = alloc_temp_key_id();
-                if (tls13_handshake_secret_obj_id == -1) {
-                    WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
-                    return NOT_COMPILED_IN;
-                }
+                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                return NOT_COMPILED_IN;
             }
         }
         salt_kid = tls13_derived_secret_obj_id;
