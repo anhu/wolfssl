@@ -4682,14 +4682,16 @@ int VerifyRsaSign(WOLFSSL* ssl, byte* verifySig, word32 sigSz,
     if (sigAlgo == rsa_pss_sa_algo) {
         enum wc_HashType hashType = WC_HASH_TYPE_NONE;
         int mgf = 0;
+
         ret = ConvertHashPss(hashAlgo, &hashType, &mgf);
         if (ret != 0)
             return ret;
     #ifdef HAVE_PK_CALLBACKS
     #if defined(WOLFSSL_MAXQ108x)
         if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        ret = maxq10xx_RsaPssVerify(ssl, (byte*)plain, plainSz, verifySig, sigSz);
-        if(ret != NOT_COMPILED_IN)
+        ret = maxq10xx_RsaPssVerify(ssl, (byte*)plain, plainSz, verifySig,
+                                    sigSz);
+        if (ret != NOT_COMPILED_IN)
             return ret;
         }
     #else

@@ -313,7 +313,7 @@ int wc_HmacSetKey(Hmac* hmac, int type, const byte* key, word32 length)
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
     ret = wc_MAXQ10XX_HmacSetKey(type);
-    if(ret != NOT_COMPILED_IN)
+    if (ret != NOT_COMPILED_IN)
         return ret;
 #endif
 
@@ -687,7 +687,7 @@ int wc_HmacUpdate(Hmac* hmac, const byte* msg, word32 length)
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
     ret = wc_MAXQ10XX_HmacUpdate(msg, length);
-    if(ret != NOT_COMPILED_IN)
+    if (ret != NOT_COMPILED_IN)
         return ret;
 #endif
 
@@ -796,7 +796,7 @@ int wc_HmacFinal(Hmac* hmac, byte* hash)
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
     ret = wc_MAXQ10XX_HmacFinal(hash);
-    if(ret != NOT_COMPILED_IN)
+    if (ret != NOT_COMPILED_IN)
         return ret;
 #endif
 

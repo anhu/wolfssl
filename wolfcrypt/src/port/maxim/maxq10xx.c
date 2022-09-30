@@ -993,7 +993,7 @@ static int maxq10xx_ecc_verify(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
 int maxq10xx_random(byte* output, unsigned short sz)
 {
 #if defined(WOLFSSL_MAXQ108x)
-    if(!tls13active) {
+    if (!tls13active) {
         return NOT_COMPILED_IN;
     }
 #endif
@@ -1028,7 +1028,7 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
 
     int rc = CRYPTOCB_UNAVAILABLE;
 #if defined(WOLFSSL_MAXQ108x)
-    if(!tls13active)
+    if (!tls13active)
         return CRYPTOCB_UNAVAILABLE;
 #endif
 
@@ -1843,7 +1843,7 @@ int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     mxq_err_t mxq_rc;
 
 #if defined(WOLFSSL_MAXQ108x)
-    if(!tls13active)
+    if (!tls13active)
         return NOT_COMPILED_IN;
 #endif
 
@@ -2024,7 +2024,7 @@ int wc_MAXQ10XX_HmacSetKey(int type)
     wolfSSL_CryptHwMutexLock();
     rc = MXQ_MAC_Init(0x02, algo, *mac_key_obj_id, NULL, 0);
     wolfSSL_CryptHwMutexUnLock();
-    if(rc == 0) {
+    if (rc == 0) {
         mac_comp_active = 1;
     }
 
@@ -2199,7 +2199,7 @@ static int maxq10xx_verify_signature_cb(WOLFSSL* ssl, const byte* sig,
     int rc;
     WOLFSSL_ENTER("maxq10xx_verify_signature_cb()");
 
-    if(!tls13active) {
+    if (!tls13active) {
         return NOT_COMPILED_IN;
     }
 
@@ -2227,7 +2227,7 @@ static int maxq10xx_sign_signature_cb(WOLFSSL* ssl, const byte* in, word32 inSz,
     (void)ctx;
     WOLFSSL_ENTER("maxq10xx_sign_signature_cb()");
     int rc;
-    if(!tls13active) {
+    if (!tls13active) {
         return NOT_COMPILED_IN;
     }
 
@@ -2747,8 +2747,7 @@ int wc_MAXQ10XX_HKDF_Expand(int digest, const byte* inKey, word32 inKeySz,
              * server_application_key = HKDF-Expand-Label(key: server_secret,
                                             label: "key", ctx: "") */
             int tls13_server_key_obj_id = -1;
-            if(is_hs_key)
-            {
+            if (is_hs_key) {
                 if (tls13_server_hs_key_obj_id == -1) {
                     tls13_server_hs_key_obj_id = alloc_temp_key_id();
                     if (tls13_server_hs_key_obj_id == -1) {
@@ -2783,7 +2782,7 @@ int wc_MAXQ10XX_HKDF_Expand(int digest, const byte* inKey, word32 inKeySz,
              * cient_application_iv = HKDF-Expand-Label(key: client_secret,
              *                            label: "iv", ctx: "") */
             int tls13_client_iv_obj_id = -1;
-            if(is_hs_key) {
+            if (is_hs_key) {
                 if (tls13_client_hs_key_obj_id == -1) {
                     WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
                     return NOT_COMPILED_IN;
