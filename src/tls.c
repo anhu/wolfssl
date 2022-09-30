@@ -131,12 +131,6 @@ static int TLSX_PopulateSupportedGroups(WOLFSSL* ssl, TLSX** extensions);
 
 #ifndef WOLFSSL_NO_TLS12
 
-#ifdef WOLFSSL_SHA384
-    #define HSHASH_SZ WC_SHA384_DIGEST_SIZE
-#else
-    #define HSHASH_SZ FINISHED_SZ
-#endif
-
 int BuildTlsHandshakeHash(WOLFSSL* ssl, byte* hash, word32* hashLen)
 {
     int ret = 0;
@@ -215,28 +209,19 @@ int BuildTlsFinished(WOLFSSL* ssl, Hashes* hashes, const byte* sender)
 #if !defined(NO_CERTS) && defined(HAVE_PK_CALLBACKS)
         if (ssl->ctx->TlsFinishedCb) {
             void* ctx = wolfSSL_GetTlsFinishedCtx(ssl);
-            ret = ssl->ctx->TlsFinishedCb(ssl, side, handshake_hash,
-                                        (byte*)hashes, ctx);
+            ret = ssl->ctx->TlsFinishedCb(ssl, side, handshake_hash, hashSz,
+                                          (byte*)hashes, ctx);
         }
         if (!ssl->ctx->TlsFinishedCb || ret == PROTOCOLCB_UNAVAILABLE)
 #endif
         {
-        #ifdef WOLFSSL_MAXQ10XX_TLS
-            if (ssl->options.side == WOLFSSL_CLIENT_END) {
-            ret = maxq10xx_perform_client_finished(ssl, side, FINISHED_LABEL_SZ,
-                    handshake_hash, hashSz, (byte*)hashes, TLS_FINISHED_SZ);
-            } else {
-        #endif /* WOLFSSL_MAXQ10XX_TLS */
             PRIVATE_KEY_UNLOCK();
             ret = wc_PRF_TLS((byte*)hashes, TLS_FINISHED_SZ,
-                    ssl->arrays->masterSecret,
-                   SECRET_LEN, side, FINISHED_LABEL_SZ, handshake_hash, hashSz,
-                   IsAtLeastTLSv1_2(ssl), ssl->specs.mac_algorithm,
-                   ssl->heap, ssl->devId);
+                      ssl->arrays->masterSecret, SECRET_LEN, side,
+                      FINISHED_LABEL_SZ, handshake_hash, hashSz,
+                      IsAtLeastTLSv1_2(ssl), ssl->specs.mac_algorithm,
+                      ssl->heap, ssl->devId);
             PRIVATE_KEY_LOCK();
-        #ifdef WOLFSSL_MAXQ10XX_TLS
-            }
-        #endif
         }
         ForceZero(handshake_hash, hashSz);
 #else
@@ -576,35 +561,36 @@ int MakeTlsMasterSecret(WOLFSSL* ssl)
         if (!ssl->ctx->GenMasterCb || ret == PROTOCOLCB_UNAVAILABLE)
 #endif
         {
-    #ifdef WOLFSSL_MAXQ10XX_TLS
+#ifdef HAVE_PK_CALLBACKS
             if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
                 (ssl->specs.kea == ecc_diffie_hellman_kea) &&
-                (ssl->hsKey) &&
-                (((ecc_key*)ssl->hsKey)->maxq_ctx.hw_storage == 1))
+                ssl->ctx && ssl->ctx->MakeTlsMasterSecretCb)
             {
-                ret = maxq10xx_make_tls_master_secret(ssl,
+                ret = ssl->ctx->MakeTlsMasterSecretCb(ssl,
                             ssl->arrays->clientRandom,
                             ssl->arrays->serverRandom,
                             0);
-                return ret;
+                if (ret != NOT_COMPILED_IN)
+                    return ret;
             }
-            else if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
-                    (ssl->specs.kea == psk_kea)) {
-                ret = maxq10xx_make_tls_master_secret(ssl,
+
+            if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
+                (ssl->specs.kea == psk_kea) &&
+                ssl->ctx && ssl->ctx->MakeTlsMasterSecretCb) {
+                ret = ssl->ctx->MakeTlsMasterSecretCb(ssl,
                             ssl->arrays->clientRandom,
                             ssl->arrays->serverRandom,
                             1);
-                return ret;
-            } else {
-    #endif /* WOLFSSL_MAXQ10XX_TLS */
-        ret = _MakeTlsMasterSecret(ssl->arrays->masterSecret, SECRET_LEN,
-              ssl->arrays->preMasterSecret, ssl->arrays->preMasterSz,
-              ssl->arrays->clientRandom, ssl->arrays->serverRandom,
-              IsAtLeastTLSv1_2(ssl), ssl->specs.mac_algorithm,
-              ssl->heap, ssl->devId);
-    #ifdef WOLFSSL_MAXQ10XX_TLS
+                if (ret != NOT_COMPILED_IN)
+                    return ret;
             }
-    #endif
+#endif /* HAVE_PK_CALLBACKS */
+
+            ret = _MakeTlsMasterSecret(ssl->arrays->masterSecret,
+                      SECRET_LEN, ssl->arrays->preMasterSecret,
+                      ssl->arrays->preMasterSz, ssl->arrays->clientRandom,
+                      ssl->arrays->serverRandom, IsAtLeastTLSv1_2(ssl),
+                      ssl->specs.mac_algorithm, ssl->heap, ssl->devId);
         }
     }
     if (ret == 0) {

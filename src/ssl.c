@@ -29597,10 +29597,51 @@ void* wolfSSL_GetVerifyMacCtx(WOLFSSL* ssl)
 }
 #endif /* !WOLFSSL_NO_TLS12 && !WOLFSSL_AEAD_ONLY */
 
+void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx,
+                                  CallbackReadCertDer cb)
+{
+    if (ctx)
+        ctx->ReadCertDerCb = cb;
+}
+void wolfSSL_CTX_SetHKDFExpandLabelCb(WOLFSSL_CTX* ctx,
+                                      CallbackHKDFExpandLabel cb)
+{
+    if (ctx)
+        ctx->HKDFExpandLabelCb = cb;
+}
+void wolfSSL_CTX_SetProcessServerCertCb(WOLFSSL_CTX* ctx,
+                                        CallbackProcessServerCert cb)
+{
+    if (ctx)
+        ctx->ProcessServerCertCb = cb;
+}
+void wolfSSL_CTX_SetProcessServerKexCb(WOLFSSL_CTX* ctx,
+                                       CallbackProcessServerKex cb)
+{
+    if (ctx)
+        ctx->ProcessServerKexCb = cb;
+}
+void wolfSSL_CTX_SetMakeTlsMasterSecretCb(WOLFSSL_CTX* ctx,
+                                          CallbackMakeTlsMasterSecret cb)
+{
+    if (ctx)
+        ctx->MakeTlsMasterSecretCb = cb;
+}
+void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx,
+                                          CallbackPerformTlsRecordProcessing cb)
+{
+    if (ctx)
+        ctx->PerformTlsRecordProcessingCb = cb;
+}
 #endif /* HAVE_PK_CALLBACKS */
 #endif /* NO_CERTS */
 
 #if defined(HAVE_PK_CALLBACKS) && !defined(NO_DH)
+void wolfSSL_CTX_SetDhGenerateKeyPair(WOLFSSL_CTX* ctx,
+                                      CallbackDhGenerateKeyPair cb) {
+    if (ctx)
+        ctx->DhGenerateKeyPairCb = cb;
+}
 void wolfSSL_CTX_SetDhAgreeCb(WOLFSSL_CTX* ctx, CallbackDhAgree cb)
 {
     if (ctx)

@@ -6171,12 +6171,6 @@ int wc_ecc_sign_hash(const byte* in, word32 inlen, byte* out, word32 *outlen,
     }
 
 #ifdef WOLF_CRYPTO_CB
-    #ifdef FORCE_MAXQ10XX_CB
-        if (key->devId == INVALID_DEVID) {
-            key->devId = MAXQ_DEVICE_ID;
-        }
-    #endif
-
     if (key->devId != INVALID_DEVID) {
         err = wc_CryptoCb_EccSign(in, inlen, out, outlen, rng, key);
     #ifndef WOLF_CRYPTO_CB_ONLY_ECC
@@ -7853,12 +7847,6 @@ int wc_ecc_verify_hash(const byte* sig, word32 siglen, const byte* hash,
     }
 
 #ifdef WOLF_CRYPTO_CB
-    #ifdef FORCE_MAXQ10XX_CB
-        if (key->devId == INVALID_DEVID) {
-            key->devId = MAXQ_DEVICE_ID;
-        }
-    #endif
-
     if (key->devId != INVALID_DEVID) {
         err = wc_CryptoCb_EccVerify(sig, siglen, hash, hashlen, res, key);
     #ifndef WOLF_CRYPTO_CB_ONLY_ECC
@@ -10076,7 +10064,7 @@ int wc_ecc_import_x963_ex(const byte* in, word32 inLen, ecc_key* key,
 
 #ifdef WOLFSSL_MAXQ10XX_CRYPTO
     if (err == MP_OKAY) {
-        wc_MAXQ10XX_EccSetKey(key, keysize);
+        err = wc_MAXQ10XX_EccSetKey(key, keysize);
     }
 #endif
 
@@ -10426,7 +10414,7 @@ int wc_ecc_import_private_key_ex(const byte* priv, word32 privSz,
 
 #ifdef WOLFSSL_MAXQ10XX_CRYPTO
     if (ret == 0) {
-        wc_MAXQ10XX_EccSetKey(key, key->dp->size);
+        ret = wc_MAXQ10XX_EccSetKey(key, key->dp->size);
     }
 #endif
 
@@ -10822,7 +10810,7 @@ static int wc_ecc_import_raw_private(ecc_key* key, const char* qx,
 
 #ifdef WOLFSSL_MAXQ10XX_CRYPTO
     if (err == MP_OKAY) {
-        wc_MAXQ10XX_EccSetKey(key, key->dp->size);
+        err = wc_MAXQ10XX_EccSetKey(key, key->dp->size);
     }
 #endif
 

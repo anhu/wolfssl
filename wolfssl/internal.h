@@ -1654,6 +1654,15 @@ enum Misc {
     READ_PROTO         = 0     /* reading a protocol message */
 };
 
+#ifndef WOLFSSL_NO_TLS12
+#ifdef WOLFSSL_SHA384
+    #define HSHASH_SZ WC_SHA384_DIGEST_SIZE
+#else
+    #define HSHASH_SZ FINISHED_SZ
+#endif
+#endif /* !WOLFSSL_NO_TLS12 */
+
+
 #define WOLFSSL_NAMED_GROUP_IS_FFHDE(group) \
     (MIN_FFHDE_GROUP <= (group) && (group) <= MAX_FFHDE_GROUP)
 #ifdef HAVE_PQC
@@ -1993,7 +2002,7 @@ WOLFSSL_LOCAL int RestartHandshakeHash(WOLFSSL* ssl);
 
 WOLFSSL_LOCAL int Tls13DeriveKey(WOLFSSL *ssl, byte *output, int outputLen,
     const byte *secret, const byte *label, word32 labelLen, int hashAlgo,
-    int includeMsgs);
+    int includeMsgs, int forSide);
 #endif
 int TimingPadVerify(WOLFSSL* ssl, const byte* input, int padLen, int macSz,
                     int pLen, int content);
@@ -3366,7 +3375,8 @@ struct WOLFSSL_CTX {
         CallbackX448SharedSecret X448SharedSecretCb;
     #endif
     #ifndef NO_DH
-        CallbackDhAgree DhAgreeCb;      /* User DH Agree Callback handler */
+        CallbackDhGenerateKeyPair DhGenerateKeyPairCb; /* User DH KeyGen Callback handler*/
+        CallbackDhAgree DhAgreeCb;                     /* User DH Agree Callback handler */
     #endif
     #ifndef NO_RSA
         CallbackRsaSign   RsaSignCb;      /* User RsaSign Callback handler (priv key) */
@@ -3380,14 +3390,22 @@ struct WOLFSSL_CTX {
         CallbackRsaEnc    RsaEncCb;     /* User Rsa Public Encrypt  handler */
         CallbackRsaDec    RsaDecCb;     /* User Rsa Private Decrypt handler */
     #endif /* NO_RSA */
-    CallbackGenPreMaster        GenPreMasterCb;     /* Use generate pre-master handler */
-    CallbackGenMasterSecret     GenMasterCb;        /* Use generate master secret handler */
-    CallbackGenSessionKey       GenSessionKeyCb;    /* Use generate session key handler */
-    CallbackEncryptKeys         EncryptKeysCb;/* Use setting encrypt keys handler */
-    CallbackTlsFinished         TlsFinishedCb;      /* Use Tls finished handler */
+    CallbackGenPreMaster        GenPreMasterCb;     /* User generate pre-master handler */
+    CallbackGenMasterSecret     GenMasterCb;        /* User generate master secret handler */
+    CallbackGenSessionKey       GenSessionKeyCb;    /* User generate session key handler */
+    CallbackEncryptKeys         EncryptKeysCb;/* User setting encrypt keys handler */
+    CallbackTlsFinished         TlsFinishedCb;      /* User Tls finished handler */
 #if !defined(WOLFSSL_NO_TLS12) && !defined(WOLFSSL_AEAD_ONLY)
-    CallbackVerifyMac           VerifyMacCb;        /* Use Verify mac handler */
+    CallbackVerifyMac           VerifyMacCb;        /* User Verify mac handler */
 #endif
+    CallbackReadCertDer ReadCertDerCb; /* User handler to read the certificate in DER format */
+    CallbackProcessServerCert ProcessServerCertCb; /* User handler to process a certificate */
+    CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
+    CallbackMakeTlsMasterSecret MakeTlsMasterSecretCb; /* User handler to create the TLS master secret */
+    CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */
+
+    CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
+
 #endif /* HAVE_PK_CALLBACKS */
 #ifdef HAVE_WOLF_EVENT
     WOLF_EVENT_QUEUE event_queue;
