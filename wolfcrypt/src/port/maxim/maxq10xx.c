@@ -54,6 +54,9 @@ void dbg_dumphex(const char *identifier, const uint8_t* pdata, uint32_t plen);
 #define DEVICE_CERT_OBJ_ID     0x1002
 #define DEVICE_KEY_PAIR_OBJ_ID 0x1004
 #define PSK_OBJ_ID             0x1234
+#define K_CHUNKSIZE            2032
+#define K_CIPHER_BLOCKSIZE     16
+#define ECC256_KEYSIZE         32
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
 #define PSK_KID (0x1235)
@@ -810,9 +813,6 @@ static int maxq10xx_cipher_do(mxq_algo_id_t algo_id, mxq_u1 encrypt,
                               mxq_length aad_len, mxq_u1* p_tag,
                               mxq_length tag_len)
 {
-    const unsigned int K_CHUNKSIZE = 2032;
-    const unsigned int K_CIPHER_BLOCKSIZE = 16;
-
     mxq_err_t mxq_rc;
     ciph_params_t cparams;
 
@@ -898,9 +898,21 @@ static int maxq10xx_ecc_sign(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
 {
     mxq_err_t mxq_rc;
     int rc;
-    mxq_u1 input_digest[keycomplen];
-    mxq_u1 buff_sign[keycomplen * 2];
-    mxq_length buff_len = sizeof(buff_sign);
+    mxq_u1 *input_digest = NULL;
+    mxq_u1 *buff_sign = NULL;
+    mxq_length buff_len = keycomplen * 2;
+    byte *r = NULL;
+    byte *s = NULL;
+
+    input_digest = XMALLOC(keycomplen, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+    buff_sign = XMALLOC(keycomplen * 2, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+    if (input_digest == NULL || buff_sign == NULL) {
+        XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        XFREE(buff_sign, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        return MEMORY_E;
+    }
+    r = &buff_sign[0];
+    s = &buff_sign[keycomplen];
 
     /* truncate input to match key size */
     if (data_size > keycomplen) {
@@ -908,29 +920,26 @@ static int maxq10xx_ecc_sign(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
     }
 
     /* build input digest */
-    XMEMSET(input_digest, 0, sizeof(input_digest));
-
+    XMEMSET(input_digest, 0, keycomplen);
     XMEMCPY(&input_digest[keycomplen - data_size], p_in, data_size);
 
-
     mxq_rc = MXQ_Sign(ALGO_ECDSA_PLAIN, key_id, input_digest,
-                      sizeof(input_digest), buff_sign, &buff_len);
+                      keycomplen, buff_sign, &buff_len);
     if (mxq_rc) {
         WOLFSSL_MSG("MAXQ: MXQ_Sign() failed");
         return WC_HW_E;
     }
 
     /* convert r and s to signature */
-    byte *r = &buff_sign[0];
-    byte *s = &buff_sign[keycomplen];
-
     rc = wc_ecc_rs_raw_to_sig((const byte *)r, keycomplen, (const byte *)s,
                               keycomplen, p_sign_out, sign_len);
     if (rc != 0) {
         WOLFSSL_MSG("MAXQ: converting r and s to signature failed");
     }
 
-    return 0;
+    XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+    XFREE(buff_sign, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+    return rc;
 }
 
 #ifdef MAXQ_ECC
@@ -938,15 +947,28 @@ static int maxq10xx_ecc_verify(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
                                mxq_u1* p_sign, mxq_u1 sign_len, int *result,
                                mxq_length keycomplen)
 {
+    int rc;
     mxq_err_t mxq_rc;
-    mxq_u1 buff_rs[keycomplen * 2];
-    byte *r = &buff_rs[0];
-    byte *s = &buff_rs[keycomplen];
+    mxq_u1 *buff_rs = NULL;
+    mxq_u1 *input_digest = NULL;
+    mxq_u1 *buff_signature = NULL;
+    byte *r = NULL;
+    byte *s = NULL;
     word32 r_len = keycomplen;
     word32 s_len = keycomplen;
-    mxq_u1 input_digest[keycomplen];
 
-    int rc;
+    input_digest = XMALLOC(keycomplen, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+    buff_rs = XMALLOC(keycomplen * 2, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+    buff_signature = XMALLOC(keycomplen * 2, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+
+    if (input_digest == NULL || buff_rs == NULL || buff_signature == NULL) {
+        XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        XFREE(buff_rs, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        XFREE(buff_signature, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        return MEMORY_E;
+    }
+    r = &buff_rs[0];
+    s = &buff_rs[keycomplen];
 
     /* truncate input to match key size */
     if (data_size > keycomplen) {
@@ -954,35 +976,44 @@ static int maxq10xx_ecc_verify(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
     }
 
     /* build input digest */
-    XMEMSET(input_digest, 0, sizeof(input_digest));
+    XMEMSET(input_digest, 0, keycomplen);
     XMEMCPY(&input_digest[keycomplen - data_size], p_in, data_size);
 
     /* extract r and s from signature */
-    XMEMSET(buff_rs, 0, sizeof(buff_rs));
+    XMEMSET(buff_rs, 0, keycomplen * 2);
 
     rc = wc_ecc_sig_to_rs(p_sign, sign_len, r, &r_len, s, &s_len);
     if (rc != 0) {
+        XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        XFREE(buff_rs, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        XFREE(buff_signature, NULL, DYNAMIC_TYPE_TMP_BUFFER);
         WOLFSSL_MSG("MAXQ: extracting r and s from signature failed");
         *result = 0;
         return rc;
     }
 
     if ((r_len > keycomplen) || (s_len > keycomplen)) {
+        XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        XFREE(buff_rs, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+        XFREE(buff_signature, NULL, DYNAMIC_TYPE_TMP_BUFFER);
         WOLFSSL_MSG("MAXQ: r and s corrupted");
         *result = 0;
         return BUFFER_E;
     }
 
     /* prepare raw signature */
-    mxq_u1 buff_signature[keycomplen * 2];
-    XMEMSET(buff_signature, 0, sizeof(buff_signature));
+    XMEMSET(buff_signature, 0, keycomplen * 2);
 
     /* add leading zeros if necessary */
     XMEMCPY(&buff_signature[keycomplen - r_len], r, r_len);
     XMEMCPY(&buff_signature[(keycomplen * 2) - s_len], s, s_len);
 
     mxq_rc = MXQ_Verify(ALGO_ECDSA_PLAIN, key_id, input_digest,
-                        sizeof(input_digest), buff_signature, (keycomplen * 2));
+                        keycomplen, buff_signature, keycomplen * 2);
+
+    XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+    XFREE(buff_rs, NULL, DYNAMIC_TYPE_TMP_BUFFER);
+    XFREE(buff_signature, NULL, DYNAMIC_TYPE_TMP_BUFFER);
 
     *result = (mxq_rc ? 0 : 1);
     return 0;
@@ -1009,8 +1040,7 @@ int maxq10xx_random(byte* output, unsigned short sz)
         return ret;
     }
 
-    if (MXQ_Get_Random_Ext(output, sz, 0))
-    {
+    if (MXQ_Get_Random_Ext(output, sz, 0)) {
         WOLFSSL_MSG("MAXQ: MXQ_Get_Random_Ext() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
@@ -1315,13 +1345,14 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
                 return rc;
             }
 
-            rc = maxq10xx_ecc_verify(info->pk.eccverify.key->maxq_ctx.key_obj_id,
-                                     (byte *)info->pk.eccverify.hash,
-                                     info->pk.eccverify.hashlen,
-                                     (byte *)info->pk.eccverify.sig,
-                                     info->pk.eccverify.siglen,
-                                     info->pk.eccverify.res,
-                                     info->pk.eccverify.key->dp->size);
+            rc =
+                maxq10xx_ecc_verify(info->pk.eccverify.key->maxq_ctx.key_obj_id,
+                                    (byte *)info->pk.eccverify.hash,
+                                    info->pk.eccverify.hashlen,
+                                    (byte *)info->pk.eccverify.sig,
+                                    info->pk.eccverify.siglen,
+                                    info->pk.eccverify.res,
+                                    info->pk.eccverify.key->dp->size);
             if (rc != 0) {
                 wolfSSL_CryptHwMutexUnLock();
                 return rc;
@@ -1604,16 +1635,16 @@ int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl, ecc_key* p_key,
 {
     int rc;
     mxq_err_t mxq_rc;
-    word32 keysize = 32;
+    word32 keysize = ECC256_KEYSIZE;
 
-    byte peer_public_key[1 + (2 * keysize)];
+    byte peer_public_key[1 + (2 * ECC256_KEYSIZE)];
     peer_public_key[0] = ASN_OCTET_STRING;
 
     mxq_length key_len_param;
     mxq_u1* server_public_key_param;
     mxq_u2 csid_param = ssl->options.cipherSuite |
                         (ssl->options.cipherSuite0 << 8);
-    byte result_public_key[1 + (2 * keysize)];
+    byte result_public_key[1 + (2 * ECC256_KEYSIZE)];
 
     if (ssl->options.side != WOLFSSL_CLIENT_END) {
         return BAD_STATE_E;
@@ -1843,8 +1874,14 @@ int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     mxq_err_t mxq_rc;
 
 #if defined(WOLFSSL_MAXQ108x)
-    if (!tls13active)
+    DecodedCert decoded;
+    mxq_keyparam_id_t keyparam = MXQ_KEYPARAM_EC_P256R1;
+    int pk_offset = 0;
+    word32 cert_size = 0;
+
+    if (!tls13active) {
         return NOT_COMPILED_IN;
+    }
 #endif
 
     WOLFSSL_ENTER("maxq10xx_read_device_cert_der()");
@@ -1872,10 +1909,6 @@ int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
 
 #if defined(WOLFSSL_MAXQ108x)
 
-    DecodedCert decoded;
-    mxq_keyparam_id_t keyparam = MXQ_KEYPARAM_EC_P256R1;
-    int pk_offset;
-
     wc_InitDecodedCert(&decoded, p_dest_buff, *p_len, NULL);
     wc_ParseCert(&decoded, CERT_TYPE, NO_VERIFY, NULL);
     pk_offset = decoded.publicKeyIndex;
@@ -1897,7 +1930,7 @@ int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     }
 #endif
 
-    word32 cert_size = (p_dest_buff[2] << 8) + p_dest_buff[3] + 4;
+    cert_size = (p_dest_buff[2] << 8) + p_dest_buff[3] + 4;
     if (*p_len < cert_size) {
         return BUFFER_E;
     }
@@ -1924,20 +1957,14 @@ int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
         return rc;
     }
 
-    rc = maxq10xx_ecc_sign(
-        DEVICE_KEY_PAIR_OBJ_ID,
-        (byte *)p_in,
-        p_in_len,
-        p_out,
-        p_out_len,
-        device_key_len);
+    rc = maxq10xx_ecc_sign(DEVICE_KEY_PAIR_OBJ_ID, (byte *)p_in, p_in_len,
+                           p_out, p_out_len, device_key_len);
 
     wolfSSL_CryptHwMutexUnLock();
     if (rc) {
         WOLFSSL_MSG("MAXQ: maxq10xx_ecc_sign() failed");
         return rc;
     }
-
 
     return 0;
 }
@@ -1968,7 +1995,8 @@ int maxq10xx_port_init(void)
         wolfSSL_CryptHwMutexUnLock();
 
         #ifdef WOLF_CRYPTO_CB
-        ret = wc_CryptoCb_RegisterDevice(MAXQ_DEVICE_ID, wolfSSL_MAXQ10XX_CryptoDevCb, NULL);
+        ret = wc_CryptoCb_RegisterDevice(MAXQ_DEVICE_ID,
+                                         wolfSSL_MAXQ10XX_CryptoDevCb, NULL);
         if (ret != 0) {
             WOLFSSL_MSG("MAXQ: wolfSSL_MAXQ10XX_CryptoDevCb, "
                         "wc_CryptoCb_RegisterDevice() failed");
@@ -2113,7 +2141,8 @@ static int maxq10xx_DhAgreeCb(WOLFSSL* ssl, struct DhKey* key,
 
     WOLFSSL_ENTER("maxq10xx_DhAgreeCb()");
 
-    mxq_u2 csid_param = ssl->options.cipherSuite | (ssl->options.cipherSuite0 << 8);
+    mxq_u2 csid_param = ssl->options.cipherSuite |
+                        (ssl->options.cipherSuite0 << 8);
 
     if (tls13_dh_obj_id == -1) {
         WOLFSSL_MSG("MAXQ: DH key is not created before");
@@ -2128,6 +2157,7 @@ static int maxq10xx_DhAgreeCb(WOLFSSL* ssl, struct DhKey* key,
             return NOT_COMPILED_IN;
         }
     }
+
     rc = wolfSSL_CryptHwMutexLock();
     if (rc != 0) {
         return rc;
@@ -2225,8 +2255,10 @@ static int maxq10xx_sign_signature_cb(WOLFSSL* ssl, const byte* in, word32 inSz,
     (void)key;
     (void)keySz;
     (void)ctx;
-    WOLFSSL_ENTER("maxq10xx_sign_signature_cb()");
     int rc;
+
+    WOLFSSL_ENTER("maxq10xx_sign_signature_cb()");
+
     if (!tls13active) {
         return NOT_COMPILED_IN;
     }
@@ -2255,12 +2287,8 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
     (void)pubKeyDer;
     (void)side;
     (void)pubKeySz;
-
     int rc;
     word32 peerKeySz = otherKey->dp->size;
-
-    WOLFSSL_ENTER("maxq10xx_shared_secret_cb()");
-
     uint8_t  peerKeyBuf[MAX_EC_KEY_SIZE];
     uint8_t* peerKey = peerKeyBuf;
     uint8_t* qx = peerKey;
@@ -2268,6 +2296,8 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
     word32 qxLen = peerKeySz,  qyLen = peerKeySz;
     mxq_u2 csid_param = ssl->options.cipherSuite |
                         (ssl->options.cipherSuite0 << 8);
+
+    WOLFSSL_ENTER("maxq10xx_shared_secret_cb()");
 
     rc = wc_ecc_export_public_raw(otherKey, qx, &qxLen, qy, &qyLen);
 
@@ -2308,7 +2338,7 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
 
 void maxq10xx_SetPssSignature(byte* in, word32 inSz)
 {
-    memcpy(rsa_pss_signature,in,inSz);
+    memcpy(rsa_pss_signature, in, inSz);
     rsa_pss_signlen = inSz;
 }
 
@@ -2321,11 +2351,11 @@ int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
     mxq_u2 pss_signlen;
     mxq_u2 pubkey_objectid;
 
+    WOLFSSL_ENTER("maxq10xx_RsaPssVerify");
+
     if (!tls13active) {
         return NOT_COMPILED_IN;
     }
-
-    WOLFSSL_ENTER("maxq10xx_RsaPssVerify");
 
     if (signature == NULL) {
         pss_sign = rsa_pss_signature;
@@ -2359,14 +2389,13 @@ static int maxq10xx_RsaPssSign(WOLFSSL* ssl, const byte* in, word32 inSz,
     (void)key;
     (void)keySz;
     (void)ctx;
-
     int ret;
+
+    WOLFSSL_ENTER("maxq10xx_RsaPssSign");
 
     if (!tls13active) {
         return NOT_COMPILED_IN;
     }
-
-    WOLFSSL_ENTER("maxq10xx_RsaPssSign");
 
     ret = wolfSSL_CryptHwMutexLock();
     if (ret != 0) {
