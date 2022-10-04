@@ -609,15 +609,14 @@ void wc_MAXQ10XX_AesFree(Aes* aes)
         mxq_rc = MXQ_DeleteObject(aes->maxq_ctx.key_obj_id);
         if (mxq_rc) {
             WOLFSSL_MSG("MAXQ: MXQ_DeleteObject() failed");
-            wolfSSL_CryptHwMutexUnLock();
             rc = 1;
         }
+        wolfSSL_CryptHwMutexUnLock();
     }
 
     if (rc == 0) {
         free_aes_key_id(aes->maxq_ctx.key_obj_id);
         aes->maxq_ctx.key_obj_id = 0;
-        wolfSSL_CryptHwMutexUnLock();
     }
 }
 
