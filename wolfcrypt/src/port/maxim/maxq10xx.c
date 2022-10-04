@@ -2024,7 +2024,7 @@ int maxq10xx_port_init(void)
 int wc_MAXQ10XX_HmacSetKey(int type)
 {
     mxq_algo_id_t algo;
-    int rc = 0;
+    int rc;
     mxq_err_t mxq_rc;
 
     if (!tls13active) {
@@ -2057,7 +2057,11 @@ int wc_MAXQ10XX_HmacSetKey(int type)
         return NOT_COMPILED_IN;
     }
 
-    wolfSSL_CryptHwMutexLock();
+    rc = wolfSSL_CryptHwMutexLock();
+    if (rc != 0) {
+        return rc;
+    }
+
     mxq_rc = MXQ_MAC_Init(0x02, algo, *mac_key_obj_id, NULL, 0);
     wolfSSL_CryptHwMutexUnLock();
 
@@ -2073,13 +2077,17 @@ int wc_MAXQ10XX_HmacSetKey(int type)
 
 int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length)
 {
-    int rc = 0;
+    int rc;
     mxq_err_t mxq_rc;
     if (!tls13active || !mac_comp_active) {
         return NOT_COMPILED_IN;
     }
 
-    wolfSSL_CryptHwMutexLock();
+    rc = wolfSSL_CryptHwMutexLock();
+    if (rc != 0) {
+        return rc;
+    }
+
     mxq_rc = MXQ_MAC_Update((unsigned char *)msg, length);
     wolfSSL_CryptHwMutexUnLock();
 
@@ -2093,14 +2101,18 @@ int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length)
 
 int wc_MAXQ10XX_HmacFinal(byte* hash)
 {
-    int rc = 0;
+    int rc;
     mxq_err_t mxq_rc;
     mxq_length maclen = 64;
     if (!tls13active || !mac_comp_active) {
         return NOT_COMPILED_IN;
     }
 
-    wolfSSL_CryptHwMutexLock();
+    rc = wolfSSL_CryptHwMutexLock();
+    if (rc != 0) {
+        return rc;
+    }
+
     mxq_rc = MXQ_MAC_Finish(hash, &maclen);
     wolfSSL_CryptHwMutexUnLock();
     if (mxq_rc) {
