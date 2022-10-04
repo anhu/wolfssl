@@ -1972,7 +1972,8 @@ int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
 
 int maxq10xx_port_init(void)
 {
-    int ret;
+    int ret = 0;
+    mxq_err_t mxq_rc;
 
     #ifdef WOLF_CRYPTO_CB
     ret = wc_CryptoCb_RegisterDevice(0, wolfSSL_Soft_CryptoDevCb, NULL);
@@ -1984,31 +1985,30 @@ int maxq10xx_port_init(void)
     #endif
 
     ret = maxq_CryptHwMutexTryLock();
+    if (ret) {
+        WOLFSSL_MSG("MAXQ: maxq10xx_port_init() -> device is busy "
+                    "(switching to soft mode)");
+        return 0;
+    }
+
+    mxq_rc = MXQ_Module_Init();
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: MXQ_Module_Init() failed");
+        ret = WC_HW_E;
+    }
+
+    wolfSSL_CryptHwMutexUnLock();
+
+    #ifdef WOLF_CRYPTO_CB
     if (ret == 0) {
-        ret = MXQ_Module_Init();
-        if (ret != 0) {
-            WOLFSSL_MSG("MAXQ: MXQ_Module_Init() failed");
-            wolfSSL_CryptHwMutexUnLock();
-            return ret;
-        }
-
-        wolfSSL_CryptHwMutexUnLock();
-
-        #ifdef WOLF_CRYPTO_CB
         ret = wc_CryptoCb_RegisterDevice(MAXQ_DEVICE_ID,
                                          wolfSSL_MAXQ10XX_CryptoDevCb, NULL);
         if (ret != 0) {
             WOLFSSL_MSG("MAXQ: wolfSSL_MAXQ10XX_CryptoDevCb, "
                         "wc_CryptoCb_RegisterDevice() failed");
-            return ret;
         }
-        #endif
     }
-    else {
-        WOLFSSL_MSG("MAXQ: maxq10xx_port_init() -> device is busy "
-                    "(switching to soft mode)");
-        ret = 0;
-    }
+    #endif
 
     return ret;
 }
@@ -2017,7 +2017,8 @@ int maxq10xx_port_init(void)
 int wc_MAXQ10XX_HmacSetKey(int type)
 {
     mxq_algo_id_t algo;
-    int rc;
+    int rc = 0;
+    mxq_err_t mxq_rc;
 
     if (!tls13active) {
         return NOT_COMPILED_IN;
@@ -2050,10 +2051,14 @@ int wc_MAXQ10XX_HmacSetKey(int type)
     }
 
     wolfSSL_CryptHwMutexLock();
-    rc = MXQ_MAC_Init(0x02, algo, *mac_key_obj_id, NULL, 0);
+    mxq_rc = MXQ_MAC_Init(0x02, algo, *mac_key_obj_id, NULL, 0);
     wolfSSL_CryptHwMutexUnLock();
-    if (rc == 0) {
+
+    if (mxq_rc == 0) {
         mac_comp_active = 1;
+    } else {
+        WOLFSSL_MSG("MAXQ: MXQ_MAC_Init() failed");
+        rc = WC_HW_E;
     }
 
     return rc;
@@ -2061,32 +2066,46 @@ int wc_MAXQ10XX_HmacSetKey(int type)
 
 int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length)
 {
-    int rc;
+    int rc = 0;
+    mxq_err_t mxq_rc;
     if (!tls13active || !mac_comp_active) {
         return NOT_COMPILED_IN;
     }
 
     wolfSSL_CryptHwMutexLock();
-    rc = MXQ_MAC_Update( (unsigned char *)msg, length);
+    mxq_rc = MXQ_MAC_Update((unsigned char *)msg, length);
     wolfSSL_CryptHwMutexUnLock();
+
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: MXQ_MAC_Update() failed");
+        rc = WC_HW_E;
+    }
+
     return rc;
 }
 
 int wc_MAXQ10XX_HmacFinal(byte* hash)
 {
-    int rc;
+    int rc = 0;
+    mxq_err_t mxq_rc;
     mxq_length maclen = 64;
     if (!tls13active || !mac_comp_active) {
         return NOT_COMPILED_IN;
     }
 
     wolfSSL_CryptHwMutexLock();
-    rc = MXQ_MAC_Finish(hash, &maclen);
+    mxq_rc = MXQ_MAC_Finish(hash, &maclen);
+    wolfSSL_CryptHwMutexUnLock();
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: MXQ_MAC_Finish() failed");
+        rc = WC_HW_E;
+    }
+
     free_temp_key_id(*mac_key_obj_id);
     *mac_key_obj_id = -1;
     mac_key_obj_id = NULL;
     mac_comp_active = 0;
-    wolfSSL_CryptHwMutexUnLock();
+
     return rc;
 }
 
@@ -2095,6 +2114,8 @@ int  maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
                             byte* pub, word32* pubSz)
 {
     int rc;
+    mxq_err_t mxq_rc;
+
     WOLFSSL_ENTER("maxq10xx_create_dh_key()");
     if (!tls13active) {
         return NOT_COMPILED_IN;
@@ -2115,15 +2136,15 @@ int  maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
         return rc;
     }
 
-    rc = MXQ_TLS13_Generate_Key(pub, tls13_dh_obj_id, 0, MXQ_KEYPARAM_DHE, pSz,
-                                p, gSz, g);
-    if (rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Generate_Key() failed");
-        wolfSSL_CryptHwMutexUnLock();
-        return rc;
-    }
+    mxq_rc = MXQ_TLS13_Generate_Key(pub, tls13_dh_obj_id, 0, MXQ_KEYPARAM_DHE,
+                                    pSz, p, gSz, g);
 
     wolfSSL_CryptHwMutexUnLock();
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Generate_Key() failed");
+        rc = WC_HW_E;
+    }
+
     return rc;
 }
 
@@ -2137,7 +2158,8 @@ static int maxq10xx_DhAgreeCb(WOLFSSL* ssl, struct DhKey* key,
     (void)key;
     (void)priv;
     (void)privSz;
-    int rc = 0;
+    int rc;
+    mxq_err_t mxq_rc;
 
     WOLFSSL_ENTER("maxq10xx_DhAgreeCb()");
 
@@ -2163,16 +2185,22 @@ static int maxq10xx_DhAgreeCb(WOLFSSL* ssl, struct DhKey* key,
         return rc;
     }
 
-    rc = MXQ_TLS13_Create_Secret((unsigned char*)pubKeyDer, pubKeySz,
-                                 tls13_dh_obj_id, 0, MXQ_KEYPARAM_DHE,
-                                 csid_param, tls13_shared_secret_obj_id,
-                                 out, outlen);
+    mxq_rc = MXQ_TLS13_Create_Secret((unsigned char*)pubKeyDer, pubKeySz,
+                                     tls13_dh_obj_id, 0, MXQ_KEYPARAM_DHE,
+                                     csid_param, tls13_shared_secret_obj_id,
+                                     out, outlen);
     wolfSSL_CryptHwMutexUnLock();
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: () failed");
+        rc = WC_HW_E;
+    }
+
     *outlen = pubKeySz;
     free_temp_key_id(tls13_dh_obj_id);
     tls13_dh_obj_id = -1;
     free_temp_key_id(tls13_ecc_obj_id);
     tls13_ecc_obj_id = -1;
+
     return rc;
 }
 
@@ -2182,6 +2210,7 @@ static int  maxq10xx_create_ecc_key_cb(WOLFSSL* ssl, ecc_key* key, word32 keySz,
     (void)ctx;
     (void)ssl;
     int rc;
+    mxq_err_t mxq_rc;
     unsigned char mxq_key[MAX_EC_KEY_SIZE];
 
     WOLFSSL_ENTER("maxq10xx_create_ecc_key_cb()");
@@ -2199,13 +2228,14 @@ static int  maxq10xx_create_ecc_key_cb(WOLFSSL* ssl, ecc_key* key, word32 keySz,
     if (rc != 0) {
         return rc;
     }
-    rc = MXQ_TLS13_Generate_Key(mxq_key, tls13_ecc_obj_id, MXQ_KEYTYPE_ECC,
-                                getMaxqKeyParamFromCurve(key->dp->id),
-                                keySz, NULL, 0, NULL);
+    mxq_rc = MXQ_TLS13_Generate_Key(mxq_key, tls13_ecc_obj_id, MXQ_KEYTYPE_ECC,
+                                    getMaxqKeyParamFromCurve(key->dp->id),
+                                    keySz, NULL, 0, NULL);
+
     wolfSSL_CryptHwMutexUnLock();
-    if (rc) {
+    if (mxq_rc) {
         WOLFSSL_MSG("MAXQ: MXQ_TLS13_Generate_Key() failed");
-        return rc;
+        return WC_HW_E;
     }
 
     rc = wc_ecc_import_unsigned(key, (byte*)mxq_key, (byte*)mxq_key + keySz,
@@ -2288,6 +2318,7 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
     (void)side;
     (void)pubKeySz;
     int rc;
+    mxq_err_t mxq_rc;
     word32 peerKeySz = otherKey->dp->size;
     uint8_t  peerKeyBuf[MAX_EC_KEY_SIZE];
     uint8_t* peerKey = peerKeyBuf;
@@ -2320,18 +2351,23 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
         return rc;
     }
 
-    rc = MXQ_TLS13_Create_Secret(peerKey, (2*peerKeySz), tls13_ecc_obj_id,
-                                 MXQ_KEYTYPE_ECC,
-                                 getMaxqKeyParamFromCurve(otherKey->dp->id),
-                                 csid_param, tls13_shared_secret_obj_id,
-                                 out, outlen);
+    mxq_rc = MXQ_TLS13_Create_Secret(peerKey, (2*peerKeySz), tls13_ecc_obj_id,
+                                     MXQ_KEYTYPE_ECC,
+                                     getMaxqKeyParamFromCurve(otherKey->dp->id),
+                                     csid_param, tls13_shared_secret_obj_id,
+                                     out, outlen);
+
+    wolfSSL_CryptHwMutexUnLock();
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Create_Secret() failed");
+        rc = WC_HW_E;
+    }
 
     *outlen = otherKey->dp->size;
     free_temp_key_id(tls13_dh_obj_id);
     tls13_dh_obj_id = -1;
     free_temp_key_id(tls13_ecc_obj_id);
     tls13_ecc_obj_id = -1;
-    wolfSSL_CryptHwMutexUnLock();
 
     return rc;
 }
@@ -2346,10 +2382,11 @@ int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
                           byte* signature, word32 sig_sz)
 {
     (void)ssl;
-    int ret;
     unsigned char* pss_sign;
     mxq_u2 pss_signlen;
     mxq_u2 pubkey_objectid;
+    int ret;
+    mxq_err_t mxq_rc;
 
     WOLFSSL_ENTER("maxq10xx_RsaPssVerify");
 
@@ -2372,10 +2409,15 @@ int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
     if (ret != 0) {
         return ret;
     }
-    ret = MXQ_Verify(ALGO_RSASSAPSSPKCS1_V2_1_PLAIN, pubkey_objectid,
-                     hashed_msg, hashed_msg_sz, pss_sign, pss_signlen);
+    mxq_rc = MXQ_Verify(ALGO_RSASSAPSSPKCS1_V2_1_PLAIN, pubkey_objectid,
+                        hashed_msg, hashed_msg_sz, pss_sign, pss_signlen);
 
     wolfSSL_CryptHwMutexUnLock();
+
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: MXQ_Verify() failed");
+        ret = WC_HW_E;
+    }
     return ret;
 }
 
@@ -2390,6 +2432,7 @@ static int maxq10xx_RsaPssSign(WOLFSSL* ssl, const byte* in, word32 inSz,
     (void)keySz;
     (void)ctx;
     int ret;
+    mxq_err_t mxq_rc;
 
     WOLFSSL_ENTER("maxq10xx_RsaPssSign");
 
@@ -2402,10 +2445,16 @@ static int maxq10xx_RsaPssSign(WOLFSSL* ssl, const byte* in, word32 inSz,
         return ret;
     }
 
-    ret = MXQ_Sign(ALGO_RSASSAPSSPKCS1_V2_1_PLAIN, DEVICE_KEY_PAIR_OBJ_ID,
-                   in, inSz, out, outSz);
+    mxq_rc = MXQ_Sign(ALGO_RSASSAPSSPKCS1_V2_1_PLAIN, DEVICE_KEY_PAIR_OBJ_ID,
+                      in, inSz, out, outSz);
 
     wolfSSL_CryptHwMutexUnLock();
+
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: MXQ_Sign() failed");
+        ret = WC_HW_E;
+    }
+
     return ret;
 }
 
