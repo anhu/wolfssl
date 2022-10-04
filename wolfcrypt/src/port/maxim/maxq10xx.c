@@ -440,64 +440,67 @@ static void free_temp_key_id(int obj_id)
 /*
  * WolfCrypt Functions
  */
-void wc_MAXQ10XX_AesSetKey(Aes* aes, const byte* userKey, word32 keylen)
+int wc_MAXQ10XX_AesSetKey(Aes* aes, const byte* userKey, word32 keylen)
 {
     XMEMCPY(aes->maxq_ctx.key, userKey, keylen);
     aes->maxq_ctx.key_pending = 1;
+    return 0;
 }
 
-void wc_MAXQ10XX_EccSetKey(ecc_key* key, word32 keysize)
+int wc_MAXQ10XX_EccSetKey(ecc_key* key, word32 keysize)
 {
-    int err = -1;
+    int err = 0;
     int keytype = key->type;
     word32 bufflen = 0;
 
     if (key->maxq_ctx.hw_ecc == -1) {
-        return;
+        err = WC_HW_E;
     }
 
-    if (key->dp->id != ECC_SECP256R1) {
-        err = ECC_CURVE_OID_E;
-        goto end_MAXQ10XX_EccSetKey;
-    }
-
-    if ((keytype != ECC_PUBLICKEY) && (keytype != ECC_PRIVATEKEY) &&
-        (keytype != ECC_PRIVATEKEY_ONLY)) {
-        err = BAD_FUNC_ARG;
-        goto end_MAXQ10XX_EccSetKey;
-    }
-
-    bufflen = keysize;
-    if ((keytype == ECC_PUBLICKEY) || (keytype == ECC_PRIVATEKEY)) {
-        err = wc_export_int(key->pubkey.x, key->maxq_ctx.ecc_key,
-                            &bufflen, keysize, WC_TYPE_UNSIGNED_BIN);
-        if (err) {
-            goto end_MAXQ10XX_EccSetKey;
-        }
-
-        err = wc_export_int(key->pubkey.y, key->maxq_ctx.ecc_key + keysize,
-                            &bufflen, keysize, WC_TYPE_UNSIGNED_BIN);
-        if (err) {
-            goto end_MAXQ10XX_EccSetKey;
+    if (err == 0) {
+        if (key->dp->id != ECC_SECP256R1) {
+            err = ECC_CURVE_OID_E;
         }
     }
 
-    if ((keytype == ECC_PRIVATEKEY) || (keytype == ECC_PRIVATEKEY_ONLY)) {
-        err = wc_export_int(&key->k, key->maxq_ctx.ecc_key + (2 * keysize),
-                            &bufflen, keysize, WC_TYPE_UNSIGNED_BIN);
-        if (err) {
-            goto end_MAXQ10XX_EccSetKey;
+    if (err == 0) {
+        if ((keytype != ECC_PUBLICKEY) && (keytype != ECC_PRIVATEKEY) &&
+            (keytype != ECC_PRIVATEKEY_ONLY)) {
+            err = BAD_FUNC_ARG;
         }
     }
 
-end_MAXQ10XX_EccSetKey:
-    if (err) {
-        key->maxq_ctx.hw_ecc = -1;
+    if (err == 0) {
+        bufflen = keysize;
+        if ((keytype == ECC_PUBLICKEY) || (keytype == ECC_PRIVATEKEY)) {
+            err = wc_export_int(key->pubkey.x, key->maxq_ctx.ecc_key,
+                                &bufflen, keysize, WC_TYPE_UNSIGNED_BIN);
+        }
     }
-    else {
+
+    if (err == 0) {
+        if ((keytype == ECC_PUBLICKEY) || (keytype == ECC_PRIVATEKEY)) {
+            err = wc_export_int(key->pubkey.y, key->maxq_ctx.ecc_key + keysize,
+                                &bufflen, keysize, WC_TYPE_UNSIGNED_BIN);
+        }
+    }
+
+    if (err == 0) {
+        if ((keytype == ECC_PRIVATEKEY) || (keytype == ECC_PRIVATEKEY_ONLY)) {
+            err = wc_export_int(&key->k, key->maxq_ctx.ecc_key + (2 * keysize),
+                                &bufflen, keysize, WC_TYPE_UNSIGNED_BIN);
+        }
+    }
+
+    if (err == 0) {
         key->maxq_ctx.hw_ecc = 1;
         key->maxq_ctx.key_pending = 1;
     }
+    else {
+        key->maxq_ctx.hw_ecc = -1;
+    }
+
+    return err;
 }
 
 #ifdef MAXQ_AESGCM
@@ -1279,9 +1282,11 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
         }
         else if (info->pk.type == WC_PK_TYPE_ECDSA_SIGN) {
             if (info->pk.eccsign.key->maxq_ctx.hw_ecc == 0) {
-                wc_MAXQ10XX_EccSetKey(
-                    info->pk.eccsign.key,
-                    info->pk.eccsign.key->dp->size);
+                rc = wc_MAXQ10XX_EccSetKey(info->pk.eccsign.key,
+                                           info->pk.eccsign.key->dp->size);
+                if (rc != 0) {
+                    return rc;
+                }
             }
 
             if (info->pk.eccsign.key->maxq_ctx.hw_ecc == -1) {
@@ -1323,8 +1328,11 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
             }
 
             if (info->pk.eccverify.key->maxq_ctx.hw_ecc == 0) {
-                wc_MAXQ10XX_EccSetKey(info->pk.eccverify.key,
-                                      info->pk.eccverify.key->dp->size);
+                rc = wc_MAXQ10XX_EccSetKey(info->pk.eccverify.key,
+                                           info->pk.eccverify.key->dp->size);
+                if (rc != 0) {
+                    return rc;
+                }
             }
 
             if (info->pk.eccverify.key->maxq_ctx.hw_ecc == -1) {

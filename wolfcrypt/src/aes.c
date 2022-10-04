@@ -2840,7 +2840,9 @@ static WARN_UNUSED_RESULT int wc_AesDecrypt(
     #endif
 
     #ifdef WOLFSSL_MAXQ10XX_CRYPTO
-        wc_MAXQ10XX_AesSetKey(aes, userKey, keylen);
+        if (wc_MAXQ10XX_AesSetKey(aes, userKey, keylen) != 0) {
+            return WC_HW_E;
+        }
     #endif
 
     #ifdef WOLFSSL_IMX6_CAAM_BLOB

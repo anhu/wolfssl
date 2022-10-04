@@ -156,13 +156,13 @@ int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
 #endif /* WOLFSSL_MAXQ10XX_TLS */
 
 #ifdef WOLFSSL_MAXQ10XX_CRYPTO
-void wc_MAXQ10XX_AesSetKey(Aes* aes, const byte* userKey, word32 keylen);
+int wc_MAXQ10XX_AesSetKey(Aes* aes, const byte* userKey, word32 keylen);
 void wc_MAXQ10XX_AesFree(Aes* aes);
 
 void wc_MAXQ10XX_Sha256Copy(wc_Sha256* sha256);
 void wc_MAXQ10XX_Sha256Free(wc_Sha256* sha256);
 
-void wc_MAXQ10XX_EccSetKey(ecc_key* key, word32 keysize);
+int wc_MAXQ10XX_EccSetKey(ecc_key* key, word32 keysize);
 void wc_MAXQ10XX_EccFree(ecc_key* key);
 #endif /* WOLFSSL_MAXQ10XX_CRYPTO */
 
