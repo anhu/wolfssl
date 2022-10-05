@@ -25977,8 +25977,6 @@ static int HashSkeData(WOLFSSL* ssl, enum wc_HashType hashType,
                                 ssl->buffers.sig.length,
                                 ssl->buffers.digest.buffer,
                                 ssl->buffers.digest.length);
-        XFREE(ssl->buffers.sig.buffer, ssl->heap, DYNAMIC_TYPE_SIGNATURE);
-        ssl->buffers.sig.buffer = NULL;
     }
 
     return ret;

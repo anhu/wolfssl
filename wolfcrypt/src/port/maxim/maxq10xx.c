@@ -1885,10 +1885,6 @@ int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     mxq_keyparam_id_t keyparam = MXQ_KEYPARAM_EC_P256R1;
     int pk_offset = 0;
     word32 cert_size = 0;
-
-    if (!tls13active) {
-        return NOT_COMPILED_IN;
-    }
 #endif
 
     WOLFSSL_ENTER("maxq10xx_read_device_cert_der()");
@@ -1896,7 +1892,7 @@ int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
         return BAD_FUNC_ARG;
     }
 
-    if (*p_len < 2048) {
+    if (*p_len < 1024) {
         WOLFSSL_MSG("MAXQ: insufficient buffer length");
         return BAD_FUNC_ARG;
     }
