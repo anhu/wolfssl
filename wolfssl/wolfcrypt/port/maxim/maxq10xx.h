@@ -94,7 +94,6 @@ typedef struct {
 #endif
 
 int maxq10xx_port_init(void);
-int maxq10xx_random(byte* output, unsigned short sz);
 
 #ifdef HAVE_PK_CALLBACKS
 void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx);

@@ -1029,7 +1029,7 @@ static int maxq10xx_ecc_verify(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
 #endif /* MAXQ_ECC */
 
 #ifdef MAXQ_RNG
-int maxq10xx_random(byte* output, unsigned short sz)
+static int maxq10xx_random(byte* output, unsigned short sz)
 {
 #if defined(WOLFSSL_MAXQ108x)
     if (!tls13active) {
