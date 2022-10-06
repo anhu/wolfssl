@@ -617,12 +617,12 @@ void wc_MAXQ10XX_AesFree(Aes* aes)
             WOLFSSL_MSG("MAXQ: MXQ_DeleteObject() failed");
             rc = 1;
         }
-        wolfSSL_CryptHwMutexUnLock();
-    }
 
-    if (rc == 0) {
-        free_aes_key_id(aes->maxq_ctx.key_obj_id);
-        aes->maxq_ctx.key_obj_id = 0;
+        if (rc == 0) {
+            free_aes_key_id(aes->maxq_ctx.key_obj_id);
+            aes->maxq_ctx.key_obj_id = 0;
+        }
+        wolfSSL_CryptHwMutexUnLock();
     }
 }
 
