@@ -1365,9 +1365,8 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
         }
     #endif /* HAVE_ECC && MAXQ_ECC */
     }
-
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if (info->algo_type == WC_ALGO_TYPE_HMAC) {
+    else if (info->algo_type == WC_ALGO_TYPE_HMAC) {
         if (info->hmac.in != NULL && info->hmac.digest == NULL) {
             rc = 0;
             if (mac_comp_active == 0) {
