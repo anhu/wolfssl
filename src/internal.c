@@ -2394,6 +2394,7 @@ int InitSSL_Ctx(WOLFSSL_CTX* ctx, WOLFSSL_METHOD* method, void* heap)
         method->version.major == SSLv3_MAJOR &&
         method->version.minor == WOLFSSL_TLSV1_3) {
         maxq10xx_SetupPkCallbacks(ctx);
+        ctx->devId = MAXQ_DEVICE_ID;
     }
 #endif
 
