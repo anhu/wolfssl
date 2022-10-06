@@ -103,10 +103,6 @@ void maxq10xx_SetTls13Side(int side);
 int maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
                            byte* pub, word32* pubSz);
 
-int wc_MAXQ10XX_HmacSetKey(int type);
-int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length);
-int wc_MAXQ10XX_HmacFinal(byte* hash);
-
 int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
                                              byte* out, const byte* in,
                                              word32 sz, const byte* iv,

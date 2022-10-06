@@ -284,6 +284,11 @@ static int getSignAlgoFromCurve(int c)
     return BAD_FUNC_ARG;
 }
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+
+static int wc_MAXQ10XX_HmacSetKey(int type);
+static int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length);
+static int wc_MAXQ10XX_HmacFinal(byte* hash);
+
 static int getMaxqKeyParamFromCurve(int c)
 {
     switch(c) {
@@ -296,6 +301,7 @@ static int getMaxqKeyParamFromCurve(int c)
     }
     return BAD_FUNC_ARG;
 }
+
 #endif
 
 static int HOST_ECDSA_sign(mxq_u1* dest, int* signlen, mxq_u1* key,
@@ -1360,6 +1366,26 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
     #endif /* HAVE_ECC && MAXQ_ECC */
     }
 
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+    if (info->algo_type == WC_ALGO_TYPE_HMAC) {
+        if (info->hmac.in != NULL && info->hmac.digest == NULL) {
+            rc = 0;
+            if (mac_comp_active == 0) {
+                rc = wc_MAXQ10XX_HmacSetKey(info->hmac.macType);
+            }
+            if (rc == 0) {
+                rc = wc_MAXQ10XX_HmacUpdate(info->hmac.in, info->hmac.inSz);
+            }
+        }
+        else if (info->hmac.in == NULL && info->hmac.digest != NULL) {
+            rc = wc_MAXQ10XX_HmacFinal(info->hmac.digest);
+        }
+        else {
+            rc = BAD_FUNC_ARG;
+        }
+    }
+#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108x */
+
     if (rc != 0 && rc != CRYPTOCB_UNAVAILABLE) {
         rc = WC_HW_E;
     }
@@ -2005,7 +2031,7 @@ int maxq10xx_port_init(void)
 }
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-int wc_MAXQ10XX_HmacSetKey(int type)
+static int wc_MAXQ10XX_HmacSetKey(int type)
 {
     mxq_algo_id_t algo;
     int rc;
@@ -2015,16 +2041,14 @@ int wc_MAXQ10XX_HmacSetKey(int type)
         return NOT_COMPILED_IN;
     }
 
-    if (!(type == WC_SHA256 ||
-          type == WC_SHA384 )) {
-        return NOT_COMPILED_IN;
-    }
-
     if (type == WC_SHA256) {
         algo = ALGO_HMAC_SHA256;
     }
     else if (type == WC_SHA384) {
         algo = ALGO_HMAC_SHA384;
+    }
+    else {
+        return NOT_COMPILED_IN;
     }
 
     if (tls13_server_finish_obj_id != -1) {
@@ -2059,7 +2083,7 @@ int wc_MAXQ10XX_HmacSetKey(int type)
     return rc;
 }
 
-int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length)
+static int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -2083,7 +2107,7 @@ int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length)
     return rc;
 }
 
-int wc_MAXQ10XX_HmacFinal(byte* hash)
+static int wc_MAXQ10XX_HmacFinal(byte* hash)
 {
     int rc;
     mxq_err_t mxq_rc;
