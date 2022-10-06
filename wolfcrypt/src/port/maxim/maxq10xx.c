@@ -1252,21 +1252,9 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
 #if !defined(WC_NO_RNG) && defined(MAXQ_RNG)
     else if (info->algo_type == WC_ALGO_TYPE_SEED) {
         rc = maxq10xx_random(info->seed.seed, info->seed.sz);
-        if (rc != 0) {
-            return rc;
-        }
-
-        /* done */
-        rc = 0;
     }
     else if (info->algo_type == WC_ALGO_TYPE_RNG) {
         rc = maxq10xx_random(info->rng.out, info->rng.sz);
-        if (rc != 0) {
-            return rc;
-        }
-
-        /* done */
-        rc = 0;
     }
 #endif /* !WC_NO_RNG && MAXQ_RNG */
     else if (info->algo_type == WC_ALGO_TYPE_PK) {
