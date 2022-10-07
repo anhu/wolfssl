@@ -116,9 +116,13 @@ int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
                           byte* signature, word32 sig_sz);
 
 #ifdef HAVE_HKDF
-int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
-                        const byte* info, word32 infoSz, byte* out,
-                        word32 outSz);
+int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
+                             const byte* prk, word32 prkLen,
+                             const byte* protocol, word32 protocolLen,
+                             const byte* label, word32 labelLen,
+                             const byte* info, word32 infoLen,
+                             int digest);
+
 #endif /* HAVE_HKDF */
 #endif /* HAVE_PK_CALLBACKS */
 

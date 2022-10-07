@@ -22,6 +22,13 @@
 #include <stdint.h>
 #include <wolfssl/wolfcrypt/port/maxim/maxq10xx.h>
 
+#ifdef NO_INLINE
+    #include <wolfssl/wolfcrypt/misc.h>
+#else
+    #define WOLFSSL_MISC_INCLUDED
+    #include <wolfcrypt/src/misc.c>
+#endif
+
 #include <wolfssl/internal.h>
 #include <wolfssl/wolfcrypt/cryptocb.h>
 #include <wolfssl/wolfcrypt/error-crypt.h>
@@ -2649,7 +2656,7 @@ static char *strstr_with_size(char *str, const char *substr, size_t n)
     return NULL;
 }
 
-int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
+static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                         const byte* info, word32 infoSz, byte* out,
                         word32 outSz)
 {
@@ -3099,6 +3106,49 @@ int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
 
     wolfSSL_CryptHwMutexUnLock();
     return 0;
+}
+
+int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
+                             const byte* prk, word32 prkLen,
+                             const byte* protocol, word32 protocolLen,
+                             const byte* label, word32 labelLen,
+                             const byte* info, word32 infoLen,
+                             int digest)
+{
+    int    ret = 0;
+    int    idx = 0;
+    byte   data[MAX_TLS13_HKDF_LABEL_SZ];
+
+    /* Output length. */
+    data[idx++] = (byte)(okmLen >> 8);
+    data[idx++] = (byte)okmLen;
+    /* Length of protocol | label. */
+    data[idx++] = (byte)(protocolLen + labelLen);
+    /* Protocol */
+    XMEMCPY(&data[idx], protocol, protocolLen);
+    idx += protocolLen;
+    /* Label */
+    XMEMCPY(&data[idx], label, labelLen);
+    idx += labelLen;
+    /* Length of hash of messages */
+    data[idx++] = (byte)infoLen;
+    /* Hash of messages */
+    XMEMCPY(&data[idx], info, infoLen);
+    idx += infoLen;
+
+#ifdef WOLFSSL_CHECK_MEM_ZERO
+    wc_MemZero_Add("wc_Tls13_HKDF_Expand_Label data", data, idx);
+#endif
+
+    ret = maxq10xx_HkdfExpand(digest, prk, prkLen, data, idx, okm, okmLen);
+    ForceZero(data, idx);
+
+#ifdef WOLFSSL_CHECK_MEM_ZERO
+    wc_MemZero_Check(data, MAX_TLS13_HKDF_LABEL_SZ);
+#endif
+
+    return ret;
+
 }
 
 int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,

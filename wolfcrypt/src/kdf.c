@@ -476,11 +476,7 @@ int wc_PRF_TLS(byte* digest, word32 digLen, const byte* secret, word32 secLen,
         WOLFSSL_MSG_EX("  Digest %d", digest);
 #endif
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-        ret = maxq10xx_HkdfExpand(digest, prk, prkLen, data, idx, okm, okmLen);
-#else
         ret = wc_HKDF_Expand(digest, prk, prkLen, data, idx, okm, okmLen);
-#endif
 
 #ifdef WOLFSSL_DEBUG_TLS
         WOLFSSL_MSG("  OKM");

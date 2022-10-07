@@ -165,6 +165,40 @@ static const byte tls13ProtocolLabel[TLS13_PROTOCOL_LABEL_SZ + 1] = "tls13 ";
 static const byte dtls13ProtocolLabel[DTLS13_PROTOCOL_LABEL_SZ + 1] = "dtls13";
 #endif /* WOLFSSL_DTLS13 */
 
+/* Expand data using HMAC, salt and label and info.
+ * TLS v1.3 defines this function. Use callback if available.
+ *
+ * okm          The generated pseudorandom key - output key material.
+ * okmLen       The length of generated pseudorandom key -
+ *              output key material.
+ * prk          The salt - pseudo-random key.
+ * prkLen       The length of the salt - pseudo-random key.
+ * protocol     The TLS protocol label.
+ * protocolLen  The length of the TLS protocol label.
+ * info         The information to expand.
+ * infoLen      The length of the information.
+ * digest       The type of digest to use.
+ * returns 0 on success, otherwise failure.
+ */
+static int Tls13HKDFExpandLabel(byte* okm, word32 okmLen,
+                                const byte* prk, word32 prkLen,
+                                const byte* protocol, word32 protocolLen,
+                                const byte* label, word32 labelLen,
+                                const byte* info, word32 infoLen,
+                                int digest)
+{
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+    /*  TODO: replace MAXQ specific stuff with callback. */
+    return maxq10xx_HkdfExpandLabel(okm, okmLen, prk, prkLen,
+                                    protocol, protocolLen, label, labelLen,
+                                    info, infoLen, digest);
+#else
+    return wc_Tls13_HKDF_Expand_Label(okm, okmLen, prk, prkLen,
+                                      protocol, protocolLen, label, labelLen,
+                                      info, infoLen, digest);
+#endif
+}
+
 /* Derive a key from a message.
  *
  * ssl        The SSL/TLS object.
@@ -262,9 +296,9 @@ static int DeriveKeyMsg(WOLFSSL* ssl, byte* output, int outputLen,
         outputLen = hashSz;
 
     PRIVATE_KEY_UNLOCK();
-    ret = wc_Tls13_HKDF_Expand_Label(output, outputLen, secret, hashSz,
-                             protocol, protocolLen, label, labelLen,
-                             hash, hashSz, digestAlg);
+    ret = Tls13HKDFExpandLabel(output, outputLen, secret, hashSz,
+                               protocol, protocolLen, label, labelLen,
+                               hash, hashSz, digestAlg);
     PRIVATE_KEY_LOCK();
     return ret;
 }
@@ -354,9 +388,9 @@ int Tls13DeriveKey(WOLFSSL* ssl, byte* output, int outputLen,
                              protocol, protocolLen, label, labelLen,
                              hash, hashOutSz, digestAlg);
     #else
-    ret = wc_Tls13_HKDF_Expand_Label(output, outputLen, secret, hashSz,
-                             protocol, protocolLen, label, labelLen,
-                             hash, hashOutSz, digestAlg);
+    ret = Tls13HKDFExpandLabel(output, outputLen, secret, hashSz,
+                               protocol, protocolLen, label, labelLen,
+                               hash, hashOutSz, digestAlg);
     #endif
     PRIVATE_KEY_LOCK();
 
@@ -806,7 +840,7 @@ int Tls13_Exporter(WOLFSSL* ssl, unsigned char *out, size_t outLen,
 
     /* Derive-Secret(Secret, label, "") */
     PRIVATE_KEY_UNLOCK();
-    ret = wc_Tls13_HKDF_Expand_Label(firstExpand, hashLen,
+    ret = Tls13HKDFExpandLabel(firstExpand, hashLen,
             ssl->arrays->exporterSecret, hashLen,
             protocol, protocolLen, (byte*)label, (word32)labelLen,
             emptyHash, hashLen, hashType);
@@ -820,7 +854,7 @@ int Tls13_Exporter(WOLFSSL* ssl, unsigned char *out, size_t outLen,
         return ret;
 
     PRIVATE_KEY_UNLOCK();
-    ret = wc_Tls13_HKDF_Expand_Label(out, (word32)outLen, firstExpand, hashLen,
+    ret = Tls13HKDFExpandLabel(out, (word32)outLen, firstExpand, hashLen,
             protocol, protocolLen, exporterLabel, EXPORTER_LABEL_SZ,
             hashOut, hashLen, hashType);
     PRIVATE_KEY_LOCK();
@@ -1086,9 +1120,10 @@ int DeriveResumptionPSK(WOLFSSL* ssl, byte* nonce, byte nonceLen, byte* secret)
         resumptionLabel, RESUMPTION_LABEL_SZ, nonce, nonceLen, digestAlg,
         ssl->heap);
 #else
-    ret = wc_Tls13_HKDF_Expand_Label(secret, ssl->specs.hash_size,
-        ssl->session->masterSecret, ssl->specs.hash_size, protocol, protocolLen,
-        resumptionLabel, RESUMPTION_LABEL_SZ, nonce, nonceLen, digestAlg);
+    ret = Tls13HKDFExpandLabel(secret, ssl->specs.hash_size,
+                               ssl->session->masterSecret, ssl->specs.hash_size,
+                               protocol, protocolLen, resumptionLabel,
+                               RESUMPTION_LABEL_SZ, nonce, nonceLen, digestAlg);
 #endif /* !defined(HAVE_FIPS) || FIPS_VERSION_GE(5,3) */
     PRIVATE_KEY_LOCK();
     return ret;
