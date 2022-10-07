@@ -4583,7 +4583,7 @@ int RsaVerify(WOLFSSL* ssl, byte* in, word32 inSz, byte** out, int sigAlgo,
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
     if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetPssSignature(in, inSz);
+        maxq10xx_SetRsaPssSignature(in, inSz);
     }
 #endif
 

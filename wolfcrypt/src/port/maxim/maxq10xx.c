@@ -2398,7 +2398,7 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
     return rc;
 }
 
-void maxq10xx_SetPssSignature(byte* in, word32 inSz)
+void maxq10xx_SetRsaPssSignature(byte* in, word32 inSz)
 {
     memcpy(rsa_pss_signature, in, inSz);
     rsa_pss_signlen = inSz;
@@ -2649,9 +2649,9 @@ static char *strstr_with_size(char *str, const char *substr, size_t n)
     return NULL;
 }
 
-int wc_MAXQ10XX_HKDF_Expand(int digest, const byte* inKey, word32 inKeySz,
-                            const byte* info, word32 infoSz,
-                            byte* out, word32 outSz)
+int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
+                        const byte* info, word32 infoSz, byte* out,
+                        word32 outSz)
 {
     int rc;
     mxq_err_t mxq_rc;

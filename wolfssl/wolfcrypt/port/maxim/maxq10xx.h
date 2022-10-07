@@ -111,14 +111,14 @@ int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
                                              word32 authInSz);
 
 void maxq10xx_get_device_cert_properties(word32* hsType, word16* length);
-void maxq10xx_SetPssSignature(byte* in, word32 inSz);
+void maxq10xx_SetRsaPssSignature(byte* in, word32 inSz);
 int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
                           byte* signature, word32 sig_sz);
 
 #ifdef HAVE_HKDF
-int wc_MAXQ10XX_HKDF_Expand(int digest, const byte* inKey, word32 inKeySz,
-                            const byte* info, word32 infoSz, byte* out,
-                            word32 outSz);
+int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
+                        const byte* info, word32 infoSz, byte* out,
+                        word32 outSz);
 #endif /* HAVE_HKDF */
 #endif /* HAVE_PK_CALLBACKS */
 
