@@ -22,10 +22,24 @@
 #ifndef _WOLFPORT_MAXQ10XX_H_
 #define _WOLFPORT_MAXQ10XX_H_
 
-#include <wolfssl/wolfcrypt/types.h>
-
 #if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || \
     defined(WOLFSSL_MAXQ108x)
+
+#include <wolfssl/wolfcrypt/types.h>
+
+#ifndef WC_DH_TYPE_DEFINED
+    typedef struct DhKey DhKey;
+    #define WC_DH_TYPE_DEFINED
+#endif
+
+#ifndef WC_RNG_TYPE_DEFINED /* guard on redeclaration */
+    typedef struct OS_Seed OS_Seed;
+    typedef struct WC_RNG WC_RNG;
+    #ifdef WC_RNG_SEED_CB
+        typedef int (*wc_RngSeed_Cb)(OS_Seed* os, byte* seed, word32 sz);
+    #endif
+    #define WC_RNG_TYPE_DEFINED
+#endif
 
 #ifdef WOLF_CRYPTO_CB
     #ifdef WOLFSSL_MAXQ1061
@@ -99,8 +113,8 @@ int maxq10xx_port_init(void);
 void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx);
 void maxq10xx_SetTls13Side(int side);
 
-int maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
-                           byte* pub, word32* pubSz);
+int maxq10xx_DhGenerateKeyPair(DhKey* key, WC_RNG* rng, byte* priv,
+                               word32* privSz, byte* pub, word32* pubSz);
 
 int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
                                              byte* out, const byte* in,

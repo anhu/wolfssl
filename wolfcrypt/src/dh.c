@@ -1374,17 +1374,6 @@ static int wc_DhGenerateKeyPair_Sync(DhKey* key, WC_RNG* rng,
         pub == NULL || pubSz == NULL) {
         return BAD_FUNC_ARG;
     }
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    word32 p_size, g_size;
-    unsigned char pbuf[256], gbuf[4];
-    p_size = mp_unsigned_bin_size(&key->p);
-    mp_to_unsigned_bin(&key->p, pbuf);
-    g_size = mp_unsigned_bin_size(&key->g);
-    mp_to_unsigned_bin(&key->g, gbuf);
-    ret = maxq10xx_create_dh_key(pbuf, p_size, gbuf, g_size, pub, pubSz);
-    if (ret != NOT_COMPILED_IN)
-        return ret;
-#endif
 
     SAVE_VECTOR_REGISTERS(return _svr_ret;);
 

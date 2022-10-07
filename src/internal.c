@@ -5849,6 +5849,12 @@ int DhGenKeyPair(WOLFSSL* ssl, DhKey* dhKey,
 
     WOLFSSL_ENTER("DhGenKeyPair");
 
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+    ret = maxq10xx_DhGenerateKeyPair(dhKey, ssl->rng, priv, privSz, pub, pubSz);
+    if (ret != NOT_COMPILED_IN)
+        return ret;
+#endif
+
 #ifdef WOLFSSL_ASYNC_CRYPT
     /* initialize event */
     ret = wolfSSL_AsyncInit(ssl, &dhKey->asyncDev, WC_ASYNC_FLAG_NONE);

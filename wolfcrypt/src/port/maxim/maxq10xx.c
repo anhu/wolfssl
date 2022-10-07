@@ -2142,9 +2142,8 @@ static int wc_MAXQ10XX_HmacFinal(byte* hash)
     return rc;
 }
 
-
-int  maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
-                            byte* pub, word32* pubSz)
+static int maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
+                                  byte* pub, word32* pubSz)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -2179,6 +2178,23 @@ int  maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
     }
 
     return rc;
+}
+
+int maxq10xx_DhGenerateKeyPair(DhKey* key, WC_RNG* rng, byte* priv,
+                               word32* privSz, byte* pub, word32* pubSz) {
+    (void)rng;
+    (void)priv;
+    (void)privSz;
+    word32 p_size, g_size;
+    unsigned char pbuf[256], gbuf[4];
+
+    p_size = mp_unsigned_bin_size(&key->p);
+    mp_to_unsigned_bin(&key->p, pbuf);
+
+    g_size = mp_unsigned_bin_size(&key->g);
+    mp_to_unsigned_bin(&key->g, gbuf);
+
+    return maxq10xx_create_dh_key(pbuf, p_size, gbuf, g_size, pub, pubSz);
 }
 
 static int maxq10xx_DhAgreeCb(WOLFSSL* ssl, struct DhKey* key,
