@@ -7678,14 +7678,20 @@ static int SendTls13CertificateVerify(WOLFSSL* ssl)
                     ERROR_OUT(NO_PRIVATE_KEY, exit_scv);
             }
             else {
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+                ret = NOT_COMPILED_IN;
+#if defined(HAVE_PK_CALLBACKS)
                 if (ssl->options.side == WOLFSSL_CLIENT_END) {
-                    maxq10xx_get_device_cert_properties(&ssl->hsType,
-                                                        &args->length);
+                    if (ssl->ctx && ssl->ctx->HstypeAndKeylenCb) {
+                        ret = ssl->ctx->HstypeAndKeylenCb(&ssl->hsType,
+                                                          &args->length);
+                    }
+
+                    if ((ret != NOT_COMPILED_IN) && (ret != 0)) {
+                        goto exit_scv;
+                    }
                 }
-                else
 #endif
-                {
+                if (ret == NOT_COMPILED_IN) {
                     ret = DecodePrivateKey(ssl, &args->length);
                     if (ret != 0)
                         goto exit_scv;

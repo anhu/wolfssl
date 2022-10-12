@@ -2347,15 +2347,20 @@ static int maxq10xx_sign_signature_cb(WOLFSSL* ssl, const byte* in, word32 inSz,
     return rc;
 }
 
-void maxq10xx_get_device_cert_properties(word32* hsType, word16* length)
+static int maxq10xx_hstype_and_keylen(word32* hsType, word16* keylen)
 {
-    if (device_hs_key_type== DYNAMIC_TYPE_ECC) {
-        *length  = wc_ecc_sig_size_calc(device_key_len);
+    if (hsType == NULL || keylen == NULL) {
+        return BAD_FUNC_ARG;
+    }
+
+    if (device_hs_key_type == DYNAMIC_TYPE_ECC) {
+        *keylen = wc_ecc_sig_size_calc(device_key_len);
     }
     else {
-        *length = device_key_len;
+        *keylen = device_key_len;
     }
     *hsType = device_hs_key_type;
+    return 0;
 }
 
 static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
@@ -3269,10 +3274,10 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx)
     wolfSSL_CTX_SetEccSharedSecretCb(ctx, maxq10xx_shared_secret_cb);
     wolfSSL_CTX_SetDhGenerateKeyPair(ctx, maxq10xx_DhGenerateKeyPair);
     wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
-    wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
     wolfSSL_CTX_SetEccSignCb(ctx, maxq10xx_sign_signature_cb);
+    wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
     wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
-
+    wolfSSL_CTX_SetHstypeAndKeylenCb(ctx, maxq10xx_hstype_and_keylen);
     #ifdef HAVE_HKDF
         wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
         use_hw_hkdf_expand = 1;

@@ -29597,6 +29597,13 @@ void* wolfSSL_GetVerifyMacCtx(WOLFSSL* ssl)
 }
 #endif /* !WOLFSSL_NO_TLS12 && !WOLFSSL_AEAD_ONLY */
 
+void wolfSSL_CTX_SetHstypeAndKeylenCb(WOLFSSL_CTX* ctx,
+                                      CallbackHstypeAndKeylen cb)
+{
+    if (ctx)
+        ctx->HstypeAndKeylenCb = cb;
+}
+
 #endif /* HAVE_PK_CALLBACKS */
 #endif /* NO_CERTS */
 

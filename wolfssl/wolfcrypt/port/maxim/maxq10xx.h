@@ -121,7 +121,6 @@ int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
                                              const byte* authIn,
                                              word32 authInSz);
 
-void maxq10xx_get_device_cert_properties(word32* hsType, word16* length);
 void maxq10xx_SetRsaPssSignature(byte* in, word32 inSz);
 int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
                           byte* signature, word32 sig_sz);
