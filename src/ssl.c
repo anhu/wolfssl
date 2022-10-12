@@ -29601,6 +29601,11 @@ void* wolfSSL_GetVerifyMacCtx(WOLFSSL* ssl)
 #endif /* NO_CERTS */
 
 #if defined(HAVE_PK_CALLBACKS) && !defined(NO_DH)
+void wolfSSL_CTX_SetDhGenerateKeyPair(WOLFSSL_CTX* ctx,
+                                      CallbackDhGenerateKeyPair cb) {
+    if (ctx)
+        ctx->DhGenerateKeyPairCb = cb;
+}
 void wolfSSL_CTX_SetDhAgreeCb(WOLFSSL_CTX* ctx, CallbackDhAgree cb)
 {
     if (ctx)

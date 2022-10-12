@@ -2180,8 +2180,9 @@ static int maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
     return rc;
 }
 
-int maxq10xx_DhGenerateKeyPair(DhKey* key, WC_RNG* rng, byte* priv,
-                               word32* privSz, byte* pub, word32* pubSz) {
+static int maxq10xx_DhGenerateKeyPair(DhKey* key, WC_RNG* rng,
+                                      byte* priv, word32* privSz,
+                                      byte* pub, word32* pubSz) {
     (void)rng;
     (void)priv;
     (void)privSz;
@@ -3266,6 +3267,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx)
     tls13active = 1;
     wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_create_ecc_key_cb);
     wolfSSL_CTX_SetEccSharedSecretCb(ctx, maxq10xx_shared_secret_cb);
+    wolfSSL_CTX_SetDhGenerateKeyPair(ctx, maxq10xx_DhGenerateKeyPair);
     wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
     wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
     wolfSSL_CTX_SetEccSignCb(ctx, maxq10xx_sign_signature_cb);

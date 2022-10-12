@@ -3313,13 +3313,19 @@ WOLFSSL_API void  wolfSSL_SetHKDFExtractCtx(WOLFSSL* ssl, void *ctx);
 #ifndef NO_DH
 /* Public DH Key Callback support */
 struct DhKey;
+typedef int (*CallbackDhGenerateKeyPair)(DhKey* key, WC_RNG* rng,
+                                         byte* priv, word32* privSz,
+                                         byte* pub, word32* pubSz);
 typedef int (*CallbackDhAgree)(WOLFSSL* ssl, struct DhKey* key,
         const unsigned char* priv, unsigned int privSz,
         const unsigned char* otherPubKeyDer, unsigned int otherPubKeySz,
         unsigned char* out, word32* outlen,
         void* ctx);
-WOLFSSL_API void  wolfSSL_CTX_SetDhAgreeCb(WOLFSSL_CTX* ctx, CallbackDhAgree cb);
-WOLFSSL_API void  wolfSSL_SetDhAgreeCtx(WOLFSSL* ssl, void *ctx);
+WOLFSSL_API void wolfSSL_CTX_SetDhGenerateKeyPair(WOLFSSL_CTX* ctx,
+                                                  CallbackDhGenerateKeyPair cb);
+WOLFSSL_API void wolfSSL_CTX_SetDhAgreeCb(WOLFSSL_CTX* ctx,
+                                           CallbackDhAgree cb);
+WOLFSSL_API void wolfSSL_SetDhAgreeCtx(WOLFSSL* ssl, void *ctx);
 WOLFSSL_API void* wolfSSL_GetDhAgreeCtx(WOLFSSL* ssl);
 #endif /* !NO_DH */
 

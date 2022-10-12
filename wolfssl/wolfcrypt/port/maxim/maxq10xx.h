@@ -113,9 +113,6 @@ int maxq10xx_port_init(void);
 void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx);
 void maxq10xx_SetTls13Side(int side);
 
-int maxq10xx_DhGenerateKeyPair(DhKey* key, WC_RNG* rng, byte* priv,
-                               word32* privSz, byte* pub, word32* pubSz);
-
 int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
                                              byte* out, const byte* in,
                                              word32 sz, const byte* iv,

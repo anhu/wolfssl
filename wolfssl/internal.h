@@ -3366,7 +3366,8 @@ struct WOLFSSL_CTX {
         CallbackX448SharedSecret X448SharedSecretCb;
     #endif
     #ifndef NO_DH
-        CallbackDhAgree DhAgreeCb;      /* User DH Agree Callback handler */
+        CallbackDhGenerateKeyPair DhGenerateKeyPairCb; /* User DH KeyGen Callback handler*/
+        CallbackDhAgree DhAgreeCb;                     /* User DH Agree Callback handler */
     #endif
     #ifndef NO_RSA
         CallbackRsaSign   RsaSignCb;      /* User RsaSign Callback handler (priv key) */
