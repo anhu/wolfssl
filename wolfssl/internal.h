@@ -3389,7 +3389,8 @@ struct WOLFSSL_CTX {
 #if !defined(WOLFSSL_NO_TLS12) && !defined(WOLFSSL_AEAD_ONLY)
     CallbackVerifyMac           VerifyMacCb;        /* Use Verify mac handler */
 #endif
-    CallbackHstypeAndKeylen  HstypeAndKeylenCb; /* Use this handler to get the Handshake type and keylen */
+    CallbackHstypeAndKeylen  HstypeAndKeylenCb; /* Use this handler to get the Handshake type and key length */
+    CallbackHstypeAndSiglen  HstypeAndSiglenCb; /* Use this handler to get the Handshake type and signature length */
 
 #endif /* HAVE_PK_CALLBACKS */
 #ifdef HAVE_WOLF_EVENT

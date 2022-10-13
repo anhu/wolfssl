@@ -110,7 +110,7 @@ typedef struct {
 int maxq10xx_port_init(void);
 
 #ifdef HAVE_PK_CALLBACKS
-void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx);
+void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13);
 void maxq10xx_SetTls13Side(int side);
 
 int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
@@ -158,7 +158,6 @@ int maxq10xx_perform_tls_record_processing(WOLFSSL* ssl, int is_encrypt,
                                            byte* authTag, word32 authTagSz,
                                            const byte* authIn, word32 authInSz);
 int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len);
-int maxq10xx_get_device_cert_sig_size(void);
 int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
                               byte* p_out, word32* p_out_len);
 

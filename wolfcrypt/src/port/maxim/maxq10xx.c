@@ -1961,11 +1961,6 @@ int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     return 0;
 }
 
-int maxq10xx_get_device_cert_sig_size(void)
-{
-    return wc_ecc_sig_size_calc(32);
-}
-
 int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
                               byte* p_out, word32* p_out_len)
 {
@@ -2363,6 +2358,17 @@ static int maxq10xx_hstype_and_keylen(word32* hsType, word16* keylen)
     return 0;
 }
 
+static int maxq10xx_hstype_and_siglen(word32* hsType, word16* siglen)
+{
+    if (hsType == NULL || siglen == NULL) {
+        return BAD_FUNC_ARG;
+    }
+
+    *hsType = DYNAMIC_TYPE_ECC;
+    *siglen = wc_ecc_sig_size_calc(32);
+    return 0;
+}
+
 static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
         unsigned char* pubKeyDer, word32* pubKeySz,
         unsigned char* out, word32* outlen,
@@ -2388,7 +2394,7 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
     rc = wc_ecc_export_public_raw(otherKey, qx, &qxLen, qy, &qyLen);
 
     if (tls13_ecc_obj_id == -1) {
-        WOLFSSL_MSG("MAXQ: DH key is not created before");
+        WOLFSSL_MSG("MAXQ: ECDHE key is not created before");
         rc = NOT_COMPILED_IN;
         return rc;
     }
@@ -3262,22 +3268,27 @@ void maxq10xx_SetTls13Side(int side)
     tls13_side = side;
 }
 
-void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx)
+void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
 {
     WOLFSSL_ENTER("maxq10xx_SetupPkCallbacks");
     if (init_pk_callbacks) {
         return;
     }
 
-    tls13active = 1;
-    wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_create_ecc_key_cb);
-    wolfSSL_CTX_SetEccSharedSecretCb(ctx, maxq10xx_shared_secret_cb);
-    wolfSSL_CTX_SetDhGenerateKeyPair(ctx, maxq10xx_DhGenerateKeyPair);
-    wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
-    wolfSSL_CTX_SetEccSignCb(ctx, maxq10xx_sign_signature_cb);
-    wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
-    wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
-    wolfSSL_CTX_SetHstypeAndKeylenCb(ctx, maxq10xx_hstype_and_keylen);
+    tls13active = isTLS13;
+
+    if (tls13active) {
+        wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_create_ecc_key_cb);
+        wolfSSL_CTX_SetEccSharedSecretCb(ctx, maxq10xx_shared_secret_cb);
+        wolfSSL_CTX_SetDhGenerateKeyPair(ctx, maxq10xx_DhGenerateKeyPair);
+        wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
+        wolfSSL_CTX_SetEccSignCb(ctx, maxq10xx_sign_signature_cb);
+        wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
+        wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
+        wolfSSL_CTX_SetHstypeAndKeylenCb(ctx, maxq10xx_hstype_and_keylen);
+    }
+    wolfSSL_CTX_SetHstypeAndSiglenCb(ctx, maxq10xx_hstype_and_siglen);
+
     #ifdef HAVE_HKDF
         wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
         use_hw_hkdf_expand = 1;

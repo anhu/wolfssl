@@ -2389,12 +2389,17 @@ int InitSSL_Ctx(WOLFSSL_CTX* ctx, WOLFSSL_METHOD* method, void* heap)
 #endif /* HAVE_WOLF_EVENT */
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    /* Only setup the callbacks if we're a client on TLS 1.3. */
-    if (method->side == WOLFSSL_CLIENT_END &&
-        method->version.major == SSLv3_MAJOR &&
-        method->version.minor == WOLFSSL_TLSV1_3) {
-        maxq10xx_SetupPkCallbacks(ctx);
+    /* Only setup the callbacks if we're a client. Let the maxq10xx
+     * infrastructure know whether we are doing TLS 1.3. */
+    if (method->side == WOLFSSL_CLIENT_END) {
         ctx->devId = MAXQ_DEVICE_ID;
+        if (method->version.major == SSLv3_MAJOR &&
+            method->version.minor == WOLFSSL_TLSV1_3) {
+            maxq10xx_SetupPkCallbacks(ctx, 1);
+        }
+        else {
+            maxq10xx_SetupPkCallbacks(ctx, 0);
+        }
     }
 #endif
 
@@ -29907,26 +29912,33 @@ int SendCertificateVerify(WOLFSSL* ssl)
                 goto exit_scv;
             }
 
-        #ifdef WOLFSSL_MAXQ10XX_TLS
-            args->length = (word16)maxq10xx_get_device_cert_sig_size();
-            ssl->hsType = DYNAMIC_TYPE_ECC;
-        #else
-            if (ssl->buffers.key == NULL) {
+            ret = NOT_COMPILED_IN;
             #ifdef HAVE_PK_CALLBACKS
-                if (wolfSSL_CTX_IsPrivatePkSet(ssl->ctx))
-                    args->length = GetPrivateKeySigSize(ssl);
-                else
-            #endif
-                    ERROR_OUT(NO_PRIVATE_KEY, exit_scv);
+            if (ssl->ctx && ssl->ctx->HstypeAndSiglenCb) {
+                ret = ssl->ctx->HstypeAndSiglenCb(&ssl->hsType, &args->length);
+                if ((ret != NOT_COMPILED_IN) && (ret != 0)) {
+                     goto exit_scv;
+                }
+
             }
-            else {
-                /* Decode private key. */
-                ret = DecodePrivateKey(ssl, &args->length);
-                if (ret != 0) {
-                    goto exit_scv;
+            #endif
+            if (ret == NOT_COMPILED_IN) {
+                if (ssl->buffers.key == NULL) {
+                #ifdef HAVE_PK_CALLBACKS
+                    if (wolfSSL_CTX_IsPrivatePkSet(ssl->ctx))
+                        args->length = GetPrivateKeySigSize(ssl);
+                    else
+                #endif
+                        ERROR_OUT(NO_PRIVATE_KEY, exit_scv);
+                }
+                else {
+                    /* Decode private key. */
+                    ret = DecodePrivateKey(ssl, &args->length);
+                    if (ret != 0) {
+                        goto exit_scv;
+                    }
                 }
             }
-        #endif /* WOLFSSL_MAXQ10XX_TLS */
 
             if (args->length == 0) {
                 ERROR_OUT(NO_PRIVATE_KEY, exit_scv);
