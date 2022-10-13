@@ -3381,16 +3381,17 @@ struct WOLFSSL_CTX {
         CallbackRsaEnc    RsaEncCb;     /* User Rsa Public Encrypt  handler */
         CallbackRsaDec    RsaDecCb;     /* User Rsa Private Decrypt handler */
     #endif /* NO_RSA */
-    CallbackGenPreMaster        GenPreMasterCb;     /* Use generate pre-master handler */
-    CallbackGenMasterSecret     GenMasterCb;        /* Use generate master secret handler */
-    CallbackGenSessionKey       GenSessionKeyCb;    /* Use generate session key handler */
-    CallbackEncryptKeys         EncryptKeysCb;/* Use setting encrypt keys handler */
-    CallbackTlsFinished         TlsFinishedCb;      /* Use Tls finished handler */
+    CallbackGenPreMaster        GenPreMasterCb;     /* User generate pre-master handler */
+    CallbackGenMasterSecret     GenMasterCb;        /* User generate master secret handler */
+    CallbackGenSessionKey       GenSessionKeyCb;    /* User generate session key handler */
+    CallbackEncryptKeys         EncryptKeysCb;/* User setting encrypt keys handler */
+    CallbackTlsFinished         TlsFinishedCb;      /* User Tls finished handler */
 #if !defined(WOLFSSL_NO_TLS12) && !defined(WOLFSSL_AEAD_ONLY)
-    CallbackVerifyMac           VerifyMacCb;        /* Use Verify mac handler */
+    CallbackVerifyMac           VerifyMacCb;        /* User Verify mac handler */
 #endif
-    CallbackHstypeAndKeylen  HstypeAndKeylenCb; /* Use this handler to get the Handshake type and key length */
-    CallbackHstypeAndSiglen  HstypeAndSiglenCb; /* Use this handler to get the Handshake type and signature length */
+    CallbackHstypeAndKeylen  HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
+    CallbackHstypeAndSiglen  HstypeAndSiglenCb; /* User handler to get the Handshake type and signature length */
+    CallbackReadCertDer ReadCertDerCb; /* User handler to read the certificate in DER format */
 
 #endif /* HAVE_PK_CALLBACKS */
 #ifdef HAVE_WOLF_EVENT

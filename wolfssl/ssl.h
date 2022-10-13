@@ -3531,6 +3531,8 @@ WOLFSSL_API void wolfSSL_CTX_SetHstypeAndKeylenCb(WOLFSSL_CTX* ctx, CallbackHsty
 typedef int (*CallbackHstypeAndSiglen)(word32* hsType, word16* siglen);
 WOLFSSL_API void wolfSSL_CTX_SetHstypeAndSiglenCb(WOLFSSL_CTX* ctx, CallbackHstypeAndSiglen cb);
 
+typedef int (*CallbackReadCertDer)(WOLFSSL* ssl);
+WOLFSSL_API void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx, CallbackReadCertDer cb);
 #endif /* HAVE_PK_CALLBACKS */
 
 #ifndef NO_CERTS

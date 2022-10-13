@@ -157,7 +157,6 @@ int maxq10xx_perform_tls_record_processing(WOLFSSL* ssl, int is_encrypt,
                                            const byte* iv, word32 ivSz,
                                            byte* authTag, word32 authTagSz,
                                            const byte* authIn, word32 authInSz);
-int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len);
 int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
                               byte* p_out, word32* p_out_len);
 

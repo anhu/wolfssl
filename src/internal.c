@@ -26879,9 +26879,6 @@ static int HashSkeData(WOLFSSL* ssl, enum wc_HashType hashType,
         WOLFSSL_X509* x509 = NULL;
         WOLFSSL_EVP_PKEY* pkey = NULL;
     #endif
-    #ifdef WOLFSSL_MAXQ10XX_TLS
-        DerBuffer* maxq_der = NULL;
-    #endif
 
         WOLFSSL_START(WC_FUNC_CERTIFICATE_REQUEST_DO);
         WOLFSSL_ENTER("DoCertificateRequest");
@@ -27046,26 +27043,15 @@ static int HashSkeData(WOLFSSL* ssl, enum wc_HashType hashType,
             return ret;
     #endif
 
-    #ifdef WOLFSSL_MAXQ10XX_TLS
-        ret = AllocDer(&maxq_der, FILE_BUFFER_SIZE, CERT_TYPE, ssl->heap);
-        if (ret != 0) {
-            return ret;
+    #if defined(HAVE_PK_CALLBACKS)
+        if (ssl->options.side == WOLFSSL_CLIENT_END && ssl->ctx &&
+            ssl->ctx->ReadCertDerCb) {
+            ret = ssl->ctx->ReadCertDerCb(ssl);
+            if ((ret != 0) && (ret != NOT_COMPILED_IN)) {
+                return ret;
+            }
         }
-
-        ret = maxq10xx_read_device_cert_der(maxq_der->buffer,
-                                            &maxq_der->length);
-        if (ret != 0) {
-            return ret;
-        }
-
-        ssl->maxq_ctx.device_cert = maxq_der;
-
-        if (ssl->buffers.weOwnCert) {
-            FreeDer(&ssl->buffers.certificate);
-        }
-        ssl->buffers.certificate = maxq_der;
-        ssl->buffers.weOwnCert = 1;
-    #endif /* WOLFSSL_MAXQ10XX_TLS */
+    #endif /* HAVE_PK_CALLBACKS */
 
         /* don't send client cert or cert verify if user hasn't provided
            cert and private key */

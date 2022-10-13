@@ -7267,26 +7267,13 @@ static int SendTls13Certificate(WOLFSSL* ssl)
             return BUFFER_ERROR;
         }
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-        if (ssl->options.side == WOLFSSL_CLIENT_END) {
-            DerBuffer* maxq_der = NULL;
-
-            ret = AllocDer(&maxq_der, 4096, CERT_TYPE, ssl->heap);
-            if (ret)
+#if defined(HAVE_PK_CALLBACKS)
+        if (ssl->options.side == WOLFSSL_CLIENT_END && ssl->ctx &&
+            ssl->ctx->ReadCertDerCb) {
+            ret = ssl->ctx->ReadCertDerCb(ssl);
+            if ((ret != 0) && (ret != NOT_COMPILED_IN)) {
                 return ret;
-
-            ret = maxq10xx_read_device_cert_der(maxq_der->buffer,
-                                                &maxq_der->length);
-            if (ret)
-                return ret;
-
-            ssl->maxq_ctx.device_cert = maxq_der;
-
-            if (ssl->buffers.weOwnCert) {
-                FreeDer(&ssl->buffers.certificate);
             }
-            ssl->buffers.certificate = maxq_der;
-            ssl->buffers.weOwnCert = 1;
         }
 #endif
 

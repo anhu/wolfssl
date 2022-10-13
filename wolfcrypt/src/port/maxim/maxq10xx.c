@@ -1895,7 +1895,7 @@ int maxq10xx_perform_tls_record_processing(WOLFSSL* ssl, int is_encrypt,
     return 0;
 }
 
-int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
+static int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -1960,6 +1960,33 @@ int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     *p_len = cert_size;
     return 0;
 }
+
+static int maxq10xx_readCertDer_cb(WOLFSSL *ssl) {
+    DerBuffer* maxq_der = NULL;
+    int ret = 0;
+
+    ret = AllocDer(&maxq_der, FILE_BUFFER_SIZE, CERT_TYPE, ssl->heap);
+    if (ret != 0) {
+        return ret;
+    }
+
+    ret = maxq10xx_read_device_cert_der(maxq_der->buffer,
+                                        &maxq_der->length);
+    if (ret != 0) {
+        return ret;
+    }
+
+    ssl->maxq_ctx.device_cert = maxq_der;
+
+    if (ssl->buffers.weOwnCert) {
+        FreeDer(&ssl->buffers.certificate);
+    }
+
+    ssl->buffers.certificate = maxq_der;
+    ssl->buffers.weOwnCert = 1;
+    return 0;
+}
+
 
 int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
                               byte* p_out, word32* p_out_len)
@@ -3287,7 +3314,9 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
         wolfSSL_CTX_SetHstypeAndKeylenCb(ctx, maxq10xx_hstype_and_keylen);
     }
+
     wolfSSL_CTX_SetHstypeAndSiglenCb(ctx, maxq10xx_hstype_and_siglen);
+    wolfSSL_CTX_SetReadCertDerCb(ctx, maxq10xx_readCertDer_cb);
 
     #ifdef HAVE_HKDF
         wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
