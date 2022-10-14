@@ -2388,7 +2388,7 @@ int InitSSL_Ctx(WOLFSSL_CTX* ctx, WOLFSSL_METHOD* method, void* heap)
     ret = wolfEventQueue_Init(&ctx->event_queue);
 #endif /* HAVE_WOLF_EVENT */
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ10XX_TLS)
     /* Only setup the callbacks if we're a client. Let the maxq10xx
      * infrastructure know whether we are doing TLS 1.3. */
     if (method->side == WOLFSSL_CLIENT_END) {
@@ -26872,7 +26872,7 @@ static int HashSkeData(WOLFSSL* ssl, enum wc_HashType hashType,
         word32 begin = *inOutIdx;
     #if defined(OPENSSL_EXTRA) || defined(OPENSSL_ALL) || \
         defined(WOLFSSL_NGINX) || defined(HAVE_LIGHTY) || \
-        defined(WOLFSSL_MAXQ10XX_TLS)
+        defined(HAVE_PK_CALLBACKS)
         int ret;
     #endif
     #ifdef OPENSSL_EXTRA
