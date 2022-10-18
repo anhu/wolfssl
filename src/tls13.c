@@ -214,6 +214,7 @@ static int Tls13HKDFExpandKeyLabel(byte* okm, word32 okmLen,
                                        protocol, protocolLen, label, labelLen,
                                        info, infoLen, digest, forSide);
 #else
+    (void)forSide;
     return wc_Tls13_HKDF_Expand_Label(okm, okmLen, prk, prkLen,
                                       protocol, protocolLen, label, labelLen,
                                       info, infoLen, digest);
