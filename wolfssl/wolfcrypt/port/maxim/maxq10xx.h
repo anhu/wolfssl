@@ -111,7 +111,6 @@ int maxq10xx_port_init(void);
 
 #ifdef HAVE_PK_CALLBACKS
 void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13);
-void maxq10xx_SetTls13Side(int side);
 
 int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
                                              byte* out, const byte* in,
@@ -132,6 +131,16 @@ int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
                              const byte* label, word32 labelLen,
                              const byte* info, word32 infoLen,
                              int digest);
+
+/* Same as previous function, but also informs integrations about whether
+ * the key or IV is for the server or for the client.
+ */
+int maxq10xx_HkdfExpandKeyLabel(byte* okm, word32 okmLen,
+                                const byte* prk, word32 prkLen,
+                                const byte* protocol, word32 protocolLen,
+                                const byte* label, word32 labelLen,
+                                const byte* info, word32 infoLen,
+                                int digest, int forSide);
 
 #endif /* HAVE_HKDF */
 #endif /* HAVE_PK_CALLBACKS */

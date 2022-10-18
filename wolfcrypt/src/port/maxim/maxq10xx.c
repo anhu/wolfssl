@@ -69,7 +69,6 @@ void dbg_dumphex(const char *identifier, const uint8_t* pdata, uint32_t plen);
 #define PSK_KID (0x1235)
 static unsigned char tls13active          =  0;
 static unsigned char tls13early           =  0;
-static int tls13_side                     =  0;
 
 static int tls13_dh_obj_id                = -1;
 static int tls13_ecc_obj_id               = -1;
@@ -2726,7 +2725,7 @@ static char *strstr_with_size(char *str, const char *substr, size_t n)
 
 static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                         const byte* info, word32 infoSz, byte* out,
-                        word32 outSz)
+                        word32 outSz, int forSide)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -2888,7 +2887,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
     }
     else if (strstr_with_size((char *)info, keyLabel, infoSz) != NULL) {
         /* first client key then server */
-        if (tls13_side & PROVISION_CLIENT) {
+        if (forSide == WOLFSSL_CLIENT_END) {
             /* client_handshake_key = HKDF-Expand-Label(key: client_secret,
              *                            label: "key", ctx: "")
              * client_application_key = HKDF-Expand-Label(key: client_secret,
@@ -2955,7 +2954,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
     }
     else if (strstr_with_size((char *)info, ivLabel, infoSz) != NULL) {
         /* first client key then server */
-        if (tls13_side & PROVISION_CLIENT) {
+        if (forSide == WOLFSSL_CLIENT_END) {
             /* client_handshake_iv = HKDF-Expand-Label(key: client_secret,
              *                           label: "iv", ctx: "")
              * cient_application_iv = HKDF-Expand-Label(key: client_secret,
@@ -3030,7 +3029,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
         }
         else {
             /* first client key then server */
-            if (tls13_side & PROVISION_CLIENT) {
+            if (forSide == WOLFSSL_CLIENT_END) {
                 /* finished_key = HKDF-Expand-Label(key: client_secret,
                  * label: "finished", ctx: "") */
                 if (is_hs_key) {
@@ -3115,7 +3114,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
         *tls13_client_key_id = -1;
     }
     else if (strstr_with_size((char *)info, appTrafUpdLabel, infoSz) != NULL) {
-        if (tls13_side & PROVISION_CLIENT) {
+        if (forSide == WOLFSSL_CLIENT_END) {
             /* updated_client_secret = HKDF-Expand-Label(key: client_secret,
              *                             label: "traffic upd", ctx: "") */
             if (tls13_client_app_key_obj_id == -1) {
@@ -3127,7 +3126,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
             ret_keytype = MXQ_KEYTYPE_IKM;
             ret_isiv = 0;
         }
-        else if (tls13_side & PROVISION_SERVER) {
+        else {
             /* updated_server_secret = HKDF-Expand-Label(key: server_secret,
              *                             label: "traffic upd", ctx: "") */
             if (tls13_server_app_key_obj_id == -1) {
@@ -3138,10 +3137,6 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
             ret_kid = tls13_server_secret_obj_id;
             ret_keytype = MXQ_KEYTYPE_IKM;
             ret_isiv = 0;
-        }
-        else {
-            WOLFSSL_MSG("MAXQ: TLS1.3 Side is not selected");
-            return NOT_COMPILED_IN;
         }
     }
     else {
@@ -3176,12 +3171,13 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
     return 0;
 }
 
-int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
-                             const byte* prk, word32 prkLen,
-                             const byte* protocol, word32 protocolLen,
-                             const byte* label, word32 labelLen,
-                             const byte* info, word32 infoLen,
-                             int digest)
+static int maxq10xx_HkdfExpandLabel_internal(byte* okm, word32 okmLen,
+                                             const byte* prk, word32 prkLen,
+                                             const byte* protocol,
+                                             word32 protocolLen,
+                                             const byte* label, word32 labelLen,
+                                             const byte* info, word32 infoLen,
+                                             int digest, int forSide)
 {
     int    ret = 0;
     int    idx = 0;
@@ -3208,7 +3204,8 @@ int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
     wc_MemZero_Add("wc_Tls13_HKDF_Expand_Label data", data, idx);
 #endif
 
-    ret = maxq10xx_HkdfExpand(digest, prk, prkLen, data, idx, okm, okmLen);
+    ret = maxq10xx_HkdfExpand(digest, prk, prkLen, data, idx, okm, okmLen,
+                              forSide);
     ForceZero(data, idx);
 
 #ifdef WOLFSSL_CHECK_MEM_ZERO
@@ -3216,7 +3213,35 @@ int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
 #endif
 
     return ret;
+}
 
+/* In these generic cases, the side does not matter. */
+int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
+                             const byte* prk, word32 prkLen,
+                             const byte* protocol, word32 protocolLen,
+                             const byte* label, word32 labelLen,
+                             const byte* info, word32 infoLen,
+                             int digest) {
+    return maxq10xx_HkdfExpandLabel_internal(okm, okmLen, prk, prkLen, protocol,
+                                             protocolLen, label, labelLen,
+                                             info, infoLen, digest,
+                                             0 /*don't care */);
+}
+
+/* For key and IV, we need to know if this for the server or client. */
+int maxq10xx_HkdfExpandKeyLabel(byte* okm, word32 okmLen,
+                                const byte* prk, word32 prkLen,
+                                const byte* protocol, word32 protocolLen,
+                                const byte* label, word32 labelLen,
+                                const byte* info, word32 infoLen,
+                                int digest, int forSide) {
+    if (forSide != WOLFSSL_SERVER_END && forSide != WOLFSSL_CLIENT_END) {
+        return BAD_FUNC_ARG;
+    }
+
+    return maxq10xx_HkdfExpandLabel_internal(okm, okmLen, prk, prkLen, protocol,
+                                             protocolLen, label, labelLen,
+                                             info, infoLen, digest, forSide);
 }
 
 int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
@@ -3301,13 +3326,6 @@ int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
     return 0;
 }
 #endif /* HAVE_HKDF */
-
-void maxq10xx_SetTls13Side(int side)
-{
-    WOLFSSL_ENTER("maxq10xx_SetTls13Side");
-    tls13_side = side;
-}
-
 #endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108x */
 
 void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
