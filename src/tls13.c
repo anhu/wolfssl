@@ -214,6 +214,11 @@ static int Tls13HKDFExpandKeyLabel(byte* okm, word32 okmLen,
                                        protocol, protocolLen, label, labelLen,
                                        info, infoLen, digest, forSide);
 #else
+/* hash buffer may not be fully initialized, but the sending length won't
+ * extend beyond the initialized span.
+ */
+PRAGMA_GCC_DIAG_PUSH;
+PRAGMA_GCC("GCC diagnostic ignored \"-Wmaybe-uninitialized\"");
     (void)forSide;
     return wc_Tls13_HKDF_Expand_Label(okm, okmLen, prk, prkLen,
                                       protocol, protocolLen, label, labelLen,
