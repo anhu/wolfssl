@@ -1485,7 +1485,9 @@ static int mxq_get_sign_alg_from_sig_oid(word32 maxq_id){
     }
 }
 #endif
-int maxq10xx_process_server_certificate(WOLFSSL* ssl, DecodedCert* p_cert)
+
+static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
+                                               DecodedCert* p_cert)
 {
     mxq_keytype_id_t key_type = MXQ_KEYTYPE_ECC;
     mxq_keyparam_id_t keyparam = MXQ_KEYPARAM_EC_P256R1;
@@ -1620,11 +1622,10 @@ int maxq10xx_process_server_certificate(WOLFSSL* ssl, DecodedCert* p_cert)
     return 0;
 }
 
-int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
-                                         const byte* p_sig, word32 p_sig_len,
-                                         const byte* p_rand, word32 p_rand_len,
-                                         const byte* p_server_params,
-                                         word32 p_server_params_len)
+static int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
+               const byte* p_sig, word32 p_sig_len,
+               const byte* p_rand, word32 p_rand_len,
+               const byte* p_server_params, word32 p_server_params_len)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -1667,8 +1668,8 @@ int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
     return 0;
 }
 
-int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl, ecc_key* p_key,
-                                         ecc_key* p_peer_key)
+static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl, ecc_key* p_key,
+                                                ecc_key* p_peer_key)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -1773,8 +1774,10 @@ int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl, ecc_key* p_key,
     return 0;
 }
 
-int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, const byte* p_client_rand,
-                                    const byte* p_server_rand, int is_psk)
+static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl,
+                                           const byte* p_client_rand,
+                                           const byte* p_server_rand,
+                                           int is_psk)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -1789,6 +1792,13 @@ int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, const byte* p_client_rand,
         (ssl->specs.kea != psk_kea)) {
         WOLFSSL_MSG("MAXQ: key exchange algo not supported");
         return NOT_COMPILED_IN;
+    }
+
+    if (ssl->specs.kea == ecc_diffie_hellman_kea) {
+        if ((ssl->hsKey == NULL ) ||
+            (((ecc_key*)ssl->hsKey)->maxq_ctx.hw_storage == 0)) {
+            return NOT_COMPILED_IN;
+        }
     }
 
     XMEMCPY(tls_rand, p_client_rand, RAN_LEN);
@@ -1830,10 +1840,10 @@ int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, const byte* p_client_rand,
     return 0;
 }
 
-int maxq10xx_perform_client_finished(WOLFSSL* ssl, const byte* p_label,
-                                     word32 p_label_len, const byte* p_seed,
-                                     word32 p_seed_len, byte* p_dest,
-                                     word32 p_dest_len)
+static int maxq10xx_perform_client_finished(WOLFSSL* ssl,
+               const byte* p_label, word32 p_label_len,
+               const byte* p_seed, word32 p_seed_len,
+               byte* p_dest, word32 p_dest_len)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -1859,16 +1869,20 @@ int maxq10xx_perform_client_finished(WOLFSSL* ssl, const byte* p_label,
     return 0;
 }
 
-int maxq10xx_perform_tls_record_processing(WOLFSSL* ssl, int is_encrypt,
-                                           byte* out, const byte* in, word32 sz,
-                                           const byte* iv, word32 ivSz,
-                                           byte* authTag, word32 authTagSz,
-                                           const byte* authIn, word32 authInSz)
+static int maxq10xx_perform_tls_record_processing(WOLFSSL* ssl, int is_encrypt,
+               byte* out, const byte* in, word32 sz,
+               const byte* iv, word32 ivSz,
+               byte* authTag, word32 authTagSz,
+               const byte* authIn, word32 authInSz)
 {
     int rc;
     mxq_err_t mxq_rc;
     mxq_u2 key_id = (is_encrypt == 1) ? 1 : 0;
     mxq_algo_id_t algo_id = 0;
+
+    if (! ssl->maxq_ctx.use_hw_keys) {
+        return NOT_COMPILED_IN;
+    } 
 
     if (ssl->options.side != WOLFSSL_CLIENT_END) {
         return BAD_STATE_E;
@@ -2011,8 +2025,9 @@ static int maxq10xx_hstype_and_siglen(word32* hsType, word16* siglen)
 
 #endif /* HAVE_PK_CALLBACKS */
 
-int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
-                              byte* p_out, word32* p_out_len)
+static int maxq10xx_sign_device_cert(WOLFSSL* ssl,
+               const byte* p_in, word32 p_in_len,
+               byte* p_out, word32* p_out_len)
 {
     int rc;
 
@@ -3215,13 +3230,12 @@ static int maxq10xx_HkdfExpandLabel_internal(byte* okm, word32 okmLen,
     return ret;
 }
 
-/* In these generic cases, the side does not matter. */
-int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
-                             const byte* prk, word32 prkLen,
-                             const byte* protocol, word32 protocolLen,
-                             const byte* label, word32 labelLen,
-                             const byte* info, word32 infoLen,
-                             int digest) {
+static int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
+               const byte* prk, word32 prkLen,
+               const byte* protocol, word32 protocolLen,
+               const byte* label, word32 labelLen,
+               const byte* info, word32 infoLen,
+               int digest) {
     return maxq10xx_HkdfExpandLabel_internal(okm, okmLen, prk, prkLen, protocol,
                                              protocolLen, label, labelLen,
                                              info, infoLen, digest,
@@ -3229,12 +3243,12 @@ int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
 }
 
 /* For key and IV, we need to know if this for the server or client. */
-int maxq10xx_HkdfExpandKeyLabel(byte* okm, word32 okmLen,
-                                const byte* prk, word32 prkLen,
-                                const byte* protocol, word32 protocolLen,
-                                const byte* label, word32 labelLen,
-                                const byte* info, word32 infoLen,
-                                int digest, int forSide) {
+static int maxq10xx_HkdfExpandKeyLabel(byte* okm, word32 okmLen,
+               const byte* prk, word32 prkLen,
+               const byte* protocol, word32 protocolLen,
+               const byte* label, word32 labelLen,
+               const byte* info, word32 infoLen,
+               int digest, int forSide) {
     if (forSide != WOLFSSL_SERVER_END && forSide != WOLFSSL_CLIENT_END) {
         return BAD_FUNC_ARG;
     }
@@ -3244,13 +3258,11 @@ int maxq10xx_HkdfExpandKeyLabel(byte* okm, word32 okmLen,
                                              info, infoLen, digest, forSide);
 }
 
-int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
-                                             byte* out, const byte* in,
-                                             word32 sz, const byte* iv,
-                                             word32 ivSz, byte* authTag,
-                                             word32 authTagSz,
-                                             const byte* authIn,
-                                             word32 authInSz)
+static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
+               int is_encrypt, byte* out, const byte* in,
+               word32 sz, const byte* iv, word32 ivSz,
+               byte* authTag, word32 authTagSz,
+               const byte* authIn, word32 authInSz)
 {
     int rc;
     mxq_err_t mxq_rc;
@@ -3349,17 +3361,36 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
         wolfSSL_CTX_SetHstypeAndKeylenCb(ctx, maxq10xx_hstype_and_keylen);
+        wolfSSL_CTX_SetTls13RecordProcessingCb(ctx,
+            maxq10xx_perform_tls13_record_processing);
+
     }
 
     #ifdef HAVE_HKDF
-        wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
-        use_hw_hkdf_expand = 1;
+    wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
+    wolfSSL_CTX_SetHKDFExpandLabelCb(ctx, maxq10xx_HkdfExpandLabel);
+    wolfSSL_CTX_SetHKDFExpandKeyLabelCb(ctx, maxq10xx_HkdfExpandKeyLabel);
+    use_hw_hkdf_expand = 1;
     #endif
 
 #endif /* WOLFSSL_MAXQ108x */
 
+    wolfSSL_CTX_SetProcessServerCertCb(ctx,
+       maxq10xx_process_server_certificate);
+    wolfSSL_CTX_SetProcessServerKexCb(ctx,
+        maxq10xx_process_server_key_exchange);
+    wolfSSL_CTX_SetPerformClientKexCb(ctx,
+        maxq10xx_perform_client_key_exchange);
+    wolfSSL_CTX_SetMakeTlsMasterSecretCb(ctx,
+        maxq10xx_make_tls_master_secret);
+    wolfSSL_CTX_SetPerformClientFinCb(ctx,
+        maxq10xx_perform_client_finished);
+    wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
+        maxq10xx_perform_tls_record_processing);
+
     wolfSSL_CTX_SetHstypeAndSiglenCb(ctx, maxq10xx_hstype_and_siglen);
     wolfSSL_CTX_SetReadCertDerCb(ctx, maxq10xx_readCertDer_cb);
+    wolfSSL_CTX_SetSignCertCb(ctx, maxq10xx_sign_device_cert);
 
     init_pk_callbacks = 1;
 }

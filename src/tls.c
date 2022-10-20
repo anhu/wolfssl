@@ -221,12 +221,19 @@ int BuildTlsFinished(WOLFSSL* ssl, Hashes* hashes, const byte* sender)
         if (!ssl->ctx->TlsFinishedCb || ret == PROTOCOLCB_UNAVAILABLE)
 #endif
         {
-#ifdef WOLFSSL_MAXQ10XX_TLS
-            if (ssl->options.side == WOLFSSL_CLIENT_END) {
-            ret = maxq10xx_perform_client_finished(ssl, side, FINISHED_LABEL_SZ,
-                    handshake_hash, hashSz, (byte*)hashes, TLS_FINISHED_SZ);
-            } else
-#endif /* WOLFSSL_MAXQ10XX_TLS */
+#ifdef HAVE_PK_CALLBACKS
+/* TODO: Use TlsFinishedCb */
+            ret = NOT_COMPILED_IN;
+            if (ssl->options.side == WOLFSSL_CLIENT_END &&
+                ssl->ctx && ssl->ctx->PerformClientFinCb) {
+                ret = ssl->ctx->PerformClientFinCb(ssl,
+                          side, FINISHED_LABEL_SZ,
+                          handshake_hash, hashSz,
+                          (byte*)hashes, TLS_FINISHED_SZ);
+            }
+
+            if (ret == NOT_COMPILED_IN)
+#endif /* HAVE_PK_CALLBACKS */
             {
                 PRIVATE_KEY_UNLOCK();
                 ret = wc_PRF_TLS((byte*)hashes, TLS_FINISHED_SZ,
@@ -575,34 +582,36 @@ int MakeTlsMasterSecret(WOLFSSL* ssl)
         if (!ssl->ctx->GenMasterCb || ret == PROTOCOLCB_UNAVAILABLE)
 #endif
         {
-#ifdef WOLFSSL_MAXQ10XX_TLS
+#ifdef HAVE_PK_CALLBACKS
             if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
                 (ssl->specs.kea == ecc_diffie_hellman_kea) &&
-                (ssl->hsKey) &&
-                (((ecc_key*)ssl->hsKey)->maxq_ctx.hw_storage == 1))
+                ssl->ctx && ssl->ctx->MakeTlsMasterSecretCb)
             {
-                ret = maxq10xx_make_tls_master_secret(ssl,
+                ret = ssl->ctx->MakeTlsMasterSecretCb(ssl,
                             ssl->arrays->clientRandom,
                             ssl->arrays->serverRandom,
                             0);
-                return ret;
+                if (ret != NOT_COMPILED_IN)
+                    return ret;
             }
-            else if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
-                    (ssl->specs.kea == psk_kea)) {
-                ret = maxq10xx_make_tls_master_secret(ssl,
+
+            if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
+                (ssl->specs.kea == psk_kea) &&
+                ssl->ctx && ssl->ctx->MakeTlsMasterSecretCb) {
+                ret = ssl->ctx->MakeTlsMasterSecretCb(ssl,
                             ssl->arrays->clientRandom,
                             ssl->arrays->serverRandom,
                             1);
-                return ret;
-            } else
-#endif /* WOLFSSL_MAXQ10XX_TLS */
-            {
-                ret = _MakeTlsMasterSecret(ssl->arrays->masterSecret,
-                          SECRET_LEN, ssl->arrays->preMasterSecret,
-                          ssl->arrays->preMasterSz, ssl->arrays->clientRandom,
-                          ssl->arrays->serverRandom, IsAtLeastTLSv1_2(ssl),
-                          ssl->specs.mac_algorithm, ssl->heap, ssl->devId);
+                if (ret != NOT_COMPILED_IN)
+                    return ret;
             }
+#endif /* HAVE_PK_CALLBACKS */
+
+            ret = _MakeTlsMasterSecret(ssl->arrays->masterSecret,
+                      SECRET_LEN, ssl->arrays->preMasterSecret,
+                      ssl->arrays->preMasterSz, ssl->arrays->clientRandom,
+                      ssl->arrays->serverRandom, IsAtLeastTLSv1_2(ssl),
+                      ssl->specs.mac_algorithm, ssl->heap, ssl->devId);
         }
     }
     if (ret == 0) {

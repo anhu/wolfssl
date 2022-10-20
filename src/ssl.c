@@ -29615,6 +29615,66 @@ void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx,
     if (ctx)
         ctx->ReadCertDerCb = cb;
 }
+void wolfSSL_CTX_SetSignCertCb(WOLFSSL_CTX* ctx,
+                               CallbackSignCert cb)
+{
+    if (ctx)
+        ctx->SignCertCb = cb;
+}
+void wolfSSL_CTX_SetTls13RecordProcessingCb(WOLFSSL_CTX* ctx,
+                                            CallbackTls13RecordProcessing cb)
+{
+    if (ctx)
+        ctx->Tls13RecordProcessingCb = cb;
+}
+void wolfSSL_CTX_SetHKDFExpandLabelCb(WOLFSSL_CTX* ctx,
+                                      CallbackHKDFExpandLabel cb)
+{
+    if (ctx)
+        ctx->HKDFExpandLabelCb = cb;
+}
+void wolfSSL_CTX_SetHKDFExpandKeyLabelCb(WOLFSSL_CTX* ctx,
+                                         CallbackHKDFExpandKeyLabel cb)
+{
+    if (ctx)
+        ctx->HKDFExpandKeyLabelCb = cb;
+}
+void wolfSSL_CTX_SetProcessServerCertCb(WOLFSSL_CTX* ctx,
+                                        CallbackProcessServerCert cb)
+{
+    if (ctx)
+        ctx->ProcessServerCertCb = cb;
+}
+void wolfSSL_CTX_SetProcessServerKexCb(WOLFSSL_CTX* ctx,
+                                       CallbackProcessServerKex cb)
+{
+    if (ctx)
+        ctx->ProcessServerKexCb = cb;
+}
+void wolfSSL_CTX_SetPerformClientKexCb(WOLFSSL_CTX* ctx,
+                                       CallbackPerformClientKex cb)
+{
+    if (ctx)
+        ctx->PerformClientKexCb = cb;
+}
+void wolfSSL_CTX_SetMakeTlsMasterSecretCb(WOLFSSL_CTX* ctx,
+                                          CallbackMakeTlsMasterSecret cb)
+{
+    if (ctx)
+        ctx->MakeTlsMasterSecretCb = cb;
+}
+void wolfSSL_CTX_SetPerformClientFinCb(WOLFSSL_CTX* ctx,
+                                       CallbackPerformClientFin cb)
+{
+    if (ctx)
+        ctx->PerformClientFinCb = cb;
+}
+void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx,
+                                          CallbackPerformTlsRecordProcessing cb)
+{
+    if (ctx)
+        ctx->PerformTlsRecordProcessingCb = cb;
+}
 #endif /* HAVE_PK_CALLBACKS */
 #endif /* NO_CERTS */
 

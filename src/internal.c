@@ -12957,14 +12957,19 @@ static int ProcessPeerCertParse(WOLFSSL* ssl, ProcPeerCertArgs* args,
     }
 #endif
 
-#ifdef WOLFSSL_MAXQ10XX_TLS
+#ifdef HAVE_PK_CALLBACKS
     if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        ret = maxq10xx_process_server_certificate(ssl, args->dCert);
-        if (ret != 0) {
-            return ret;
+        int orig_ret = ret;
+        ret = NOT_COMPILED_IN;
+        if (ssl->ctx && ssl->ctx->ProcessServerCertCb) {
+            ret = ssl->ctx->ProcessServerCertCb(ssl, args->dCert);
+        }
+
+        if (ret == NOT_COMPILED_IN) {
+            ret = orig_ret;
         }
     }
-#endif /* WOLFSSL_MAXQ10XX_TLS */
+#endif /* HAVE_PK_CALLBACKS */
 
     return ret;
 }
@@ -17303,17 +17308,20 @@ static WC_INLINE int EncryptDo(WOLFSSL* ssl, byte* out, const byte* input,
             XMEMCPY(ssl->encrypt.nonce + AESGCM_IMP_IV_SZ,
                                 ssl->keys.aead_exp_IV, AESGCM_EXP_IV_SZ);
 #endif
-        #ifdef WOLFSSL_MAXQ10XX_TLS
-            if (ssl->maxq_ctx.use_hw_keys == 1) {
-                ret = maxq10xx_perform_tls_record_processing(ssl, 1,
-                        out + AESGCM_EXP_IV_SZ, input + AESGCM_EXP_IV_SZ,
-                        sz - AESGCM_EXP_IV_SZ - ssl->specs.aead_mac_size,
-                        ssl->encrypt.nonce, AESGCM_NONCE_SZ,
-                        out + sz - ssl->specs.aead_mac_size,
-                        ssl->specs.aead_mac_size,
-                        ssl->encrypt.additional, AEAD_AUTH_DATA_SZ);
-            } else
-        #endif /* WOLFSSL_MAXQ10XX_TLS */
+        #ifdef HAVE_PK_CALLBACKS
+            ret = NOT_COMPILED_IN;
+            if (ssl->ctx && ssl->ctx->PerformTlsRecordProcessingCb) {
+                ret = ssl->ctx->PerformTlsRecordProcessingCb(ssl, 1,
+                         out + AESGCM_EXP_IV_SZ, input + AESGCM_EXP_IV_SZ,
+                         sz - AESGCM_EXP_IV_SZ - ssl->specs.aead_mac_size,
+                         ssl->encrypt.nonce, AESGCM_NONCE_SZ,
+                         out + sz - ssl->specs.aead_mac_size,
+                         ssl->specs.aead_mac_size,
+                         ssl->encrypt.additional, AEAD_AUTH_DATA_SZ);
+            }
+
+            if (ret == NOT_COMPILED_IN)
+        #endif /* HAVE_PK_CALLBACKS */
             {
                 ret = aes_auth_fn(ssl->encrypt.aes,
                         out + AESGCM_EXP_IV_SZ, input + AESGCM_EXP_IV_SZ,
@@ -17604,9 +17612,10 @@ static WC_INLINE int DecryptDo(WOLFSSL* ssl, byte* plain, const byte* input,
                         AESGCM_IMP_IV_SZ);
             XMEMCPY(ssl->decrypt.nonce + AESGCM_IMP_IV_SZ, input,
                                                             AESGCM_EXP_IV_SZ);
-        #ifdef WOLFSSL_MAXQ10XX_TLS
-            if (ssl->maxq_ctx.use_hw_keys == 1) {
-                ret = maxq10xx_perform_tls_record_processing(ssl, 0,
+        #ifdef HAVE_PK_CALLBACKS
+            ret = NOT_COMPILED_IN;
+            if (ssl->ctx && ssl->ctx->PerformTlsRecordProcessingCb) {
+                ret = ssl->ctx->PerformTlsRecordProcessingCb(ssl, 0,
                         plain + AESGCM_EXP_IV_SZ,
                         input + AESGCM_EXP_IV_SZ,
                         sz - AESGCM_EXP_IV_SZ - ssl->specs.aead_mac_size,
@@ -17614,8 +17623,10 @@ static WC_INLINE int DecryptDo(WOLFSSL* ssl, byte* plain, const byte* input,
                         (byte *)(input + sz - ssl->specs.aead_mac_size),
                         ssl->specs.aead_mac_size,
                         ssl->decrypt.additional, AEAD_AUTH_DATA_SZ);
-            } else
-        #endif /* WOLFSSL_MAXQ10XX_TLS */
+            }
+
+            if (ret == NOT_COMPILED_IN)
+        #endif /* HAVE_PK_CALLBACKS */
             {
                 if ((ret = aes_auth_fn(ssl->decrypt.aes,
                             plain + AESGCM_EXP_IV_SZ,
@@ -28161,18 +28172,20 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                     #ifdef HAVE_ECC
                         case ecc_dsa_sa_algo:
                         {
-                        #ifdef WOLFSSL_MAXQ10XX_TLS
-                            if (ssl->options.side == WOLFSSL_CLIENT_END) {
-                                ret = maxq10xx_process_server_key_exchange(ssl,
+                        #ifdef HAVE_PK_CALLBACKS
+                            ret = NOT_COMPILED_IN;
+                            if (ssl->options.side == WOLFSSL_CLIENT_END &&
+                                ssl->ctx && ssl->ctx->ProcessServerKexCb) {
+                                ret = ssl->ctx->ProcessServerKexCb(ssl,
                                     args->sigAlgo,
-                                    args->verifySig,
-                                    args->verifySigSz,
-                                    ssl->buffers.sig.buffer,
-                                    SEED_LEN,
+                                    args->verifySig, args->verifySigSz,
+                                    ssl->buffers.sig.buffer, SEED_LEN,
                                     &ssl->buffers.sig.buffer[SEED_LEN],
                                     (ssl->buffers.sig.length - SEED_LEN));
-                            } else
-                        #endif /* WOLFSSL_MAXQ10XX_TLS */
+                            }
+
+                            if (ret == NOT_COMPILED_IN)
+                        #endif /* HAVE_PK_CALLBACKS */
                             {
                                 ret = EccVerify(ssl,
                                     args->verifySig, args->verifySigSz,
@@ -28792,17 +28805,21 @@ int SendClientKeyExchange(WOLFSSL* ssl)
                         goto exit_scke;
                     }
 
-                    #ifdef WOLFSSL_MAXQ10XX_TLS
-                    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-                        ret = maxq10xx_perform_client_key_exchange(ssl,
-                                (ecc_key*)ssl->hsKey,
-                                NULL);
+                    #ifdef HAVE_PK_CALLBACKS
+                    ret = NOT_COMPILED_IN;
+                    if (ssl->options.side == WOLFSSL_CLIENT_END &&
+                        ssl->ctx && ssl->ctx->PerformClientKexCb) {
+                        ret = ssl->ctx->PerformClientKexCb(ssl,
+                                (ecc_key*)ssl->hsKey, NULL);
+                    }
+
+                    if (ret != NOT_COMPILED_IN) {
                         break;
                     }
-                    #endif /* WOLFSSL_MAXQ10XX_TLS */
+                    #endif /* HAVE_PK_CALLBACKS */
 
                     ret = EccMakeKey(ssl, (ecc_key*)ssl->hsKey, peerKey);
-                #endif
+                #endif /* HAVE_ECC */
 
                     break;
                 }
@@ -30044,27 +30061,34 @@ int SendCertificateVerify(WOLFSSL* ssl)
         case TLS_ASYNC_DO:
         {
         #ifdef HAVE_ECC
-           if (ssl->hsType == DYNAMIC_TYPE_ECC) {
-            #ifdef WOLFSSL_MAXQ10XX_TLS
-                ret = maxq10xx_sign_device_cert(ssl,
-                          ssl->buffers.digest.buffer,
-                          ssl->buffers.digest.length,
-                          ssl->buffers.sig.buffer,
-                          (word32*)&ssl->buffers.sig.length);
-            #else
-                ecc_key* key = (ecc_key*)ssl->hsKey;
-
-                ret = EccSign(ssl,
-                    ssl->buffers.digest.buffer, ssl->buffers.digest.length,
-                    ssl->buffers.sig.buffer, (word32*)&ssl->buffers.sig.length,
-                    key,
+            if (ssl->hsType == DYNAMIC_TYPE_ECC) {
             #ifdef HAVE_PK_CALLBACKS
-                    ssl->buffers.key
+/*TODO: get rid of this.  Use whatever callback is in EccSign() */
+                ret = NOT_COMPILED_IN;
+                if (ssl->ctx && ssl->ctx->SignCertCb) {
+                    ret = ssl->ctx->SignCertCb(ssl,
+                              ssl->buffers.digest.buffer,
+                              ssl->buffers.digest.length,
+                              ssl->buffers.sig.buffer,
+                              (word32*)&ssl->buffers.sig.length);
+                }
+                if (ret == NOT_COMPILED_IN)
+            #endif /* HAVE_PK_CALLBACKS */
+                {
+                    ecc_key* key = (ecc_key*)ssl->hsKey;
+
+                    ret = EccSign(ssl,
+                        ssl->buffers.digest.buffer, ssl->buffers.digest.length,
+                        ssl->buffers.sig.buffer,
+                        (word32*)&ssl->buffers.sig.length,
+                        key,
+            #ifdef HAVE_PK_CALLBACKS
+                        ssl->buffers.key
             #else
-                    NULL
+                        NULL
             #endif
-                );
-            #endif /* WOLFSSL_MAXQ10XX_TLS */
+                    );
+                }
             }
         #endif /* HAVE_ECC */
         #if defined(HAVE_ED25519) && !defined(NO_ED25519_CLIENT_AUTH)

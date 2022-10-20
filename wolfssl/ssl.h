@@ -3533,6 +3533,67 @@ WOLFSSL_API void wolfSSL_CTX_SetHstypeAndSiglenCb(WOLFSSL_CTX* ctx, CallbackHsty
 
 typedef int (*CallbackReadCertDer)(WOLFSSL* ssl);
 WOLFSSL_API void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx, CallbackReadCertDer cb);
+
+typedef int (*CallbackSignCert)(WOLFSSL* ssl,
+       const byte* p_in, word32 p_in_len,
+       byte* p_out, word32* p_out_len);
+WOLFSSL_API void wolfSSL_CTX_SetSignCertCb(WOLFSSL_CTX* ctx, CallbackSignCert cb);
+
+typedef int (*CallbackTls13RecordProcessing)(WOLFSSL* ssl, int is_encrypt,
+       byte* out, const byte* in, word32 sz,
+       const byte* iv, word32 ivSz,
+       byte* authTag, word32 authTagSz,
+       const byte* authIn, word32 authInSz);
+WOLFSSL_API void wolfSSL_CTX_SetTls13RecordProcessingCb(WOLFSSL_CTX* ctx, CallbackTls13RecordProcessing cb);
+
+typedef int (*CallbackHKDFExpandLabel)(byte* okm, word32 okmLen,
+       const byte* prk, word32 prkLen,
+       const byte* protocol, word32 protocolLen,
+       const byte* label, word32 labelLen,
+       const byte* info, word32 infoLen,
+       int digest);
+WOLFSSL_API void wolfSSL_CTX_SetHKDFExpandLabelCb(WOLFSSL_CTX* ctx, CallbackHKDFExpandLabel cb);
+
+typedef int (*CallbackHKDFExpandKeyLabel)(byte* okm, word32 okmLen,
+       const byte* prk, word32 prkLen,
+       const byte* protocol, word32 protocolLen,
+       const byte* label, word32 labelLen,
+       const byte* info, word32 infoLen,
+       int digest, int forSide);
+WOLFSSL_API void wolfSSL_CTX_SetHKDFExpandKeyLabelCb(WOLFSSL_CTX* ctx, CallbackHKDFExpandKeyLabel cb);
+
+typedef int (*CallbackProcessServerCert)(WOLFSSL* ssl, DecodedCert* p_cert);
+WOLFSSL_API void wolfSSL_CTX_SetProcessServerCertCb(WOLFSSL_CTX* ctx, CallbackProcessServerCert cb);
+
+typedef int (*CallbackProcessServerKex)(WOLFSSL* ssl, byte p_sig_algo,
+       const byte* p_sig, word32 p_sig_len,
+       const byte* p_rand, word32 p_rand_len,
+       const byte* p_server_params, word32 p_server_params_len);
+WOLFSSL_API void wolfSSL_CTX_SetProcessServerKexCb(WOLFSSL_CTX* ctx, CallbackProcessServerKex cb);
+
+typedef int (*CallbackPerformClientKex)(WOLFSSL* ssl, ecc_key* p_key, ecc_key* p_peer_key);
+WOLFSSL_API void wolfSSL_CTX_SetPerformClientKexCb(WOLFSSL_CTX* ctx, CallbackPerformClientKex cb);
+
+typedef int (*CallbackMakeTlsMasterSecret)(WOLFSSL* ssl,
+       const byte* p_client_rand, const byte* p_server_rand, int is_psk);
+WOLFSSL_API void wolfSSL_CTX_SetMakeTlsMasterSecretCb(WOLFSSL_CTX* ctx, CallbackMakeTlsMasterSecret cb);
+
+typedef int (*CallbackPerformClientFin)(WOLFSSL* ssl, const byte* p_label, word32 p_label_len,
+       const byte* p_seed, word32 p_seed_len,
+       byte* p_dest, word32 p_dest_len);
+WOLFSSL_API void wolfSSL_CTX_SetPerformClientFinCb(WOLFSSL_CTX* ctx, CallbackPerformClientFin cb);
+
+typedef int (*CallbackPerformTlsRecordProcessing)(WOLFSSL* ssl, int is_encrypt,
+       byte* out, const byte* in, word32 sz,
+       const byte* iv, word32 ivSz,
+       byte* authTag, word32 authTagSz,
+       const byte* authIn, word32 authInSz);
+WOLFSSL_API void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx, CallbackPerformTlsRecordProcessing cb);
+
+//typedef int (*Callback)();
+//WOLFSSL_API void wolfSSL_CTX_SetCb(WOLFSSL_CTX* ctx, Callback cb);
+
+
 #endif /* HAVE_PK_CALLBACKS */
 
 #ifndef NO_CERTS

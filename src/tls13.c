@@ -168,6 +168,7 @@ static const byte dtls13ProtocolLabel[DTLS13_PROTOCOL_LABEL_SZ + 1] = "dtls13";
 /* Expand data using HMAC, salt and label and info.
  * TLS v1.3 defines this function. Use callback if available.
  *
+ * ssl          The SSL/TLS object.
  * okm          The generated pseudorandom key - output key material.
  * okmLen       The length of generated pseudorandom key -
  *              output key material.
@@ -180,50 +181,68 @@ static const byte dtls13ProtocolLabel[DTLS13_PROTOCOL_LABEL_SZ + 1] = "dtls13";
  * digest       The type of digest to use.
  * returns 0 on success, otherwise failure.
  */
-static int Tls13HKDFExpandLabel(byte* okm, word32 okmLen,
+static int Tls13HKDFExpandLabel(WOLFSSL* ssl, byte* okm, word32 okmLen,
                                 const byte* prk, word32 prkLen,
                                 const byte* protocol, word32 protocolLen,
                                 const byte* label, word32 labelLen,
                                 const byte* info, word32 infoLen,
                                 int digest)
 {
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    return maxq10xx_HkdfExpandLabel(okm, okmLen, prk, prkLen,
-                                    protocol, protocolLen, label, labelLen,
-                                    info, infoLen, digest);
-#else
-    return wc_Tls13_HKDF_Expand_Label(okm, okmLen, prk, prkLen,
-                                      protocol, protocolLen, label, labelLen,
-                                      info, infoLen, digest);
+#if defined(HAVE_PK_CALLBACKS)
+    int ret = NOT_COMPILED_IN;
+    if (ssl->ctx && ssl->ctx->HKDFExpandLabelCb) {
+        ret = ssl->ctx->HKDFExpandLabelCb(okm, okmLen, prk, prkLen,
+                                          protocol, protocolLen,
+                                          label, labelLen,
+                                          info, infoLen, digest);
+    }
+
+    if (ret != NOT_COMPILED_IN)
+        return ret;
 #endif
+    (void)ssl;
+    return wc_Tls13_HKDF_Expand_Label(okm, okmLen, prk, prkLen,
+                                      protocol, protocolLen,
+                                      label, labelLen,
+                                      info, infoLen, digest);
 }
 
 /* Same as above, but pass in the side we are expanding for.
  *
  * forSide      The side (WOLFSSL_CLIENT_END or WOLFSSL_SERVER_END).
  */
-static int Tls13HKDFExpandKeyLabel(byte* okm, word32 okmLen,
+static int Tls13HKDFExpandKeyLabel(WOLFSSL* ssl, byte* okm, word32 okmLen,
                                    const byte* prk, word32 prkLen,
                                    const byte* protocol, word32 protocolLen,
                                    const byte* label, word32 labelLen,
                                    const byte* info, word32 infoLen,
                                    int digest, int forSide)
 {
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    return maxq10xx_HkdfExpandKeyLabel(okm, okmLen, prk, prkLen,
-                                       protocol, protocolLen, label, labelLen,
-                                       info, infoLen, digest, forSide);
-#else
+#if defined(HAVE_PK_CALLBACKS)
+    int ret = NOT_COMPILED_IN;
+    if (ssl->ctx && ssl->ctx->HKDFExpandKeyLabelCb) {
+        ret = ssl->ctx->HKDFExpandKeyLabelCb(okm, okmLen, prk, prkLen,
+                                             protocol, protocolLen,
+                                             label, labelLen,
+                                             info, infoLen,
+                                             digest, forSide);
+    }
+
+    if (ret != NOT_COMPILED_IN)
+        return ret;
+#endif
+
 /* hash buffer may not be fully initialized, but the sending length won't
  * extend beyond the initialized span.
  */
 PRAGMA_GCC_DIAG_PUSH;
 PRAGMA_GCC("GCC diagnostic ignored \"-Wmaybe-uninitialized\"");
+    (void)ssl;
     (void)forSide;
     return wc_Tls13_HKDF_Expand_Label(okm, okmLen, prk, prkLen,
-                                      protocol, protocolLen, label, labelLen,
+                                      protocol, protocolLen,
+                                      label, labelLen,
                                       info, infoLen, digest);
-#endif
 }
 
 
@@ -325,7 +344,7 @@ static int DeriveKeyMsg(WOLFSSL* ssl, byte* output, int outputLen,
         outputLen = hashSz;
 
     PRIVATE_KEY_UNLOCK();
-    ret = Tls13HKDFExpandLabel(output, outputLen, secret, hashSz,
+    ret = Tls13HKDFExpandLabel(ssl, output, outputLen, secret, hashSz,
                                protocol, protocolLen, label, labelLen,
                                hash, hashSz, digestAlg);
     PRIVATE_KEY_LOCK();
@@ -418,7 +437,7 @@ int Tls13DeriveKey(WOLFSSL* ssl, byte* output, int outputLen,
                              protocol, protocolLen, label, labelLen,
                              hash, hashOutSz, digestAlg);
     #else
-    ret = Tls13HKDFExpandKeyLabel(output, outputLen, secret, hashSz,
+    ret = Tls13HKDFExpandKeyLabel(ssl, output, outputLen, secret, hashSz,
                                   protocol, protocolLen, label, labelLen,
                                   hash, hashOutSz, digestAlg, forSide);
     #endif
@@ -871,7 +890,7 @@ int Tls13_Exporter(WOLFSSL* ssl, unsigned char *out, size_t outLen,
 
     /* Derive-Secret(Secret, label, "") */
     PRIVATE_KEY_UNLOCK();
-    ret = Tls13HKDFExpandLabel(firstExpand, hashLen,
+    ret = Tls13HKDFExpandLabel(ssl, firstExpand, hashLen,
             ssl->arrays->exporterSecret, hashLen,
             protocol, protocolLen, (byte*)label, (word32)labelLen,
             emptyHash, hashLen, hashType);
@@ -885,7 +904,7 @@ int Tls13_Exporter(WOLFSSL* ssl, unsigned char *out, size_t outLen,
         return ret;
 
     PRIVATE_KEY_UNLOCK();
-    ret = Tls13HKDFExpandLabel(out, (word32)outLen, firstExpand, hashLen,
+    ret = Tls13HKDFExpandLabel(ssl, out, (word32)outLen, firstExpand, hashLen,
             protocol, protocolLen, exporterLabel, EXPORTER_LABEL_SZ,
             hashOut, hashLen, hashType);
     PRIVATE_KEY_LOCK();
@@ -1156,7 +1175,7 @@ int DeriveResumptionPSK(WOLFSSL* ssl, byte* nonce, byte nonceLen, byte* secret)
         resumptionLabel, RESUMPTION_LABEL_SZ, nonce, nonceLen, digestAlg,
         ssl->heap);
 #else
-    ret = Tls13HKDFExpandLabel(secret, ssl->specs.hash_size,
+    ret = Tls13HKDFExpandLabel(ssl, secret, ssl->specs.hash_size,
                                ssl->session->masterSecret, ssl->specs.hash_size,
                                protocol, protocolLen, resumptionLabel,
                                RESUMPTION_LABEL_SZ, nonce, nonceLen, digestAlg);
@@ -2443,13 +2462,15 @@ static int EncryptTls13(WOLFSSL* ssl, byte* output, const byte* input,
 
                     nonceSz = AESGCM_NONCE_SZ;
 
-                #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-                    ret = maxq10xx_perform_tls13_record_processing(ssl, 1,
-                            output,
-                            input, dataSz,
-                            ssl->encrypt.nonce, nonceSz,
-                            output + dataSz, macSz,
-                            aad, aadSz);
+                #if defined(HAVE_PK_CALLBACKS)
+                    ret = NOT_COMPILED_IN;
+                    if (ssl->ctx && ssl->ctx->Tls13RecordProcessingCb) {
+                        ret = ssl->ctx->Tls13RecordProcessingCb(ssl, 1,
+                                  output, input, dataSz,
+                                  ssl->encrypt.nonce, nonceSz,
+                                  output + dataSz, macSz,
+                                  aad, aadSz);
+                    }
                     if (ret == NOT_COMPILED_IN)
                 #endif
                     {
@@ -2483,10 +2504,15 @@ static int EncryptTls13(WOLFSSL* ssl, byte* output, const byte* input,
                 #endif
 
                     nonceSz = AESCCM_NONCE_SZ;
-                #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-                    ret = maxq10xx_perform_tls13_record_processing(ssl, 1,
-                            output, input, dataSz, ssl->encrypt.nonce, nonceSz,
-                            output + dataSz, macSz, aad, aadSz);
+                #if defined(HAVE_PK_CALLBACKS)
+                    ret = NOT_COMPILED_IN;
+                    if (ssl->ctx && ssl->ctx->Tls13RecordProcessingCb) {
+                        ret = ssl->ctx->Tls13RecordProcessingCb(ssl, 1,
+                                  output, input, dataSz,
+                                  ssl->encrypt.nonce, nonceSz,
+                                  output + dataSz, macSz,
+                                  aad, aadSz);
+                    }
                     if (ret == NOT_COMPILED_IN)
                 #endif
                     {
@@ -2820,13 +2846,15 @@ int DecryptTls13(WOLFSSL* ssl, byte* output, const byte* input, word16 sz,
 
                     nonceSz = AESGCM_NONCE_SZ;
 
-                #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-                    ret = maxq10xx_perform_tls13_record_processing(ssl, 0,
-                            output,
-                            input, dataSz,
-                            ssl->decrypt.nonce, nonceSz,
-                            (byte *)(input + dataSz), macSz,
-                            aad, aadSz);
+                #if defined(HAVE_PK_CALLBACKS)
+                    ret = NOT_COMPILED_IN;
+                    if (ssl->ctx && ssl->ctx->Tls13RecordProcessingCb) {
+                        ret = ssl->ctx->Tls13RecordProcessingCb(ssl, 0,
+                                  output, input, dataSz,
+                                  ssl->decrypt.nonce, nonceSz,
+                                  (byte *)(input + dataSz), macSz,
+                                  aad, aadSz);
+                    }
                     if (ret == NOT_COMPILED_IN)
                 #endif
                     {
@@ -2857,13 +2885,15 @@ int DecryptTls13(WOLFSSL* ssl, byte* output, const byte* input, word16 sz,
                 #endif
 
                     nonceSz = AESCCM_NONCE_SZ;
-                #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-                    ret = maxq10xx_perform_tls13_record_processing(ssl, 0,
-                            output,
-                            input, dataSz,
-                            ssl->decrypt.nonce, nonceSz,
-                            (byte *)(input + dataSz), macSz,
-                            aad, aadSz);
+                #if defined(HAVE_PK_CALLBACKS)
+                    ret = NOT_COMPILED_IN;
+                    if (ssl->ctx && ssl->ctx->Tls13RecordProcessingCb) {
+                        ret = ssl->ctx->Tls13RecordProcessingCb(ssl, 0,
+                                  output, input, dataSz,
+                                  ssl->decrypt.nonce, nonceSz,
+                                  (byte *)(input + dataSz), macSz,
+                                  aad, aadSz);
+                    }
                     if (ret == NOT_COMPILED_IN)
                 #endif
                     {

@@ -3389,10 +3389,19 @@ struct WOLFSSL_CTX {
 #if !defined(WOLFSSL_NO_TLS12) && !defined(WOLFSSL_AEAD_ONLY)
     CallbackVerifyMac           VerifyMacCb;        /* User Verify mac handler */
 #endif
-    CallbackHstypeAndKeylen  HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
-    CallbackHstypeAndSiglen  HstypeAndSiglenCb; /* User handler to get the Handshake type and signature length */
+    CallbackHstypeAndKeylen HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
+    CallbackHstypeAndSiglen HstypeAndSiglenCb; /* User handler to get the Handshake type and signature length */
     CallbackReadCertDer ReadCertDerCb; /* User handler to read the certificate in DER format */
-
+    CallbackSignCert SignCertCb; /* User handler to sign data TODO: Investigate replacing this with EccSign pk callback. */
+    CallbackTls13RecordProcessing Tls13RecordProcessingCb; /* User handler to process the TLS 1.3 record */
+    CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
+    CallbackHKDFExpandKeyLabel HKDFExpandKeyLabelCb; /* User handler to do HKDF expansions keys. Pass in server or client */
+    CallbackProcessServerCert ProcessServerCertCb; /* User handler to process a certificate */
+    CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
+    CallbackPerformClientKex PerformClientKexCb; /* User handler to compute the shared secret */
+    CallbackMakeTlsMasterSecret MakeTlsMasterSecretCb; /* User handler to create the TLS master secret */
+    CallbackPerformClientFin PerformClientFinCb; /* User handler to  TODO TODO TODO ....not sure what's going on here. */
+    CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS 1.2 record */
 #endif /* HAVE_PK_CALLBACKS */
 #ifdef HAVE_WOLF_EVENT
     WOLF_EVENT_QUEUE event_queue;

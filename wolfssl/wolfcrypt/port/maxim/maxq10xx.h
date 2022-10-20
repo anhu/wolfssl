@@ -112,63 +112,15 @@ int maxq10xx_port_init(void);
 #ifdef HAVE_PK_CALLBACKS
 void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13);
 
-int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl, int is_encrypt,
-                                             byte* out, const byte* in,
-                                             word32 sz, const byte* iv,
-                                             word32 ivSz, byte* authTag,
-                                             word32 authTagSz,
-                                             const byte* authIn,
-                                             word32 authInSz);
-
 void maxq10xx_SetRsaPssSignature(byte* in, word32 inSz);
 int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
                           byte* signature, word32 sig_sz);
 
 #ifdef HAVE_HKDF
-int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
-                             const byte* prk, word32 prkLen,
-                             const byte* protocol, word32 protocolLen,
-                             const byte* label, word32 labelLen,
-                             const byte* info, word32 infoLen,
-                             int digest);
-
-/* Same as previous function, but also informs integrations about whether
- * the key or IV is for the server or for the client.
- */
-int maxq10xx_HkdfExpandKeyLabel(byte* okm, word32 okmLen,
-                                const byte* prk, word32 prkLen,
-                                const byte* protocol, word32 protocolLen,
-                                const byte* label, word32 labelLen,
-                                const byte* info, word32 infoLen,
-                                int digest, int forSide);
-
 #endif /* HAVE_HKDF */
 #endif /* HAVE_PK_CALLBACKS */
 
 #ifdef WOLFSSL_MAXQ10XX_TLS
-int maxq10xx_process_server_certificate(WOLFSSL* ssl, DecodedCert* p_cert);
-int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
-                                         const byte* p_sig, word32 p_sig_len,
-                                         const byte* p_rand, word32 p_rand_len,
-                                         const byte* p_server_params,
-                                         word32 p_server_params_len);
-
-int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl, ecc_key* p_key, ecc_key*
-                                         p_peer_key);
-int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, const byte* p_client_rand,
-                                    const byte* p_server_rand, int is_psk);
-int maxq10xx_perform_client_finished(WOLFSSL* ssl, const byte* p_label,
-                                     word32 p_label_len, const byte* p_seed,
-                                     word32 p_seed_len, byte* p_dest,
-                                     word32 p_dest_len);
-int maxq10xx_perform_tls_record_processing(WOLFSSL* ssl, int is_encrypt,
-                                           byte* out, const byte* in, word32 sz,
-                                           const byte* iv, word32 ivSz,
-                                           byte* authTag, word32 authTagSz,
-                                           const byte* authIn, word32 authInSz);
-int maxq10xx_sign_device_cert(WOLFSSL* ssl, const byte* p_in, word32 p_in_len,
-                              byte* p_out, word32* p_out_len);
-
 #endif /* WOLFSSL_MAXQ10XX_TLS */
 
 #ifdef WOLFSSL_MAXQ10XX_CRYPTO
