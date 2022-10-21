@@ -131,12 +131,6 @@ static int TLSX_PopulateSupportedGroups(WOLFSSL* ssl, TLSX** extensions);
 
 #ifndef WOLFSSL_NO_TLS12
 
-#ifdef WOLFSSL_SHA384
-    #define HSHASH_SZ WC_SHA384_DIGEST_SIZE
-#else
-    #define HSHASH_SZ FINISHED_SZ
-#endif
-
 int BuildTlsHandshakeHash(WOLFSSL* ssl, byte* hash, word32* hashLen)
 {
     int ret = 0;
@@ -215,34 +209,19 @@ int BuildTlsFinished(WOLFSSL* ssl, Hashes* hashes, const byte* sender)
 #if !defined(NO_CERTS) && defined(HAVE_PK_CALLBACKS)
         if (ssl->ctx->TlsFinishedCb) {
             void* ctx = wolfSSL_GetTlsFinishedCtx(ssl);
-            ret = ssl->ctx->TlsFinishedCb(ssl, side, handshake_hash,
-                                        (byte*)hashes, ctx);
+            ret = ssl->ctx->TlsFinishedCb(ssl, side, handshake_hash, hashSz,
+                                          (byte*)hashes, ctx);
         }
         if (!ssl->ctx->TlsFinishedCb || ret == PROTOCOLCB_UNAVAILABLE)
 #endif
         {
-#ifdef HAVE_PK_CALLBACKS
-/* TODO: Use TlsFinishedCb */
-            ret = NOT_COMPILED_IN;
-            if (ssl->options.side == WOLFSSL_CLIENT_END &&
-                ssl->ctx && ssl->ctx->PerformClientFinCb) {
-                ret = ssl->ctx->PerformClientFinCb(ssl,
-                          side, FINISHED_LABEL_SZ,
-                          handshake_hash, hashSz,
-                          (byte*)hashes, TLS_FINISHED_SZ);
-            }
-
-            if (ret == NOT_COMPILED_IN)
-#endif /* HAVE_PK_CALLBACKS */
-            {
-                PRIVATE_KEY_UNLOCK();
-                ret = wc_PRF_TLS((byte*)hashes, TLS_FINISHED_SZ,
-                          ssl->arrays->masterSecret, SECRET_LEN, side,
-                          FINISHED_LABEL_SZ, handshake_hash, hashSz,
-                          IsAtLeastTLSv1_2(ssl), ssl->specs.mac_algorithm,
-                          ssl->heap, ssl->devId);
-                PRIVATE_KEY_LOCK();
-            }
+            PRIVATE_KEY_UNLOCK();
+            ret = wc_PRF_TLS((byte*)hashes, TLS_FINISHED_SZ,
+                      ssl->arrays->masterSecret, SECRET_LEN, side,
+                      FINISHED_LABEL_SZ, handshake_hash, hashSz,
+                      IsAtLeastTLSv1_2(ssl), ssl->specs.mac_algorithm,
+                      ssl->heap, ssl->devId);
+            PRIVATE_KEY_LOCK();
         }
         ForceZero(handshake_hash, hashSz);
 #else

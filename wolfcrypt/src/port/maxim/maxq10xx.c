@@ -1840,16 +1840,15 @@ static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl,
     return 0;
 }
 
-static int maxq10xx_perform_client_finished(WOLFSSL* ssl,
-               const byte* p_label, word32 p_label_len,
-               const byte* p_seed, word32 p_seed_len,
-               byte* p_dest, word32 p_dest_len)
+static int maxq10xx_perform_client_finished(WOLFSSL* ssl, const byte* p_label,
+               const byte* p_seed, word32 seedSz, byte* p_dest, void* ctx)
 {
+    (void)ctx;
     int rc;
     mxq_err_t mxq_rc;
 
     if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return BAD_STATE_E;
+        return PROTOCOLCB_UNAVAILABLE;
     }
 
     rc = wolfSSL_CryptHwMutexLock();
@@ -1857,8 +1856,9 @@ static int maxq10xx_perform_client_finished(WOLFSSL* ssl,
         return rc;
     }
 
-    mxq_rc = MXQ_tls_prf_sha_256(0, p_label, p_label_len, p_seed, p_seed_len,
-                                 p_dest, p_dest_len);
+    mxq_rc = MXQ_tls_prf_sha_256(0, p_label, FINISHED_LABEL_SZ,
+                                 p_seed, seedSz, 
+                                 p_dest, TLS_FINISHED_SZ);
     if (mxq_rc) {
         WOLFSSL_MSG("MAXQ: MXQ_tls_prf_sha_256() failed");
         wolfSSL_CryptHwMutexUnLock();
@@ -3368,8 +3368,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         maxq10xx_perform_client_key_exchange);
     wolfSSL_CTX_SetMakeTlsMasterSecretCb(ctx,
         maxq10xx_make_tls_master_secret);
-    wolfSSL_CTX_SetPerformClientFinCb(ctx,
-        maxq10xx_perform_client_finished);
+    wolfSSL_CTX_SetTlsFinishedCb(ctx, maxq10xx_perform_client_finished);
     wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
         maxq10xx_perform_tls_record_processing);
 

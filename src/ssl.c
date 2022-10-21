@@ -29657,12 +29657,6 @@ void wolfSSL_CTX_SetMakeTlsMasterSecretCb(WOLFSSL_CTX* ctx,
     if (ctx)
         ctx->MakeTlsMasterSecretCb = cb;
 }
-void wolfSSL_CTX_SetPerformClientFinCb(WOLFSSL_CTX* ctx,
-                                       CallbackPerformClientFin cb)
-{
-    if (ctx)
-        ctx->PerformClientFinCb = cb;
-}
 void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx,
                                           CallbackPerformTlsRecordProcessing cb)
 {

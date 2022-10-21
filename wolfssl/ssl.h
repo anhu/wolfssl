@@ -3511,7 +3511,7 @@ WOLFSSL_API void* wolfSSL_GetEncryptKeysCtx(WOLFSSL* ssl);
 
 typedef int (*CallbackTlsFinished)(WOLFSSL* ssl,
                             const byte *side,
-                            const byte *handshake_hash,
+                            const byte *handshake_hash, word32 hashSz,
                             byte *hashes, void* ctx);
 WOLFSSL_API void  wolfSSL_CTX_SetTlsFinishedCb(WOLFSSL_CTX* ctx, CallbackTlsFinished cb);
 WOLFSSL_API void  wolfSSL_SetTlsFinishedCtx(WOLFSSL* ssl, void *ctx);
@@ -3572,11 +3572,6 @@ WOLFSSL_API void wolfSSL_CTX_SetPerformClientKexCb(WOLFSSL_CTX* ctx, CallbackPer
 typedef int (*CallbackMakeTlsMasterSecret)(WOLFSSL* ssl,
        const byte* p_client_rand, const byte* p_server_rand, int is_psk);
 WOLFSSL_API void wolfSSL_CTX_SetMakeTlsMasterSecretCb(WOLFSSL_CTX* ctx, CallbackMakeTlsMasterSecret cb);
-
-typedef int (*CallbackPerformClientFin)(WOLFSSL* ssl, const byte* p_label, word32 p_label_len,
-       const byte* p_seed, word32 p_seed_len,
-       byte* p_dest, word32 p_dest_len);
-WOLFSSL_API void wolfSSL_CTX_SetPerformClientFinCb(WOLFSSL_CTX* ctx, CallbackPerformClientFin cb);
 
 typedef int (*CallbackPerformTlsRecordProcessing)(WOLFSSL* ssl, int is_encrypt,
        byte* out, const byte* in, word32 sz,

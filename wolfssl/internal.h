@@ -1654,6 +1654,15 @@ enum Misc {
     READ_PROTO         = 0     /* reading a protocol message */
 };
 
+#ifndef WOLFSSL_NO_TLS12
+#ifdef WOLFSSL_SHA384
+    #define HSHASH_SZ WC_SHA384_DIGEST_SIZE
+#else
+    #define HSHASH_SZ FINISHED_SZ
+#endif
+#endif /* !WOLFSSL_NO_TLS12 */
+
+
 #define WOLFSSL_NAMED_GROUP_IS_FFHDE(group) \
     (MIN_FFHDE_GROUP <= (group) && (group) <= MAX_FFHDE_GROUP)
 #ifdef HAVE_PQC
@@ -3399,7 +3408,6 @@ struct WOLFSSL_CTX {
     CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
     CallbackPerformClientKex PerformClientKexCb; /* User handler to compute the shared secret */
     CallbackMakeTlsMasterSecret MakeTlsMasterSecretCb; /* User handler to create the TLS master secret */
-    CallbackPerformClientFin PerformClientFinCb; /* User handler to  TODO TODO TODO ....not sure what's going on here. */
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS 1.2 record */
 #endif /* HAVE_PK_CALLBACKS */
 #ifdef HAVE_WOLF_EVENT
