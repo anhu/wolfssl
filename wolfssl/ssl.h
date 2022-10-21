@@ -3534,11 +3534,6 @@ WOLFSSL_API void wolfSSL_CTX_SetHstypeAndSiglenCb(WOLFSSL_CTX* ctx, CallbackHsty
 typedef int (*CallbackReadCertDer)(WOLFSSL* ssl);
 WOLFSSL_API void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx, CallbackReadCertDer cb);
 
-typedef int (*CallbackSignCert)(WOLFSSL* ssl,
-       const byte* p_in, word32 p_in_len,
-       byte* p_out, word32* p_out_len);
-WOLFSSL_API void wolfSSL_CTX_SetSignCertCb(WOLFSSL_CTX* ctx, CallbackSignCert cb);
-
 typedef int (*CallbackTls13RecordProcessing)(WOLFSSL* ssl, int is_encrypt,
        byte* out, const byte* in, word32 sz,
        const byte* iv, word32 ivSz,

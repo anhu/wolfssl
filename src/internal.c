@@ -30062,33 +30062,19 @@ int SendCertificateVerify(WOLFSSL* ssl)
         {
         #ifdef HAVE_ECC
             if (ssl->hsType == DYNAMIC_TYPE_ECC) {
-            #ifdef HAVE_PK_CALLBACKS
-/*TODO: get rid of this.  Use whatever callback is in EccSign() */
-                ret = NOT_COMPILED_IN;
-                if (ssl->ctx && ssl->ctx->SignCertCb) {
-                    ret = ssl->ctx->SignCertCb(ssl,
-                              ssl->buffers.digest.buffer,
-                              ssl->buffers.digest.length,
-                              ssl->buffers.sig.buffer,
-                              (word32*)&ssl->buffers.sig.length);
-                }
-                if (ret == NOT_COMPILED_IN)
-            #endif /* HAVE_PK_CALLBACKS */
-                {
-                    ecc_key* key = (ecc_key*)ssl->hsKey;
+                ecc_key* key = (ecc_key*)ssl->hsKey;
 
-                    ret = EccSign(ssl,
-                        ssl->buffers.digest.buffer, ssl->buffers.digest.length,
-                        ssl->buffers.sig.buffer,
-                        (word32*)&ssl->buffers.sig.length,
-                        key,
+                ret = EccSign(ssl,
+                    ssl->buffers.digest.buffer, ssl->buffers.digest.length,
+                    ssl->buffers.sig.buffer,
+                    (word32*)&ssl->buffers.sig.length,
+                    key,
             #ifdef HAVE_PK_CALLBACKS
-                        ssl->buffers.key
+                    ssl->buffers.key
             #else
-                        NULL
+                    NULL
             #endif
-                    );
-                }
+                );
             }
         #endif /* HAVE_ECC */
         #if defined(HAVE_ED25519) && !defined(NO_ED25519_CLIENT_AUTH)

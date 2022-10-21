@@ -2026,9 +2026,13 @@ static int maxq10xx_hstype_and_siglen(word32* hsType, word16* siglen)
 #endif /* HAVE_PK_CALLBACKS */
 
 static int maxq10xx_sign_device_cert(WOLFSSL* ssl,
-               const byte* p_in, word32 p_in_len,
-               byte* p_out, word32* p_out_len)
+               const unsigned char* p_in, unsigned int p_in_len,
+               unsigned char* p_out, word32* p_out_len,
+               const unsigned char* keyDer, unsigned int keySz, void* ctx)
 {
+    (void)keyDer;
+    (void)keySz;
+    (void)ctx;
     int rc;
 
     if (ssl->options.side != WOLFSSL_CLIENT_END) {
@@ -2386,24 +2390,6 @@ static int maxq10xx_verify_signature_cb(WOLFSSL* ssl, const byte* sig,
                              (mxq_u1*)sig, sigSz, result, tls13_server_key_len);
     wolfSSL_CryptHwMutexUnLock();
 
-    return rc;
-}
-
-static int maxq10xx_sign_signature_cb(WOLFSSL* ssl, const byte* in, word32 inSz,
-        byte* out, word32* outSz, const byte* key, word32 keySz, void* ctx)
-{
-    (void)key;
-    (void)keySz;
-    (void)ctx;
-    int rc;
-
-    WOLFSSL_ENTER("maxq10xx_sign_signature_cb()");
-
-    if (!tls13active) {
-        return NOT_COMPILED_IN;
-    }
-
-    rc = maxq10xx_sign_device_cert(ssl, in, inSz, out, outSz);
     return rc;
 }
 
@@ -3357,7 +3343,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         wolfSSL_CTX_SetEccSharedSecretCb(ctx, maxq10xx_shared_secret_cb);
         wolfSSL_CTX_SetDhGenerateKeyPair(ctx, maxq10xx_DhGenerateKeyPair);
         wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
-        wolfSSL_CTX_SetEccSignCb(ctx, maxq10xx_sign_signature_cb);
         wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
         wolfSSL_CTX_SetHstypeAndKeylenCb(ctx, maxq10xx_hstype_and_keylen);
@@ -3390,7 +3375,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
 
     wolfSSL_CTX_SetHstypeAndSiglenCb(ctx, maxq10xx_hstype_and_siglen);
     wolfSSL_CTX_SetReadCertDerCb(ctx, maxq10xx_readCertDer_cb);
-    wolfSSL_CTX_SetSignCertCb(ctx, maxq10xx_sign_device_cert);
+    wolfSSL_CTX_SetEccSignCb(ctx, maxq10xx_sign_device_cert);
 
     init_pk_callbacks = 1;
 }

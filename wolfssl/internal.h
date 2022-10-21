@@ -3392,7 +3392,6 @@ struct WOLFSSL_CTX {
     CallbackHstypeAndKeylen HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
     CallbackHstypeAndSiglen HstypeAndSiglenCb; /* User handler to get the Handshake type and signature length */
     CallbackReadCertDer ReadCertDerCb; /* User handler to read the certificate in DER format */
-    CallbackSignCert SignCertCb; /* User handler to sign data TODO: Investigate replacing this with EccSign pk callback. */
     CallbackTls13RecordProcessing Tls13RecordProcessingCb; /* User handler to process the TLS 1.3 record */
     CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
     CallbackHKDFExpandKeyLabel HKDFExpandKeyLabelCb; /* User handler to do HKDF expansions keys. Pass in server or client */

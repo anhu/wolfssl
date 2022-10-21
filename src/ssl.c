@@ -29615,12 +29615,6 @@ void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx,
     if (ctx)
         ctx->ReadCertDerCb = cb;
 }
-void wolfSSL_CTX_SetSignCertCb(WOLFSSL_CTX* ctx,
-                               CallbackSignCert cb)
-{
-    if (ctx)
-        ctx->SignCertCb = cb;
-}
 void wolfSSL_CTX_SetTls13RecordProcessingCb(WOLFSSL_CTX* ctx,
                                             CallbackTls13RecordProcessing cb)
 {
