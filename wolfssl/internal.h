@@ -3406,7 +3406,6 @@ struct WOLFSSL_CTX {
     CallbackHKDFExpandKeyLabel HKDFExpandKeyLabelCb; /* User handler to do HKDF expansions keys. Pass in server or client */
     CallbackProcessServerCert ProcessServerCertCb; /* User handler to process a certificate */
     CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
-    CallbackPerformClientKex PerformClientKexCb; /* User handler to compute the shared secret */
     CallbackMakeTlsMasterSecret MakeTlsMasterSecretCb; /* User handler to create the TLS master secret */
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS 1.2 record */
 #endif /* HAVE_PK_CALLBACKS */

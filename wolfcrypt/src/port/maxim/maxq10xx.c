@@ -1668,15 +1668,18 @@ static int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
     return 0;
 }
 
-static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl, ecc_key* p_key,
-                                                ecc_key* p_peer_key)
+static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl,
+                                                ecc_key* p_key,
+                                                unsigned int keySz,
+                                                int ecc_curve,
+                                                void *ctx)
 {
+    (void)keySz;
+    (void)ecc_curve;
+    (void)ctx;
     int rc;
     mxq_err_t mxq_rc;
     word32 keysize = ECC256_KEYSIZE;
-
-    byte peer_public_key[1 + (2 * ECC256_KEYSIZE)];
-    peer_public_key[0] = ASN_OCTET_STRING;
 
     mxq_length key_len_param;
     mxq_u1* server_public_key_param;
@@ -1698,25 +1701,6 @@ static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl, ecc_key* p_key,
         return NOT_COMPILED_IN;
     }
 
-    if (p_peer_key) {
-        word32 bufflen = keysize;
-
-        rc = wc_export_int(p_peer_key->pubkey.x, (peer_public_key + 1),
-                            &bufflen, keysize, WC_TYPE_UNSIGNED_BIN);
-        if (rc) {
-            WOLFSSL_MSG("MAXQ: wc_export_int() for pubkey.x failed");
-            return rc;
-        }
-
-        rc = wc_export_int(p_peer_key->pubkey.y,
-                           (peer_public_key + 1 + keysize),
-                           &bufflen, keysize, WC_TYPE_UNSIGNED_BIN);
-        if (rc) {
-            WOLFSSL_MSG("MAXQ: wc_export_int() for pubkey.y failed");
-            return rc;
-        }
-    }
-
     rc = wolfSSL_CryptHwMutexLock();
     if (rc != 0) {
         return rc;
@@ -1724,14 +1708,8 @@ static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl, ecc_key* p_key,
 
     XMEMSET(result_public_key, 0, sizeof(result_public_key));
 
-    if (p_peer_key) {
-        server_public_key_param = peer_public_key;
-        key_len_param = sizeof(peer_public_key);
-    }
-    else {
-        server_public_key_param = NULL;
-        key_len_param = sizeof(result_public_key);
-    }
+    server_public_key_param = NULL;
+    key_len_param = sizeof(result_public_key);
 
     mxq_rc = MXQ_Ecdh_Compute_Shared(MXQ_KEYPARAM_EC_P256R1,
                                      server_public_key_param, result_public_key,
@@ -3349,6 +3327,8 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         wolfSSL_CTX_SetTls13RecordProcessingCb(ctx,
             maxq10xx_perform_tls13_record_processing);
 
+    } else {
+        wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_perform_client_key_exchange);
     }
 
     #ifdef HAVE_HKDF
@@ -3364,8 +3344,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
        maxq10xx_process_server_certificate);
     wolfSSL_CTX_SetProcessServerKexCb(ctx,
         maxq10xx_process_server_key_exchange);
-    wolfSSL_CTX_SetPerformClientKexCb(ctx,
-        maxq10xx_perform_client_key_exchange);
     wolfSSL_CTX_SetMakeTlsMasterSecretCb(ctx,
         maxq10xx_make_tls_master_secret);
     wolfSSL_CTX_SetTlsFinishedCb(ctx, maxq10xx_perform_client_finished);

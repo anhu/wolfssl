@@ -3566,9 +3566,6 @@ typedef int (*CallbackProcessServerKex)(WOLFSSL* ssl, byte p_sig_algo,
        const byte* p_server_params, word32 p_server_params_len);
 WOLFSSL_API void wolfSSL_CTX_SetProcessServerKexCb(WOLFSSL_CTX* ctx, CallbackProcessServerKex cb);
 
-typedef int (*CallbackPerformClientKex)(WOLFSSL* ssl, ecc_key* p_key, ecc_key* p_peer_key);
-WOLFSSL_API void wolfSSL_CTX_SetPerformClientKexCb(WOLFSSL_CTX* ctx, CallbackPerformClientKex cb);
-
 typedef int (*CallbackMakeTlsMasterSecret)(WOLFSSL* ssl,
        const byte* p_client_rand, const byte* p_server_rand, int is_psk);
 WOLFSSL_API void wolfSSL_CTX_SetMakeTlsMasterSecretCb(WOLFSSL_CTX* ctx, CallbackMakeTlsMasterSecret cb);

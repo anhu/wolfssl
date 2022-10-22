@@ -28805,19 +28805,6 @@ int SendClientKeyExchange(WOLFSSL* ssl)
                         goto exit_scke;
                     }
 
-                    #ifdef HAVE_PK_CALLBACKS
-                    ret = NOT_COMPILED_IN;
-                    if (ssl->options.side == WOLFSSL_CLIENT_END &&
-                        ssl->ctx && ssl->ctx->PerformClientKexCb) {
-                        ret = ssl->ctx->PerformClientKexCb(ssl,
-                                (ecc_key*)ssl->hsKey, NULL);
-                    }
-
-                    if (ret != NOT_COMPILED_IN) {
-                        break;
-                    }
-                    #endif /* HAVE_PK_CALLBACKS */
-
                     ret = EccMakeKey(ssl, (ecc_key*)ssl->hsKey, peerKey);
                 #endif /* HAVE_ECC */
 
