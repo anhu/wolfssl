@@ -3407,7 +3407,6 @@ struct WOLFSSL_CTX {
     CallbackHstypeAndKeylen HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
     CallbackHstypeAndSiglen HstypeAndSiglenCb; /* User handler to get the Handshake type and signature length */
     CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
-    CallbackHKDFExpandKeyLabel HKDFExpandKeyLabelCb; /* User handler to do HKDF expansions keys. Pass in server or client */
 
 #endif /* HAVE_PK_CALLBACKS */
 #ifdef HAVE_WOLF_EVENT

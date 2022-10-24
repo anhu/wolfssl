@@ -194,7 +194,8 @@ static int Tls13HKDFExpandLabel(WOLFSSL* ssl, byte* okm, word32 okmLen,
         ret = ssl->ctx->HKDFExpandLabelCb(okm, okmLen, prk, prkLen,
                                           protocol, protocolLen,
                                           label, labelLen,
-                                          info, infoLen, digest);
+                                          info, infoLen, digest,
+                                          WOLFSSL_CLIENT_END /* ignored */);
     }
 
     if (ret != NOT_COMPILED_IN)
@@ -220,12 +221,12 @@ static int Tls13HKDFExpandKeyLabel(WOLFSSL* ssl, byte* okm, word32 okmLen,
 {
 #if defined(HAVE_PK_CALLBACKS)
     int ret = NOT_COMPILED_IN;
-    if (ssl->ctx && ssl->ctx->HKDFExpandKeyLabelCb) {
-        ret = ssl->ctx->HKDFExpandKeyLabelCb(okm, okmLen, prk, prkLen,
-                                             protocol, protocolLen,
-                                             label, labelLen,
-                                             info, infoLen,
-                                             digest, forSide);
+    if (ssl->ctx && ssl->ctx->HKDFExpandLabelCb) {
+        ret = ssl->ctx->HKDFExpandLabelCb(okm, okmLen, prk, prkLen,
+                                         protocol, protocolLen,
+                                         label, labelLen,
+                                         info, infoLen,
+                                         digest, forSide);
     }
 
     if (ret != NOT_COMPILED_IN)

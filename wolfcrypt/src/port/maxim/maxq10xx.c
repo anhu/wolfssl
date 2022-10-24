@@ -3150,13 +3150,12 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
     return 0;
 }
 
-static int maxq10xx_HkdfExpandLabel_internal(byte* okm, word32 okmLen,
-                                             const byte* prk, word32 prkLen,
-                                             const byte* protocol,
-                                             word32 protocolLen,
-                                             const byte* label, word32 labelLen,
-                                             const byte* info, word32 infoLen,
-                                             int digest, int forSide)
+static int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
+                                    const byte* prk, word32 prkLen,
+                                    const byte* protocol, word32 protocolLen,
+                                    const byte* label, word32 labelLen,
+                                    const byte* info, word32 infoLen,
+                                    int digest, int forSide)
 {
     int    ret = 0;
     int    idx = 0;
@@ -3192,34 +3191,6 @@ static int maxq10xx_HkdfExpandLabel_internal(byte* okm, word32 okmLen,
 #endif
 
     return ret;
-}
-
-static int maxq10xx_HkdfExpandLabel(byte* okm, word32 okmLen,
-               const byte* prk, word32 prkLen,
-               const byte* protocol, word32 protocolLen,
-               const byte* label, word32 labelLen,
-               const byte* info, word32 infoLen,
-               int digest) {
-    return maxq10xx_HkdfExpandLabel_internal(okm, okmLen, prk, prkLen, protocol,
-                                             protocolLen, label, labelLen,
-                                             info, infoLen, digest,
-                                             0 /*don't care */);
-}
-
-/* For key and IV, we need to know if this for the server or client. */
-static int maxq10xx_HkdfExpandKeyLabel(byte* okm, word32 okmLen,
-               const byte* prk, word32 prkLen,
-               const byte* protocol, word32 protocolLen,
-               const byte* label, word32 labelLen,
-               const byte* info, word32 infoLen,
-               int digest, int forSide) {
-    if (forSide != WOLFSSL_SERVER_END && forSide != WOLFSSL_CLIENT_END) {
-        return BAD_FUNC_ARG;
-    }
-
-    return maxq10xx_HkdfExpandLabel_internal(okm, okmLen, prk, prkLen, protocol,
-                                             protocolLen, label, labelLen,
-                                             info, infoLen, digest, forSide);
 }
 
 static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
@@ -3317,7 +3288,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
     #ifdef HAVE_HKDF
     wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
     wolfSSL_CTX_SetHKDFExpandLabelCb(ctx, maxq10xx_HkdfExpandLabel);
-    wolfSSL_CTX_SetHKDFExpandKeyLabelCb(ctx, maxq10xx_HkdfExpandKeyLabel);
     use_hw_hkdf_expand = 1;
     #endif
 
