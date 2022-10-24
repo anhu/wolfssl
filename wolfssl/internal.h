@@ -3404,7 +3404,6 @@ struct WOLFSSL_CTX {
     CallbackMakeTlsMasterSecret MakeTlsMasterSecretCb; /* User handler to create the TLS master secret */
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */
 
-    CallbackHstypeAndKeylen HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
     CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
 
 #endif /* HAVE_PK_CALLBACKS */

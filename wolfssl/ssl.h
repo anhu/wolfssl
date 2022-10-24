@@ -3525,9 +3525,6 @@ WOLFSSL_API void  wolfSSL_SetVerifyMacCtx(WOLFSSL* ssl, void *ctx);
 WOLFSSL_API void* wolfSSL_GetVerifyMacCtx(WOLFSSL* ssl);
 #endif
 
-typedef int (*CallbackHstypeAndKeylen)(word32* hsType, word16* keylen);
-WOLFSSL_API void wolfSSL_CTX_SetHstypeAndKeylenCb(WOLFSSL_CTX* ctx, CallbackHstypeAndKeylen cb);
-
 typedef int (*CallbackReadCertDer)(WOLFSSL* ssl);
 WOLFSSL_API void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx, CallbackReadCertDer cb);
 

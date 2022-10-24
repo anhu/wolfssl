@@ -2360,22 +2360,6 @@ static int maxq10xx_verify_signature_cb(WOLFSSL* ssl, const byte* sig,
     return rc;
 }
 
-static int maxq10xx_hstype_and_keylen(word32* hsType, word16* keylen)
-{
-    if (hsType == NULL || keylen == NULL) {
-        return BAD_FUNC_ARG;
-    }
-
-    if (device_hs_key_type == DYNAMIC_TYPE_ECC) {
-        *keylen = wc_ecc_sig_size_calc(device_key_len);
-    }
-    else {
-        *keylen = device_key_len;
-    }
-    *hsType = device_hs_key_type;
-    return 0;
-}
-
 static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
         unsigned char* pubKeyDer, word32* pubKeySz,
         unsigned char* out, word32* outlen,
@@ -3288,7 +3272,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
         wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
-        wolfSSL_CTX_SetHstypeAndKeylenCb(ctx, maxq10xx_hstype_and_keylen);
         wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
             maxq10xx_perform_tls13_record_processing);
 

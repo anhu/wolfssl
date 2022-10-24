@@ -7686,24 +7686,9 @@ static int SendTls13CertificateVerify(WOLFSSL* ssl)
                     ERROR_OUT(NO_PRIVATE_KEY, exit_scv);
             }
             else {
-                ret = NOT_COMPILED_IN;
-#if defined(HAVE_PK_CALLBACKS)
-                if (ssl->options.side == WOLFSSL_CLIENT_END) {
-                    if (ssl->ctx && ssl->ctx->HstypeAndKeylenCb) {
-                        ret = ssl->ctx->HstypeAndKeylenCb(&ssl->hsType,
-                                                          &args->length);
-                    }
-
-                    if ((ret != NOT_COMPILED_IN) && (ret != 0)) {
-                        goto exit_scv;
-                    }
-                }
-#endif
-                if (ret == NOT_COMPILED_IN) {
-                    ret = DecodePrivateKey(ssl, &args->length);
-                    if (ret != 0)
-                        goto exit_scv;
-                }
+                ret = DecodePrivateKey(ssl, &args->length);
+                if (ret != 0)
+                    goto exit_scv;
             }
 
             if (rem < 0 || args->length > rem) {
