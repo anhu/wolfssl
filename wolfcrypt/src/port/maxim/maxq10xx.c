@@ -1847,7 +1847,7 @@ static int maxq10xx_perform_client_finished(WOLFSSL* ssl, const byte* p_label,
     return 0;
 }
 
-static int maxq10xx_perform_tls_record_processing(WOLFSSL* ssl, int is_encrypt,
+static int maxq10xx_perform_tls12_record_processing(WOLFSSL* ssl, int is_encrypt,
                byte* out, const byte* in, word32 sz,
                const byte* iv, word32 ivSz,
                byte* authTag, word32 authTagSz,
@@ -3314,6 +3314,12 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
     }
 
 #ifdef WOLFSSL_MAXQ108x
+    #ifdef HAVE_HKDF
+    wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
+    wolfSSL_CTX_SetHKDFExpandLabelCb(ctx, maxq10xx_HkdfExpandLabel);
+    wolfSSL_CTX_SetHKDFExpandKeyLabelCb(ctx, maxq10xx_HkdfExpandKeyLabel);
+    use_hw_hkdf_expand = 1;
+    #endif
 
     tls13active = isTLS13;
     if (tls13active) {
@@ -3324,21 +3330,16 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
         wolfSSL_CTX_SetHstypeAndKeylenCb(ctx, maxq10xx_hstype_and_keylen);
-        wolfSSL_CTX_SetTls13RecordProcessingCb(ctx,
+        wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
             maxq10xx_perform_tls13_record_processing);
 
-    } else {
-        wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_perform_client_key_exchange);
-    }
-
-    #ifdef HAVE_HKDF
-    wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
-    wolfSSL_CTX_SetHKDFExpandLabelCb(ctx, maxq10xx_HkdfExpandLabel);
-    wolfSSL_CTX_SetHKDFExpandKeyLabelCb(ctx, maxq10xx_HkdfExpandKeyLabel);
-    use_hw_hkdf_expand = 1;
-    #endif
-
+    } else
 #endif /* WOLFSSL_MAXQ108x */
+    {
+        wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_perform_client_key_exchange);
+        wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
+            maxq10xx_perform_tls12_record_processing);
+    }
 
     wolfSSL_CTX_SetProcessServerCertCb(ctx,
        maxq10xx_process_server_certificate);
@@ -3347,8 +3348,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
     wolfSSL_CTX_SetMakeTlsMasterSecretCb(ctx,
         maxq10xx_make_tls_master_secret);
     wolfSSL_CTX_SetTlsFinishedCb(ctx, maxq10xx_perform_client_finished);
-    wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
-        maxq10xx_perform_tls_record_processing);
 
     wolfSSL_CTX_SetHstypeAndSiglenCb(ctx, maxq10xx_hstype_and_siglen);
     wolfSSL_CTX_SetReadCertDerCb(ctx, maxq10xx_readCertDer_cb);

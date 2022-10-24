@@ -3398,16 +3398,17 @@ struct WOLFSSL_CTX {
 #if !defined(WOLFSSL_NO_TLS12) && !defined(WOLFSSL_AEAD_ONLY)
     CallbackVerifyMac           VerifyMacCb;        /* User Verify mac handler */
 #endif
-    CallbackHstypeAndKeylen HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
-    CallbackHstypeAndSiglen HstypeAndSiglenCb; /* User handler to get the Handshake type and signature length */
     CallbackReadCertDer ReadCertDerCb; /* User handler to read the certificate in DER format */
-    CallbackTls13RecordProcessing Tls13RecordProcessingCb; /* User handler to process the TLS 1.3 record */
-    CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
-    CallbackHKDFExpandKeyLabel HKDFExpandKeyLabelCb; /* User handler to do HKDF expansions keys. Pass in server or client */
     CallbackProcessServerCert ProcessServerCertCb; /* User handler to process a certificate */
     CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
     CallbackMakeTlsMasterSecret MakeTlsMasterSecretCb; /* User handler to create the TLS master secret */
-    CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS 1.2 record */
+    CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */
+
+    CallbackHstypeAndKeylen HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
+    CallbackHstypeAndSiglen HstypeAndSiglenCb; /* User handler to get the Handshake type and signature length */
+    CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
+    CallbackHKDFExpandKeyLabel HKDFExpandKeyLabelCb; /* User handler to do HKDF expansions keys. Pass in server or client */
+
 #endif /* HAVE_PK_CALLBACKS */
 #ifdef HAVE_WOLF_EVENT
     WOLF_EVENT_QUEUE event_queue;

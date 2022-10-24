@@ -3534,13 +3534,6 @@ WOLFSSL_API void wolfSSL_CTX_SetHstypeAndSiglenCb(WOLFSSL_CTX* ctx, CallbackHsty
 typedef int (*CallbackReadCertDer)(WOLFSSL* ssl);
 WOLFSSL_API void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx, CallbackReadCertDer cb);
 
-typedef int (*CallbackTls13RecordProcessing)(WOLFSSL* ssl, int is_encrypt,
-       byte* out, const byte* in, word32 sz,
-       const byte* iv, word32 ivSz,
-       byte* authTag, word32 authTagSz,
-       const byte* authIn, word32 authInSz);
-WOLFSSL_API void wolfSSL_CTX_SetTls13RecordProcessingCb(WOLFSSL_CTX* ctx, CallbackTls13RecordProcessing cb);
-
 typedef int (*CallbackHKDFExpandLabel)(byte* okm, word32 okmLen,
        const byte* prk, word32 prkLen,
        const byte* protocol, word32 protocolLen,
@@ -3576,10 +3569,6 @@ typedef int (*CallbackPerformTlsRecordProcessing)(WOLFSSL* ssl, int is_encrypt,
        byte* authTag, word32 authTagSz,
        const byte* authIn, word32 authInSz);
 WOLFSSL_API void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx, CallbackPerformTlsRecordProcessing cb);
-
-//typedef int (*Callback)();
-//WOLFSSL_API void wolfSSL_CTX_SetCb(WOLFSSL_CTX* ctx, Callback cb);
-
 
 #endif /* HAVE_PK_CALLBACKS */
 

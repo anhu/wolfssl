@@ -2464,8 +2464,8 @@ static int EncryptTls13(WOLFSSL* ssl, byte* output, const byte* input,
 
                 #if defined(HAVE_PK_CALLBACKS)
                     ret = NOT_COMPILED_IN;
-                    if (ssl->ctx && ssl->ctx->Tls13RecordProcessingCb) {
-                        ret = ssl->ctx->Tls13RecordProcessingCb(ssl, 1,
+                    if (ssl->ctx && ssl->ctx->PerformTlsRecordProcessingCb) {
+                        ret = ssl->ctx->PerformTlsRecordProcessingCb(ssl, 1,
                                   output, input, dataSz,
                                   ssl->encrypt.nonce, nonceSz,
                                   output + dataSz, macSz,
@@ -2506,8 +2506,8 @@ static int EncryptTls13(WOLFSSL* ssl, byte* output, const byte* input,
                     nonceSz = AESCCM_NONCE_SZ;
                 #if defined(HAVE_PK_CALLBACKS)
                     ret = NOT_COMPILED_IN;
-                    if (ssl->ctx && ssl->ctx->Tls13RecordProcessingCb) {
-                        ret = ssl->ctx->Tls13RecordProcessingCb(ssl, 1,
+                    if (ssl->ctx && ssl->ctx->PerformTlsRecordProcessingCb) {
+                        ret = ssl->ctx->PerformTlsRecordProcessingCb(ssl, 1,
                                   output, input, dataSz,
                                   ssl->encrypt.nonce, nonceSz,
                                   output + dataSz, macSz,
@@ -2848,8 +2848,8 @@ int DecryptTls13(WOLFSSL* ssl, byte* output, const byte* input, word16 sz,
 
                 #if defined(HAVE_PK_CALLBACKS)
                     ret = NOT_COMPILED_IN;
-                    if (ssl->ctx && ssl->ctx->Tls13RecordProcessingCb) {
-                        ret = ssl->ctx->Tls13RecordProcessingCb(ssl, 0,
+                    if (ssl->ctx && ssl->ctx->PerformTlsRecordProcessingCb) {
+                        ret = ssl->ctx->PerformTlsRecordProcessingCb(ssl, 0,
                                   output, input, dataSz,
                                   ssl->decrypt.nonce, nonceSz,
                                   (byte *)(input + dataSz), macSz,
@@ -2887,8 +2887,8 @@ int DecryptTls13(WOLFSSL* ssl, byte* output, const byte* input, word16 sz,
                     nonceSz = AESCCM_NONCE_SZ;
                 #if defined(HAVE_PK_CALLBACKS)
                     ret = NOT_COMPILED_IN;
-                    if (ssl->ctx && ssl->ctx->Tls13RecordProcessingCb) {
-                        ret = ssl->ctx->Tls13RecordProcessingCb(ssl, 0,
+                    if (ssl->ctx && ssl->ctx->PerformTlsRecordProcessingCb) {
+                        ret = ssl->ctx->PerformTlsRecordProcessingCb(ssl, 0,
                                   output, input, dataSz,
                                   ssl->decrypt.nonce, nonceSz,
                                   (byte *)(input + dataSz), macSz,
