@@ -3405,7 +3405,6 @@ struct WOLFSSL_CTX {
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */
 
     CallbackHstypeAndKeylen HstypeAndKeylenCb; /* User handler to get the Handshake type and key length */
-    CallbackHstypeAndSiglen HstypeAndSiglenCb; /* User handler to get the Handshake type and signature length */
     CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
 
 #endif /* HAVE_PK_CALLBACKS */

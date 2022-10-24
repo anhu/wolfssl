@@ -1990,17 +1990,6 @@ static int maxq10xx_readCertDer_cb(WOLFSSL *ssl) {
     return 0;
 }
 
-static int maxq10xx_hstype_and_siglen(word32* hsType, word16* siglen)
-{
-    if (hsType == NULL || siglen == NULL) {
-        return BAD_FUNC_ARG;
-    }
-
-    *hsType = DYNAMIC_TYPE_ECC;
-    *siglen = wc_ecc_sig_size_calc(32);
-    return 0;
-}
-
 #endif /* HAVE_PK_CALLBACKS */
 
 static int maxq10xx_sign_device_cert(WOLFSSL* ssl,
@@ -3319,7 +3308,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         maxq10xx_make_tls_master_secret);
     wolfSSL_CTX_SetTlsFinishedCb(ctx, maxq10xx_perform_client_finished);
 
-    wolfSSL_CTX_SetHstypeAndSiglenCb(ctx, maxq10xx_hstype_and_siglen);
     wolfSSL_CTX_SetReadCertDerCb(ctx, maxq10xx_readCertDer_cb);
     wolfSSL_CTX_SetEccSignCb(ctx, maxq10xx_sign_device_cert);
 

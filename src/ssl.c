@@ -29603,12 +29603,6 @@ void wolfSSL_CTX_SetHstypeAndKeylenCb(WOLFSSL_CTX* ctx,
     if (ctx)
         ctx->HstypeAndKeylenCb = cb;
 }
-void wolfSSL_CTX_SetHstypeAndSiglenCb(WOLFSSL_CTX* ctx,
-                                      CallbackHstypeAndSiglen cb)
-{
-    if (ctx)
-        ctx->HstypeAndSiglenCb = cb;
-}
 void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx,
                                   CallbackReadCertDer cb)
 {

@@ -29902,31 +29902,19 @@ int SendCertificateVerify(WOLFSSL* ssl)
                 goto exit_scv;
             }
 
-            ret = NOT_COMPILED_IN;
+            if (ssl->buffers.key == NULL) {
             #ifdef HAVE_PK_CALLBACKS
-            if (ssl->ctx && ssl->ctx->HstypeAndSiglenCb) {
-                ret = ssl->ctx->HstypeAndSiglenCb(&ssl->hsType, &args->length);
-                if ((ret != NOT_COMPILED_IN) && (ret != 0)) {
-                     goto exit_scv;
-                }
-
-            }
+                if (wolfSSL_CTX_IsPrivatePkSet(ssl->ctx))
+                    args->length = GetPrivateKeySigSize(ssl);
+                else
             #endif
-            if (ret == NOT_COMPILED_IN) {
-                if (ssl->buffers.key == NULL) {
-                #ifdef HAVE_PK_CALLBACKS
-                    if (wolfSSL_CTX_IsPrivatePkSet(ssl->ctx))
-                        args->length = GetPrivateKeySigSize(ssl);
-                    else
-                #endif
-                        ERROR_OUT(NO_PRIVATE_KEY, exit_scv);
-                }
-                else {
-                    /* Decode private key. */
-                    ret = DecodePrivateKey(ssl, &args->length);
-                    if (ret != 0) {
-                        goto exit_scv;
-                    }
+                    ERROR_OUT(NO_PRIVATE_KEY, exit_scv);
+            }
+            else {
+                /* Decode private key. */
+                ret = DecodePrivateKey(ssl, &args->length);
+                if (ret != 0) {
+                    goto exit_scv;
                 }
             }
 
