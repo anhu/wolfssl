@@ -2393,13 +2393,7 @@ int InitSSL_Ctx(WOLFSSL_CTX* ctx, WOLFSSL_METHOD* method, void* heap)
      * infrastructure know whether we are doing TLS 1.3. */
     if (method->side == WOLFSSL_CLIENT_END) {
         ctx->devId = MAXQ_DEVICE_ID;
-        if (method->version.major == SSLv3_MAJOR &&
-            method->version.minor == WOLFSSL_TLSV1_3) {
-            maxq10xx_SetupPkCallbacks(ctx, 1);
-        }
-        else {
-            maxq10xx_SetupPkCallbacks(ctx, 0);
-        }
+        maxq10xx_SetupPkCallbacks(ctx, &method->version);
     }
 #endif
 

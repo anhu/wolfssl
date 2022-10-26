@@ -107,10 +107,11 @@ typedef struct {
     typedef struct wc_CryptoInfo wc_CryptoInfo;
 #endif
 
+typedef struct ProtocolVersion ProtocolVersion;
 int maxq10xx_port_init(void);
 
 #ifdef HAVE_PK_CALLBACKS
-void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13);
+void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv);
 
 void maxq10xx_SetRsaPssSignature(byte* in, word32 inSz);
 int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,

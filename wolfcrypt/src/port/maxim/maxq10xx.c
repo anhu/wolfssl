@@ -3248,9 +3248,13 @@ static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
 #endif /* HAVE_HKDF */
 #endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108x */
 
-void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
+void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
 {
-    (void)isTLS13;
+    (void)pv;
+
+    if (pv == NULL) {
+        return;
+    }
 
     WOLFSSL_ENTER("maxq10xx_SetupPkCallbacks");
     if (init_pk_callbacks) {
@@ -3264,8 +3268,8 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
     use_hw_hkdf_expand = 1;
     #endif
 
-    tls13active = isTLS13;
-    if (tls13active) {
+    if ((pv->major == SSLv3_MAJOR) && (pv->minor == WOLFSSL_TLSV1_3)) {
+        tls13active = 1;
         wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_create_ecc_key_cb);
         wolfSSL_CTX_SetEccSharedSecretCb(ctx, maxq10xx_shared_secret_cb);
         wolfSSL_CTX_SetDhGenerateKeyPair(ctx, maxq10xx_DhGenerateKeyPair);
@@ -3274,7 +3278,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, int isTLS13)
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
         wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
             maxq10xx_perform_tls13_record_processing);
-
     } else
 #endif /* WOLFSSL_MAXQ108x */
     {
