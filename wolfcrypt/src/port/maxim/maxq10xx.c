@@ -1752,11 +1752,9 @@ static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl,
     return 0;
 }
 
-static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl,
-                                           const byte* p_client_rand,
-                                           const byte* p_server_rand,
-                                           int is_psk)
+static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, void *ctx)
 {
+    (void)ctx;
     int rc;
     mxq_err_t mxq_rc;
     mxq_secret_context_api_t secret_conf;
@@ -1779,8 +1777,8 @@ static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl,
         }
     }
 
-    XMEMCPY(tls_rand, p_client_rand, RAN_LEN);
-    XMEMCPY(&tls_rand[RAN_LEN], p_server_rand, RAN_LEN);
+    XMEMCPY(tls_rand, ssl->arrays->clientRandom, RAN_LEN);
+    XMEMCPY(&tls_rand[RAN_LEN], ssl->arrays->serverRandom, RAN_LEN);
 
     XMEMSET(&secret_conf, 0 ,sizeof(secret_conf));
     secret_conf.pass = 0;
@@ -1788,8 +1786,10 @@ static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl,
                        (ssl->options.cipherSuite0 << 8);
     secret_conf.Random = tls_rand;
     secret_conf.Random_size = SEED_LEN;
-    secret_conf.PSK_info.psk_id = (is_psk) ? PSK_OBJ_ID : 0;
     secret_conf.is_session_key_secret = 1;
+    if (ssl->specs.kea == psk_kea) {
+        secret_conf.PSK_info.psk_id = PSK_OBJ_ID;
+    }
 
     rc = wolfSSL_CryptHwMutexLock();
     if (rc != 0) {
@@ -3290,8 +3290,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
        maxq10xx_process_server_certificate);
     wolfSSL_CTX_SetProcessServerKexCb(ctx,
         maxq10xx_process_server_key_exchange);
-    wolfSSL_CTX_SetMakeTlsMasterSecretCb(ctx,
-        maxq10xx_make_tls_master_secret);
+    wolfSSL_CTX_SetGenMasterSecretCb(ctx, maxq10xx_make_tls_master_secret);
     wolfSSL_CTX_SetTlsFinishedCb(ctx, maxq10xx_perform_client_finished);
 
     wolfSSL_CTX_SetReadCertDerCb(ctx, maxq10xx_readCertDer_cb);

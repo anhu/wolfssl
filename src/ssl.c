@@ -29621,12 +29621,6 @@ void wolfSSL_CTX_SetProcessServerKexCb(WOLFSSL_CTX* ctx,
     if (ctx)
         ctx->ProcessServerKexCb = cb;
 }
-void wolfSSL_CTX_SetMakeTlsMasterSecretCb(WOLFSSL_CTX* ctx,
-                                          CallbackMakeTlsMasterSecret cb)
-{
-    if (ctx)
-        ctx->MakeTlsMasterSecretCb = cb;
-}
 void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx,
                                           CallbackPerformTlsRecordProcessing cb)
 {

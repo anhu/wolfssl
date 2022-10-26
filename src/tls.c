@@ -561,31 +561,6 @@ int MakeTlsMasterSecret(WOLFSSL* ssl)
         if (!ssl->ctx->GenMasterCb || ret == PROTOCOLCB_UNAVAILABLE)
 #endif
         {
-#ifdef HAVE_PK_CALLBACKS
-            if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
-                (ssl->specs.kea == ecc_diffie_hellman_kea) &&
-                ssl->ctx && ssl->ctx->MakeTlsMasterSecretCb)
-            {
-                ret = ssl->ctx->MakeTlsMasterSecretCb(ssl,
-                            ssl->arrays->clientRandom,
-                            ssl->arrays->serverRandom,
-                            0);
-                if (ret != NOT_COMPILED_IN)
-                    return ret;
-            }
-
-            if ((ssl->options.side == WOLFSSL_CLIENT_END) &&
-                (ssl->specs.kea == psk_kea) &&
-                ssl->ctx && ssl->ctx->MakeTlsMasterSecretCb) {
-                ret = ssl->ctx->MakeTlsMasterSecretCb(ssl,
-                            ssl->arrays->clientRandom,
-                            ssl->arrays->serverRandom,
-                            1);
-                if (ret != NOT_COMPILED_IN)
-                    return ret;
-            }
-#endif /* HAVE_PK_CALLBACKS */
-
             ret = _MakeTlsMasterSecret(ssl->arrays->masterSecret,
                       SECRET_LEN, ssl->arrays->preMasterSecret,
                       ssl->arrays->preMasterSz, ssl->arrays->clientRandom,

@@ -3401,7 +3401,6 @@ struct WOLFSSL_CTX {
     CallbackReadCertDer ReadCertDerCb; /* User handler to read the certificate in DER format */
     CallbackProcessServerCert ProcessServerCertCb; /* User handler to process a certificate */
     CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
-    CallbackMakeTlsMasterSecret MakeTlsMasterSecretCb; /* User handler to create the TLS master secret */
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */
 
     CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
