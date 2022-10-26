@@ -192,3 +192,7 @@ endif
 if BUILD_PSA
 nobase_include_HEADERS+= wolfssl/wolfcrypt/port/psa/psa.h
 endif
+
+if BUILD_MAXQ10XX
+nobase_include_HEADERS+= wolfssl/wolfcrypt/port/maxim/maxq10xx.h
+endif
