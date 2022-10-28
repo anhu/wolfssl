@@ -113,10 +113,6 @@ int maxq10xx_port_init(void);
 #ifdef HAVE_PK_CALLBACKS
 void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv);
 
-void maxq10xx_SetRsaPssSignature(byte* in, word32 inSz);
-int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
-                          byte* signature, word32 sig_sz);
-
 #ifdef HAVE_HKDF
 #endif /* HAVE_HKDF */
 #endif /* HAVE_PK_CALLBACKS */

@@ -6901,24 +6901,6 @@ static WC_INLINE int GetMsgHash(WOLFSSL* ssl, byte* hash)
     return ret;
 }
 
-/* The length of the certificate verification label - client and server. */
-#define CERT_VFY_LABEL_SZ    34
-/* The server certificate verification label. */
-static const byte serverCertVfyLabel[CERT_VFY_LABEL_SZ] =
-    "TLS 1.3, server CertificateVerify";
-/* The client certificate verification label. */
-static const byte clientCertVfyLabel[CERT_VFY_LABEL_SZ] =
-    "TLS 1.3, client CertificateVerify";
-
-/* The number of prefix bytes for signature data. */
-#define SIGNING_DATA_PREFIX_SZ     64
-/* The prefix byte in the signature data. */
-#define SIGNING_DATA_PREFIX_BYTE   0x20
-/* Maximum length of the signature data. */
-#define MAX_SIG_DATA_SZ            (SIGNING_DATA_PREFIX_SZ + \
-                                    CERT_VFY_LABEL_SZ      + \
-                                    WC_MAX_DIGEST_SIZE)
-
 /* Create the signature data for TLS v1.3 certificate verification.
  *
  * ssl        The SSL/TLS object.
@@ -6926,8 +6908,8 @@ static const byte clientCertVfyLabel[CERT_VFY_LABEL_SZ] =
  * sigDataSz  The length of the signature data.
  * check      Indicates this is a check not create.
  */
-static int CreateSigData(WOLFSSL* ssl, byte* sigData, word16* sigDataSz,
-                          int check)
+int CreateSigData(WOLFSSL* ssl, byte* sigData, word16* sigDataSz,
+                  int check)
 {
     word16 idx;
     int side = ssl->options.side;
@@ -6966,8 +6948,8 @@ static int CreateSigData(WOLFSSL* ssl, byte* sigData, word16* sigDataSz,
  * hashAlgo   The hash algorithm to use when signing.
  * returns the length of the encoded signature or negative on error.
  */
-static int CreateRSAEncodedSig(byte* sig, byte* sigData, int sigDataSz,
-                               int sigAlgo, int hashAlgo)
+int CreateRSAEncodedSig(byte* sig, byte* sigData, int sigDataSz,
+                        int sigAlgo, int hashAlgo)
 {
     Digest digest;
     int    hashSz = 0;
@@ -7124,13 +7106,6 @@ static int CheckRSASignature(WOLFSSL* ssl, int sigAlgo, int hashAlgo,
         if (ret < 0)
             return ret;
         sigSz = ret;
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-        if (ssl->options.side == WOLFSSL_CLIENT_END) {
-           ret =  maxq10xx_RsaPssVerify(ssl, sigData, sigSz, NULL, 0);
-           if (ret != NOT_COMPILED_IN)
-               return ret;
-        }
-#endif
 
         ret = wc_RsaPSS_CheckPadding(sigData, sigSz, decSig, decSigSz,
                                      hashType);

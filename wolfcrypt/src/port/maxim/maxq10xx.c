@@ -139,9 +139,6 @@ int mac_comp_active = 0;
 #endif /* WOLFSSL_MAXQ108x */
 #endif /* HAVE_PK_CALLBACKS */
 
-unsigned char rsa_pss_signature[512];
-mxq_u2 rsa_pss_signlen;
-
 int device_key_len = 32;
 #if defined(WOLFSSL_MAXQ108x)
 int device_hs_key_type;
@@ -2424,18 +2421,12 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
     return rc;
 }
 
-void maxq10xx_SetRsaPssSignature(byte* in, word32 inSz)
-{
-    memcpy(rsa_pss_signature, in, inSz);
-    rsa_pss_signlen = inSz;
-}
-
-int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
-                          byte* signature, word32 sig_sz)
+static int maxq10xx_RsaPssVerify_ex(WOLFSSL* ssl,
+                                    byte* hashed_msg, word32 hashed_msg_sz,
+                                    byte* pss_sign, word32 pss_signlen,
+                                    int isCertId)
 {
     (void)ssl;
-    unsigned char* pss_sign;
-    mxq_u2 pss_signlen;
     mxq_u2 pubkey_objectid;
     int ret;
     mxq_err_t mxq_rc;
@@ -2446,14 +2437,10 @@ int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
         return NOT_COMPILED_IN;
     }
 
-    if (signature == NULL) {
-        pss_sign = rsa_pss_signature;
-        pss_signlen = rsa_pss_signlen;
+    if (isCertId) {
         pubkey_objectid = tls13_server_cert_id;
     }
     else {
-        pss_sign = signature;
-        pss_signlen = sig_sz;
         pubkey_objectid = DEVICE_KEY_PAIR_OBJ_ID;
     }
 
@@ -2471,6 +2458,76 @@ int maxq10xx_RsaPssVerify(WOLFSSL* ssl, byte* hashed_msg, word32 hashed_msg_sz,
         ret = WC_HW_E;
     }
     return ret;
+}
+
+/* This will do all the work that is normally done in RsaVerify() and 
+ * CheckRSASignature(). Thats why at the bottom, we release the key. Because
+ * verification has been completed and CheckRSASignature() should be skipped.
+ * The same reasoning for maxq10xx_RsaSkipSignCheck() doing nothing. */
+static int maxq10xx_RsaPssVerify(WOLFSSL* ssl,
+                                 unsigned char* in, unsigned int inSz,
+                                 unsigned char** out, int hash, int mgf,
+                                 const unsigned char* key, unsigned int keySz,
+                                 void* ctx) {
+    (void)out;
+    (void)mgf;
+    (void)key;
+    (void)keySz;
+    (void)ctx;
+
+    int    ret = 0;
+    byte   sigData[MAX_SIG_DATA_SZ];
+    word16 sigDataSz;
+    word32 sigSz;
+
+    if (hash == SHA256h) {
+        hash = sha256_mac;
+    } else if (hash == SHA384h) {
+        hash = sha384_mac;
+    } else if (hash  == SHA512h) {
+        hash = sha512_mac;
+    } else {
+        return BAD_FUNC_ARG;
+    }
+
+    ret = CreateSigData(ssl, sigData, &sigDataSz, 1);
+    if (ret != 0)
+        return ret;
+
+    /* PSS signature can be done in-place */
+    ret = CreateRSAEncodedSig(sigData, sigData, sigDataSz,
+                              rsa_pss_sa_algo, hash);
+    if (ret < 0)
+        return ret;
+    sigSz = ret;
+
+    ret = maxq10xx_RsaPssVerify_ex(ssl, sigData, sigSz, in, inSz, 1);
+
+    if (ret == 0) {
+        /* This ensures call to CheckRSASignature() is skipped. */
+        ssl->peerRsaKeyPresent = 0;
+        FreeKey(ssl, DYNAMIC_TYPE_RSA, (void**)&ssl->peerRsaKey);
+        ssl->options.peerAuthGood = 1;
+    }
+
+    return ret;
+}
+
+static int maxq10xx_SkipSigCheck(WOLFSSL* ssl,
+                                 unsigned char* sig, unsigned int sigSz,
+                                 unsigned char** out, int hash, int mgf,
+                                 const unsigned char* key, unsigned int keySz,
+                                 void* ctx) {
+    (void)ssl;
+    (void)sig;
+    (void)sigSz;
+    (void)out;
+    (void)hash;
+    (void)mgf;
+    (void)key;
+    (void)keySz;
+    (void)ctx;
+    return 0;
 }
 
 static int maxq10xx_RsaPssSign(WOLFSSL* ssl, const byte* in, word32 inSz,
@@ -2504,7 +2561,21 @@ static int maxq10xx_RsaPssSign(WOLFSSL* ssl, const byte* in, word32 inSz,
 
     if (mxq_rc) {
         WOLFSSL_MSG("MAXQ: MXQ_Sign() failed");
-        ret = WC_HW_E;
+        return WC_HW_E;
+    }
+
+    ret = wolfSSL_CryptHwMutexLock();
+    if (ret != 0) {
+        return ret;
+    }
+ 
+    mxq_rc = MXQ_Verify(ALGO_RSASSAPSSPKCS1_V2_1_PLAIN, DEVICE_KEY_PAIR_OBJ_ID,
+                        in, inSz, out, *outSz);
+
+    wolfSSL_CryptHwMutexUnLock();
+    if (mxq_rc) {
+        WOLFSSL_MSG("MAXQ: MXQ_Verify() failed");
+        return WC_HW_E;
     }
 
     return ret;
@@ -3276,8 +3347,12 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
         wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
         wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
+        wolfSSL_CTX_SetRsaPssSignCheckCb(ctx, maxq10xx_SkipSigCheck);
+        wolfSSL_CTX_SetRsaPssVerifyCb(ctx, maxq10xx_RsaPssVerify);
+
         wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
             maxq10xx_perform_tls13_record_processing);
+
     } else
 #endif /* WOLFSSL_MAXQ108x */
     {

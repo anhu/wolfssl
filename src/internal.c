@@ -4580,12 +4580,6 @@ int RsaVerify(WOLFSSL* ssl, byte* in, word32 inSz, byte** out, int sigAlgo,
         return ret;
 #endif
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        maxq10xx_SetRsaPssSignature(in, inSz);
-    }
-#endif
-
 #if defined(WC_RSA_PSS)
     if (sigAlgo == rsa_pss_sa_algo) {
         enum wc_HashType hashType = WC_HASH_TYPE_NONE;
@@ -4687,14 +4681,6 @@ int VerifyRsaSign(WOLFSSL* ssl, byte* verifySig, word32 sigSz,
         if (ret != 0)
             return ret;
     #ifdef HAVE_PK_CALLBACKS
-    #if defined(WOLFSSL_MAXQ108x)
-        if (ssl->options.side == WOLFSSL_CLIENT_END) {
-        ret = maxq10xx_RsaPssVerify(ssl, (byte*)plain, plainSz, verifySig,
-                                    sigSz);
-        if (ret != NOT_COMPILED_IN)
-            return ret;
-        }
-    #else
         if (ssl->ctx->RsaPssSignCheckCb) {
             /* The key buffer includes private/public portion,
                 but only public is used */
@@ -4714,7 +4700,6 @@ int VerifyRsaSign(WOLFSSL* ssl, byte* verifySig, word32 sigSz,
                 }
             }
         }
-    #endif
         else
     #endif /* HAVE_PK_CALLBACKS */
         {
@@ -12950,6 +12935,16 @@ static int ProcessPeerCertParse(WOLFSSL* ssl, ProcPeerCertArgs* args,
             args->dCert->sigCtx.asyncDev);
     }
 #endif
+
+#ifdef WOLFSSL_MAXQ10XX_TLS
+    /* MAXQ10xx accepts ASN_NO_SIGNER_E because the CA cert is registered with
+     * the MAXQ hardware; not CertManager. All other return values are
+     * unexpected.
+     */
+    if (ret != ASN_NO_SIGNER_E) {
+        return ret;
+    }
+#endif /* WOLFSSL_MAXQ10XX_TLS */
 
 #ifdef HAVE_PK_CALLBACKS
     if (ssl->options.side == WOLFSSL_CLIENT_END) {
