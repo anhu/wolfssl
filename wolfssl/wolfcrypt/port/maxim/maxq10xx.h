@@ -27,24 +27,7 @@
 
 #include <wolfssl/wolfcrypt/types.h>
 
-#ifndef WC_DH_TYPE_DEFINED
-    typedef struct DhKey DhKey;
-    #define WC_DH_TYPE_DEFINED
-#endif
-
-#ifndef WC_RNG_TYPE_DEFINED /* guard on redeclaration */
-    typedef struct OS_Seed OS_Seed;
-    typedef struct WC_RNG WC_RNG;
-    #ifdef WC_RNG_SEED_CB
-        typedef int (*wc_RngSeed_Cb)(OS_Seed* os, byte* seed, word32 sz);
-    #endif
-    #define WC_RNG_TYPE_DEFINED
-#endif
-
 #ifdef WOLF_CRYPTO_CB
-    #ifdef WOLFSSL_MAXQ1061
-    #endif /* WOLFSSL_MAXQ1061 */
-
     #ifdef WOLFSSL_MAXQ1065
         #define MAXQ_AESGCM
         #define MAXQ_SHA256
@@ -61,64 +44,45 @@
     #endif /* WOLFSSL_MAXQ108x */
 #endif /* WOLF_CRYPTO_CB */
 
-#ifdef HAVE_PK_CALLBACKS
 struct WOLFSSL_CTX;
 typedef struct WOLFSSL WOLFSSL;
-#endif /* HAVE_PK_CALLBACKS */
-
-#ifdef WOLFSSL_MAXQ10XX_TLS
-typedef struct WOLFSSL WOLFSSL;
 typedef struct DecodedCert DecodedCert;
-typedef struct ecc_key ecc_key;
 typedef struct DerBuffer DerBuffer;
+typedef struct wc_CryptoInfo wc_CryptoInfo;
+typedef struct Aes Aes;
+typedef struct wc_Sha256 wc_Sha256;
+typedef struct ecc_key ecc_key;
+typedef struct ProtocolVersion ProtocolVersion;
 
 typedef struct {
     int use_hw_keys;
     DerBuffer* device_cert;
 } maxq_ssl_t;
-#endif /* WOLFSSL_MAXQ10XX_TLS */
 
-#ifdef WOLFSSL_MAXQ10XX_CRYPTO
-    typedef struct Aes Aes;
-    typedef struct wc_Sha256 wc_Sha256;
-    typedef struct ecc_key ecc_key;
+typedef struct {
+    int key_obj_id;
+    int key_pending;
+    unsigned char key[32];
+} maxq_aes_t;
 
-    typedef struct {
-        int key_obj_id;
-        int key_pending;
-        unsigned char key[32];
-    } maxq_aes_t;
+typedef struct {
+    int hash_running;
+    int soft_hash;
+} maxq_sha256_t;
 
-    typedef struct {
-        int hash_running;
-        int soft_hash;
-    } maxq_sha256_t;
+typedef struct {
+    int key_obj_id;
+    int key_pending;
+    int hw_ecc;
+    int hw_storage;
+    unsigned char ecc_key[32 * 3];
+} maxq_ecc_t;
 
-    typedef struct {
-        int key_obj_id;
-        int key_pending;
-        int hw_ecc;
-        int hw_storage;
-        unsigned char ecc_key[32 * 3];
-    } maxq_ecc_t;
-#endif /* WOLFSSL_MAXQ10XX_CRYPTO */
-
-#ifdef WOLF_CRYPTO_CB
-    typedef struct wc_CryptoInfo wc_CryptoInfo;
-#endif
-
-typedef struct ProtocolVersion ProtocolVersion;
 int maxq10xx_port_init(void);
 
-#ifdef HAVE_PK_CALLBACKS
-void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv);
-
-#ifdef HAVE_HKDF
-#endif /* HAVE_HKDF */
-#endif /* HAVE_PK_CALLBACKS */
-
-#ifdef WOLFSSL_MAXQ10XX_TLS
-#endif /* WOLFSSL_MAXQ10XX_TLS */
+#ifdef WOLF_CRYPTO_CB
+    int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx);
+#endif /* WOLF_CRYPTO_CB */
 
 #ifdef WOLFSSL_MAXQ10XX_CRYPTO
 int wc_MAXQ10XX_AesSetKey(Aes* aes, const byte* userKey, word32 keylen);
@@ -131,9 +95,9 @@ int wc_MAXQ10XX_EccSetKey(ecc_key* key, word32 keysize);
 void wc_MAXQ10XX_EccFree(ecc_key* key);
 #endif /* WOLFSSL_MAXQ10XX_CRYPTO */
 
-#ifdef WOLF_CRYPTO_CB
-    int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx);
-#endif
+#ifdef HAVE_PK_CALLBACKS
+void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv);
+#endif /* HAVE_PK_CALLBACKS */
 
 #endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108x */
 #endif /* _WOLFPORT_MAXQ10XX_H_ */
