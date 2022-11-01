@@ -19,7 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335, USA
  */
 
-#include <stdint.h>
+#ifdef HAVE_CONFIG_H
+    #include <config.h>
+#endif
+
+#include <wolfssl/wolfcrypt/settings.h>
 #include <wolfssl/wolfcrypt/port/maxim/maxq10xx.h>
 
 #ifdef NO_INLINE
@@ -29,6 +33,7 @@
     #include <wolfcrypt/src/misc.c>
 #endif
 
+#include <stdint.h>
 #include <wolfssl/internal.h>
 #include <wolfssl/wolfcrypt/cryptocb.h>
 #include <wolfssl/wolfcrypt/error-crypt.h>
