@@ -1960,8 +1960,10 @@ static int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     *p_len = cert_size;
     return 0;
 }
+#endif /* HAVE_PK_CALLBACKS */
 
-static int maxq10xx_readCertDer_cb(WOLFSSL *ssl) {
+#if defined(WOLFSSL_MAXQ10XX_TLS)
+int wolfSSL_maxq10xx_load_certificate(WOLFSSL *ssl) {
     DerBuffer* maxq_der = NULL;
     int ret = 0;
 
@@ -1984,10 +1986,9 @@ static int maxq10xx_readCertDer_cb(WOLFSSL *ssl) {
 
     ssl->buffers.certificate = maxq_der;
     ssl->buffers.weOwnCert = 1;
-    return 0;
+    return WOLFSSL_SUCCESS;
 }
-
-#endif /* HAVE_PK_CALLBACKS */
+#endif /* WOLFSSL_MAXQ10XX_TLS */
 
 static int maxq10xx_sign_device_cert(WOLFSSL* ssl,
                const unsigned char* p_in, unsigned int p_in_len,
@@ -3368,7 +3369,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
     wolfSSL_CTX_SetGenMasterSecretCb(ctx, maxq10xx_make_tls_master_secret);
     wolfSSL_CTX_SetTlsFinishedCb(ctx, maxq10xx_perform_client_finished);
 
-    wolfSSL_CTX_SetReadCertDerCb(ctx, maxq10xx_readCertDer_cb);
     wolfSSL_CTX_SetEccSignCb(ctx, maxq10xx_sign_device_cert);
 
     init_pk_callbacks = 1;

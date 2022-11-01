@@ -22,8 +22,7 @@
 #ifndef _WOLFPORT_MAXQ10XX_H_
 #define _WOLFPORT_MAXQ10XX_H_
 
-#if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || \
-    defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || defined(WOLFSSL_MAXQ108x)
 
 #include <wolfssl/wolfcrypt/types.h>
 
@@ -78,26 +77,36 @@ typedef struct {
     unsigned char ecc_key[32 * 3];
 } maxq_ecc_t;
 
-int maxq10xx_port_init(void);
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
+WOLFSSL_LOCAL int maxq10xx_port_init(void);
 
 #ifdef WOLF_CRYPTO_CB
-    int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx);
+WOLFSSL_LOCAL int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx);
 #endif /* WOLF_CRYPTO_CB */
 
 #ifdef WOLFSSL_MAXQ10XX_CRYPTO
-int wc_MAXQ10XX_AesSetKey(Aes* aes, const byte* userKey, word32 keylen);
-void wc_MAXQ10XX_AesFree(Aes* aes);
-
-void wc_MAXQ10XX_Sha256Copy(wc_Sha256* sha256);
-void wc_MAXQ10XX_Sha256Free(wc_Sha256* sha256);
-
-int wc_MAXQ10XX_EccSetKey(ecc_key* key, word32 keysize);
-void wc_MAXQ10XX_EccFree(ecc_key* key);
+WOLFSSL_LOCAL int wc_MAXQ10XX_AesSetKey(Aes* aes, const byte* userKey, word32 keylen);
+WOLFSSL_LOCAL void wc_MAXQ10XX_AesFree(Aes* aes);
+WOLFSSL_LOCAL void wc_MAXQ10XX_Sha256Copy(wc_Sha256* sha256);
+WOLFSSL_LOCAL void wc_MAXQ10XX_Sha256Free(wc_Sha256* sha256);
+WOLFSSL_LOCAL int wc_MAXQ10XX_EccSetKey(ecc_key* key, word32 keysize);
+WOLFSSL_LOCAL void wc_MAXQ10XX_EccFree(ecc_key* key);
 #endif /* WOLFSSL_MAXQ10XX_CRYPTO */
 
 #ifdef HAVE_PK_CALLBACKS
-void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv);
+WOLFSSL_LOCAL void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv);
 #endif /* HAVE_PK_CALLBACKS */
+
+#if defined(WOLFSSL_MAXQ10XX_TLS)
+WOLFSSL_LOCAL int wolfSSL_maxq10xx_load_certificate(WOLFSSL *ssl);
+#endif /* WOLFSSL_MAXQ10XX_TLS */
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108x */
 #endif /* _WOLFPORT_MAXQ10XX_H_ */

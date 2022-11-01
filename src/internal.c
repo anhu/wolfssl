@@ -7070,6 +7070,11 @@ int InitSSL(WOLFSSL* ssl, WOLFSSL_CTX* ctx, int writeDup)
             return ret;
     }
 #endif
+
+#if defined(WOLFSSL_MAXQ10XX_TLS)
+    wolfSSL_maxq10xx_load_certificate(ssl);
+#endif
+
     return 0;
 }
 
