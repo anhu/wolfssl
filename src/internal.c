@@ -26876,8 +26876,7 @@ static int HashSkeData(WOLFSSL* ssl, enum wc_HashType hashType,
         word16 len;
         word32 begin = *inOutIdx;
     #if defined(OPENSSL_EXTRA) || defined(OPENSSL_ALL) || \
-        defined(WOLFSSL_NGINX) || defined(HAVE_LIGHTY) || \
-        defined(HAVE_PK_CALLBACKS)
+        defined(WOLFSSL_NGINX) || defined(HAVE_LIGHTY)
         int ret;
     #endif
     #ifdef OPENSSL_EXTRA
@@ -27047,16 +27046,6 @@ static int HashSkeData(WOLFSSL* ssl, enum wc_HashType hashType,
         if ((ret = CertSetupCbWrapper(ssl)) != 0)
             return ret;
     #endif
-
-    #if defined(HAVE_PK_CALLBACKS)
-        if (ssl->options.side == WOLFSSL_CLIENT_END && ssl->ctx &&
-            ssl->ctx->ReadCertDerCb) {
-            ret = ssl->ctx->ReadCertDerCb(ssl);
-            if ((ret != 0) && (ret != NOT_COMPILED_IN)) {
-                return ret;
-            }
-        }
-    #endif /* HAVE_PK_CALLBACKS */
 
         /* don't send client cert or cert verify if user hasn't provided
            cert and private key */

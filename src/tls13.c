@@ -7263,16 +7263,6 @@ static int SendTls13Certificate(WOLFSSL* ssl)
             return BUFFER_ERROR;
         }
 
-#if defined(HAVE_PK_CALLBACKS)
-        if (ssl->options.side == WOLFSSL_CLIENT_END && ssl->ctx &&
-            ssl->ctx->ReadCertDerCb) {
-            ret = ssl->ctx->ReadCertDerCb(ssl);
-            if ((ret != 0) && (ret != NOT_COMPILED_IN)) {
-                return ret;
-            }
-        }
-#endif
-
         /* Certificate Data */
         certSz = ssl->buffers.certificate->length;
         /* Cert Req Ctx Len | Cert Req Ctx | Cert List Len | Cert Data Len */

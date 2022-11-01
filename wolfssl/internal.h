@@ -3424,7 +3424,6 @@ struct WOLFSSL_CTX {
 #if !defined(WOLFSSL_NO_TLS12) && !defined(WOLFSSL_AEAD_ONLY)
     CallbackVerifyMac           VerifyMacCb;        /* User Verify mac handler */
 #endif
-    CallbackReadCertDer ReadCertDerCb; /* User handler to read the certificate in DER format */
     CallbackProcessServerCert ProcessServerCertCb; /* User handler to process a certificate */
     CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */

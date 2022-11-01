@@ -29597,12 +29597,6 @@ void* wolfSSL_GetVerifyMacCtx(WOLFSSL* ssl)
 }
 #endif /* !WOLFSSL_NO_TLS12 && !WOLFSSL_AEAD_ONLY */
 
-void wolfSSL_CTX_SetReadCertDerCb(WOLFSSL_CTX* ctx,
-                                  CallbackReadCertDer cb)
-{
-    if (ctx)
-        ctx->ReadCertDerCb = cb;
-}
 void wolfSSL_CTX_SetHKDFExpandLabelCb(WOLFSSL_CTX* ctx,
                                       CallbackHKDFExpandLabel cb)
 {
