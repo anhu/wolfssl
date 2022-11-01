@@ -1350,6 +1350,10 @@ extern void uITRON4_free(void *p) ;
         #error "Changes to the ASN Template code have not be done yet."
     #endif
 
+    #if defined(WOLFSSL_MAXQ10XX_TLS) && !defined(NO_WOLFSSL_SERVER)
+        #error "The MAXQ10XX does not support server side functionalities."
+    #endif
+
     #if defined(WOLFSSL_MAXQ1061)
         #define MAXQ_DEVICE_ID 1061
     #elif defined(WOLFSSL_MAXQ1065)

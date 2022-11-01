@@ -1781,6 +1781,7 @@ int wc_GenerateSeed(OS_Seed* os, byte* output, word32 sz)
 {
 #ifdef WOLF_CRYPTO_CB
     int ret;
+
     if (os != NULL && os->devId != INVALID_DEVID) {
         ret = wc_CryptoCb_RandomSeed(os, output, sz);
         if (ret != CRYPTOCB_UNAVAILABLE)

@@ -2388,13 +2388,10 @@ int InitSSL_Ctx(WOLFSSL_CTX* ctx, WOLFSSL_METHOD* method, void* heap)
     ret = wolfEventQueue_Init(&ctx->event_queue);
 #endif /* HAVE_WOLF_EVENT */
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ10XX_TLS)
-    /* Only setup the callbacks if we're a client. Let the maxq10xx
-     * infrastructure know whether we are doing TLS 1.3. */
-    if (method->side == WOLFSSL_CLIENT_END) {
-        ctx->devId = MAXQ_DEVICE_ID;
-        maxq10xx_SetupPkCallbacks(ctx, &method->version);
-    }
+#if defined(HAVE_PK_CALLBACKS)
+    /* Let the maxq10xx infrastructure know whether we are doing TLS 1.3. */
+    ctx->devId = MAXQ_DEVICE_ID;
+    maxq10xx_SetupPkCallbacks(ctx, &method->version);
 #endif
 
     return ret;
@@ -4993,8 +4990,8 @@ int EccVerify(WOLFSSL* ssl, const byte* in, word32 inSz, const byte* out,
         ret = ssl->ctx->EccVerifyCb(ssl, in, inSz, out, outSz, keyBuf, keySz,
             &ssl->eccVerifyRes, ctx);
     }
-    #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if ((ret == NOT_COMPILED_IN) || ssl->options.side != WOLFSSL_CLIENT_END)
+    #if defined(WOLFSSL_MAXQ108x)
+    if (ret == NOT_COMPILED_IN)
     #elif !defined(WOLFSSL_RENESAS_SCEPROTECT) && \
           !defined(WOLFSSL_RENESAS_TSIP_TLS)
     else
@@ -5248,8 +5245,8 @@ int Ed25519Sign(WOLFSSL* ssl, const byte* in, word32 inSz, byte* out,
         ret = ssl->ctx->Ed25519SignCb(ssl, in, inSz, out, outSz, keyBuf,
             keySz, ctx);
     }
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    if ((ret == NOT_COMPILED_IN) || ssl->options.side != WOLFSSL_CLIENT_END)
+#if defined(WOLFSSL_MAXQ108x)
+    if (ret == NOT_COMPILED_IN)
 #else
     else
 #endif
@@ -5848,6 +5845,7 @@ int DhGenKeyPair(WOLFSSL* ssl, DhKey* dhKey,
     if (ret != 0)
         return ret;
 #endif
+
     PRIVATE_KEY_UNLOCK();
     ret = wc_DhGenerateKeyPair(dhKey, ssl->rng, priv, privSz, pub, pubSz);
     PRIVATE_KEY_LOCK();
@@ -12952,7 +12950,7 @@ static int ProcessPeerCertParse(WOLFSSL* ssl, ProcPeerCertArgs* args,
 #endif /* WOLFSSL_MAXQ10XX_TLS */
 
 #ifdef HAVE_PK_CALLBACKS
-    if (ssl->options.side == WOLFSSL_CLIENT_END) {
+    {
         int orig_ret = ret;
         ret = NOT_COMPILED_IN;
         if (ssl->ctx && ssl->ctx->ProcessServerCertCb) {
@@ -28157,8 +28155,7 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                         {
                         #ifdef HAVE_PK_CALLBACKS
                             ret = NOT_COMPILED_IN;
-                            if (ssl->options.side == WOLFSSL_CLIENT_END &&
-                                ssl->ctx && ssl->ctx->ProcessServerKexCb) {
+                            if (ssl->ctx && ssl->ctx->ProcessServerKexCb) {
                                 ret = ssl->ctx->ProcessServerKexCb(ssl,
                                     args->sigAlgo,
                                     args->verifySig, args->verifySigSz,
@@ -28934,28 +28931,26 @@ int SendClientKeyExchange(WOLFSSL* ssl)
                 #ifdef WOLFSSL_MAXQ10XX_TLS
                     byte dummy_psk[MAX_PSK_KEY_LEN];
                     word32 ret_cb;
-                    if (ssl->options.side == WOLFSSL_CLIENT_END) {
-                        // get client_identity
-                        ret_cb = ssl->options.client_psk_cb(ssl,
-                                     ssl->arrays->server_hint,
-                                     ssl->arrays->client_identity,
-                                     MAX_PSK_ID_LEN, dummy_psk,
-                                     MAX_PSK_KEY_LEN);
-                        if (ret_cb == 0 || ret_cb > MAX_PSK_KEY_LEN) {
-                            ERROR_OUT(PSK_KEY_ERROR, exit_scke);
-                        }
-
-                        // save client_identity
-                        ssl->arrays->client_identity[MAX_PSK_ID_LEN] = '\0';
-                        args->encSz = (word32)XSTRLEN(
-                                          ssl->arrays->client_identity);
-                        if (args->encSz > MAX_PSK_ID_LEN) {
-                            ERROR_OUT(CLIENT_ID_ERROR, exit_scke);
-                        }
-                        XMEMCPY(args->encSecret, ssl->arrays->client_identity,
-                                args->encSz);
-                        break;
+                    /* get client_identity */
+                    ret_cb = ssl->options.client_psk_cb(ssl,
+                                 ssl->arrays->server_hint,
+                                 ssl->arrays->client_identity,
+                                 MAX_PSK_ID_LEN, dummy_psk,
+                                 MAX_PSK_KEY_LEN);
+                    if (ret_cb == 0 || ret_cb > MAX_PSK_KEY_LEN) {
+                        ERROR_OUT(PSK_KEY_ERROR, exit_scke);
                     }
+
+                    /* save client_identity */
+                    ssl->arrays->client_identity[MAX_PSK_ID_LEN] = '\0';
+                    args->encSz = (word32)XSTRLEN(
+                                      ssl->arrays->client_identity);
+                    if (args->encSz > MAX_PSK_ID_LEN) {
+                         ERROR_OUT(CLIENT_ID_ERROR, exit_scke);
+                    }
+                    XMEMCPY(args->encSecret, ssl->arrays->client_identity,
+                            args->encSz);
+                    break;
                 #endif /* WOLFSSL_MAXQ10XX_TLS */
 
                     ssl->arrays->psk_keySz = ssl->options.client_psk_cb(ssl,

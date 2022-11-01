@@ -786,7 +786,8 @@ void wc_MAXQ10XX_Sha256Free(wc_Sha256* sha256)
 
 #ifdef WOLF_CRYPTO_CB
 #ifdef MAXQ_SHA256
-static int maxq10xx_hash_update_sha256(const mxq_u1* psrc, mxq_length inlen, int running)
+static int maxq10xx_hash_update_sha256(const mxq_u1* psrc, mxq_length inlen,
+                                       int running)
 {
     mxq_err_t mxq_rc;
 
@@ -1491,6 +1492,7 @@ static int mxq_get_sign_alg_from_sig_oid(word32 maxq_id){
 static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
                                                DecodedCert* p_cert)
 {
+    (void)ssl;
     mxq_keytype_id_t key_type = MXQ_KEYTYPE_ECC;
     mxq_keyparam_id_t keyparam = MXQ_KEYPARAM_EC_P256R1;
     mxq_length totalkeylen;
@@ -1501,12 +1503,6 @@ static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
     mxq_err_t mxq_rc;
     mxq_u1 certdata[2048];
     mxq_length certdatalen = sizeof(certdata);
-
-
-    if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return BAD_STATE_E;
-    }
-
 #if defined(WOLFSSL_MAXQ1065)
 
     if (p_cert->signatureOID != CTC_SHA256wECDSA) {
@@ -1632,10 +1628,6 @@ static int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
     int rc;
     mxq_err_t mxq_rc;
 
-    if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return BAD_STATE_E;
-    }
-
     if (ssl->specs.kea != ecc_diffie_hellman_kea) {
         WOLFSSL_MSG("MAXQ: key exchange algo not supported");
         return NOT_COMPILED_IN;
@@ -1688,10 +1680,6 @@ static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl,
     mxq_u2 csid_param = ssl->options.cipherSuite |
                         (ssl->options.cipherSuite0 << 8);
     byte result_public_key[1 + (2 * ECC256_KEYSIZE)];
-
-    if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return BAD_STATE_E;
-    }
 
     if (ssl->specs.kea != ecc_diffie_hellman_kea) {
         WOLFSSL_MSG("MAXQ: key exchange algo not supported");
@@ -1762,10 +1750,6 @@ static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, void *ctx)
     mxq_secret_context_api_t secret_conf;
     mxq_u1 tls_rand[SEED_LEN];
 
-    if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return BAD_STATE_E;
-    }
-
     if ((ssl->specs.kea != ecc_diffie_hellman_kea) &&
         (ssl->specs.kea != psk_kea)) {
         WOLFSSL_MSG("MAXQ: key exchange algo not supported");
@@ -1823,13 +1807,10 @@ static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, void *ctx)
 static int maxq10xx_perform_client_finished(WOLFSSL* ssl, const byte* p_label,
                const byte* p_seed, word32 seedSz, byte* p_dest, void* ctx)
 {
+    (void)ssl;
     (void)ctx;
     int rc;
     mxq_err_t mxq_rc;
-
-    if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return PROTOCOLCB_UNAVAILABLE;
-    }
 
     rc = wolfSSL_CryptHwMutexLock();
     if (rc != 0) {
@@ -1863,10 +1844,6 @@ static int maxq10xx_perform_tls12_record_processing(WOLFSSL* ssl, int is_encrypt
     if (! ssl->maxq_ctx.use_hw_keys) {
         return NOT_COMPILED_IN;
     } 
-
-    if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return BAD_STATE_E;
-    }
 
     if ((ssl->specs.bulk_cipher_algorithm != wolfssl_aes_gcm) &&
             (ssl->specs.bulk_cipher_algorithm != wolfssl_aes_ccm)) {
@@ -2000,14 +1977,11 @@ static int maxq10xx_sign_device_cert(WOLFSSL* ssl,
                unsigned char* p_out, word32* p_out_len,
                const unsigned char* keyDer, unsigned int keySz, void* ctx)
 {
+    (void)ssl;
     (void)keyDer;
     (void)keySz;
     (void)ctx;
     int rc;
-
-    if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return BAD_STATE_E;
-    }
 
     rc = wolfSSL_CryptHwMutexLock();
     if (rc != 0) {
@@ -3255,10 +3229,6 @@ static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
 
     if (!tls13active) {
         return NOT_COMPILED_IN;
-    }
-
-    if (ssl->options.side != WOLFSSL_CLIENT_END) {
-        return BAD_STATE_E;
     }
 
     if ((ssl->specs.bulk_cipher_algorithm != wolfssl_aes_gcm) &&

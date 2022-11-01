@@ -2833,7 +2833,6 @@ static WARN_UNUSED_RESULT int wc_AesDecrypt(
         word32 temp;
         unsigned int i = 0;
     #endif
-
     #ifdef WOLFSSL_IMX6_CAAM_BLOB
         byte   local[32];
         word32 localSz = 32;

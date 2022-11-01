@@ -342,10 +342,7 @@ int wc_HmacSetKey(Hmac* hmac, int type, const byte* key, word32 length)
 #endif
 
 #if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
-    /* Nothing left to do here. */
-    /* TODO: this makes the server fail. Is that okay?
-     *       do nothing...memory errors? Try valgrind. 
-     *       Is there a way to check this is the client? */
+    /* For MAXQ108x, nothing left to do. */
     return 0;
 #endif
 
