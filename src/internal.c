@@ -4990,10 +4990,9 @@ int EccVerify(WOLFSSL* ssl, const byte* in, word32 inSz, const byte* out,
         ret = ssl->ctx->EccVerifyCb(ssl, in, inSz, out, outSz, keyBuf, keySz,
             &ssl->eccVerifyRes, ctx);
     }
-    #if defined(WOLFSSL_MAXQ108x)
-    if (ret == NOT_COMPILED_IN)
-    #elif !defined(WOLFSSL_RENESAS_SCEPROTECT) && \
-          !defined(WOLFSSL_RENESAS_TSIP_TLS)
+    #if !defined(WOLFSSL_RENESAS_SCEPROTECT) && \
+        !defined(WOLFSSL_RENESAS_TSIP_TLS) && \
+        !defined(WOLFSSL_MAXQ108x)
     else
     #else
     if (!ssl->ctx->EccVerifyCb || ret == CRYPTOCB_UNAVAILABLE)
@@ -28154,7 +28153,6 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                         case ecc_dsa_sa_algo:
                         {
                         #ifdef HAVE_PK_CALLBACKS
-                            ret = NOT_COMPILED_IN;
                             if (ssl->ctx && ssl->ctx->ProcessServerKexCb) {
                                 ret = ssl->ctx->ProcessServerKexCb(ssl,
                                     args->sigAlgo,
@@ -28163,22 +28161,18 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                                     &ssl->buffers.sig.buffer[SEED_LEN],
                                     (ssl->buffers.sig.length - SEED_LEN));
                             }
-
-                            if (ret == NOT_COMPILED_IN)
                         #endif /* HAVE_PK_CALLBACKS */
-                            {
-                                ret = EccVerify(ssl,
-                                    args->verifySig, args->verifySigSz,
-                                    ssl->buffers.digest.buffer,
-                                    ssl->buffers.digest.length,
-                                    ssl->peerEccDsaKey,
-                                #ifdef HAVE_PK_CALLBACKS
-                                    &ssl->buffers.peerEccDsaKey
-                                #else
-                                    NULL
-                                #endif
-                                );
-                            }
+                            ret = EccVerify(ssl,
+                                args->verifySig, args->verifySigSz,
+                                ssl->buffers.digest.buffer,
+                                ssl->buffers.digest.length,
+                                ssl->peerEccDsaKey,
+                            #ifdef HAVE_PK_CALLBACKS
+                                &ssl->buffers.peerEccDsaKey
+                            #else
+                                NULL
+                            #endif
+                            );
 
                         #ifdef WOLFSSL_ASYNC_CRYPT
                             if (ret != WC_PENDING_E)

@@ -1374,12 +1374,13 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
                                     info->pk.eccverify.siglen,
                                     info->pk.eccverify.res,
                                     info->pk.eccverify.key->dp->size);
+
+            wolfSSL_CryptHwMutexUnLock();
+
             if (rc != 0) {
-                wolfSSL_CryptHwMutexUnLock();
                 return rc;
             }
 
-            wolfSSL_CryptHwMutexUnLock();
             /* Success */
             rc = 0;
         }
@@ -2318,11 +2319,11 @@ static int maxq10xx_verify_signature_cb(WOLFSSL* ssl, const byte* sig,
     WOLFSSL_ENTER("maxq10xx_verify_signature_cb()");
 
     if (!tls13active) {
-        return NOT_COMPILED_IN;
+        return CRYPTOCB_UNAVAILABLE;
     }
 
     if (tls13_server_key_algo != ECDSAk) {
-        return NOT_COMPILED_IN;
+        return CRYPTOCB_UNAVAILABLE;
     }
 
     rc = wolfSSL_CryptHwMutexLock();
@@ -2411,7 +2412,7 @@ static int maxq10xx_RsaPssVerify_ex(WOLFSSL* ssl,
     int ret;
     mxq_err_t mxq_rc;
 
-    WOLFSSL_ENTER("maxq10xx_RsaPssVerify");
+    WOLFSSL_ENTER("maxq10xx_RsaPssVerify_ex");
 
     if (!tls13active) {
         return NOT_COMPILED_IN;
@@ -3319,9 +3320,9 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
         tls13active = 1;
         wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_create_ecc_key_cb);
         wolfSSL_CTX_SetEccSharedSecretCb(ctx, maxq10xx_shared_secret_cb);
+        wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
         wolfSSL_CTX_SetDhGenerateKeyPair(ctx, maxq10xx_DhGenerateKeyPair);
         wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
-        wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
         wolfSSL_CTX_SetRsaPssSignCheckCb(ctx, maxq10xx_SkipSigCheck);
         wolfSSL_CTX_SetRsaPssVerifyCb(ctx, maxq10xx_RsaPssVerify);
