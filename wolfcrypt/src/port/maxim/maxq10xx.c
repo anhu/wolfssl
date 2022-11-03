@@ -3319,7 +3319,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
         tls13active = 1;
         wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_create_ecc_key_cb);
         wolfSSL_CTX_SetEccSharedSecretCb(ctx, maxq10xx_shared_secret_cb);
- //       wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
+        wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
         wolfSSL_CTX_SetDhGenerateKeyPair(ctx, maxq10xx_DhGenerateKeyPair);
         wolfSSL_CTX_SetDhAgreeCb(ctx, maxq10xx_DhAgreeCb);
         wolfSSL_CTX_SetRsaPssSignCb(ctx, maxq10xx_RsaPssSign);
@@ -3337,7 +3337,6 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
             maxq10xx_perform_tls12_record_processing);
     }
 
-    wolfSSL_CTX_SetEccVerifyCb(ctx, maxq10xx_verify_signature_cb);
     wolfSSL_CTX_SetProcessServerCertCb(ctx,
        maxq10xx_process_server_certificate);
     wolfSSL_CTX_SetProcessServerKexCb(ctx,
