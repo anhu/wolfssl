@@ -131,6 +131,12 @@ static int TLSX_PopulateSupportedGroups(WOLFSSL* ssl, TLSX** extensions);
 
 #ifndef WOLFSSL_NO_TLS12
 
+#ifdef WOLFSSL_SHA384
+    #define HSHASH_SZ WC_SHA384_DIGEST_SIZE
+#else
+    #define HSHASH_SZ FINISHED_SZ
+#endif
+
 int BuildTlsHandshakeHash(WOLFSSL* ssl, byte* hash, word32* hashLen)
 {
     int ret = 0;
