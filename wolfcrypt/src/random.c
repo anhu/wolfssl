@@ -838,11 +838,6 @@ static int _InitRng(WC_RNG* rng, byte* nonce, word32 nonceSz,
     rng->status = DRBG_NOT_INIT;
 #endif
 
-#if defined (WOLF_CRYPTO_CB) && defined(WOLFSSL_MAXQ108x)
-    /* Override the devId with the hardware ID. */
-    rng->devId = MAXQ_DEVICE_ID;
-#endif
-
 #if defined(HAVE_INTEL_RDSEED) || defined(HAVE_INTEL_RDRAND) || \
     defined(HAVE_AMD_RDSEED)
     /* init the intel RD seed and/or rand */
