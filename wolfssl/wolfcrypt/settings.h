@@ -1342,9 +1342,6 @@ extern void uITRON4_free(void *p) ;
 
     #define WOLFSSL_MAXQ10XX_CRYPTO
     #define WOLFSSL_MAXQ10XX_TLS
-    #ifdef WOLFSSL_MAXQ10XX_TLS
-        #define DISABLE_PEER_CERT_VERS_CHECK
-    #endif
 
     #if defined(WOLFSSL_ASN_TEMPLATE) && defined(WOLFSSL_MAXQ10XX_TLS)
         #error "Changes to the ASN Template code have not be done yet."
