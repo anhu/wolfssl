@@ -3549,6 +3549,9 @@ typedef int (*CallbackPerformTlsRecordProcessing)(WOLFSSL* ssl, int is_encrypt,
        const byte* authIn, word32 authInSz);
 WOLFSSL_API void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx, CallbackPerformTlsRecordProcessing cb);
 
+typedef int (*CallbackEccSkipSharedSecret)(WOLFSSL* ssl);
+WOLFSSL_API void wolfSSL_CTX_SetEccSkipSharedSecretCb(WOLFSSL_CTX* ctx, CallbackEccSkipSharedSecret cb);
+
 #endif /* HAVE_PK_CALLBACKS */
 
 #ifndef NO_CERTS

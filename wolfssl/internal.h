@@ -3418,6 +3418,7 @@ struct WOLFSSL_CTX {
     CallbackProcessServerCert ProcessServerCertCb; /* User handler to process a certificate */
     CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */
+    CallbackEccSkipSharedSecret EccSkipSharedSecretCb; /* User indicator as to whether to skip calling EccSharedSecret() */
 
     CallbackHKDFExpandLabel HKDFExpandLabelCb; /* User handler to do HKDF expansions */
 

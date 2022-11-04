@@ -29621,6 +29621,12 @@ void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx,
     if (ctx)
         ctx->PerformTlsRecordProcessingCb = cb;
 }
+void wolfSSL_CTX_SetEccSkipSharedSecretCb(WOLFSSL_CTX* ctx,
+                                          CallbackEccSkipSharedSecret cb)
+{
+    if (ctx)
+        ctx->EccSkipSharedSecretCb = cb;
+}
 #endif /* HAVE_PK_CALLBACKS */
 #endif /* NO_CERTS */
 

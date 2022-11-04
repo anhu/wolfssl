@@ -1742,6 +1742,14 @@ static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl,
     return 0;
 }
 
+static int maxq10xx_skip_ecc_shared_secret(WOLFSSL* ssl) {
+    if ((ssl->hsKey) &&
+        (((ecc_key*)ssl->hsKey)->maxq_ctx.hw_storage == 1)) {
+        return 1;
+    }
+    return 0;
+}
+
 static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, void *ctx)
 {
     (void)ctx;
@@ -3333,6 +3341,8 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
 #endif /* WOLFSSL_MAXQ108x */
     {
         wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_perform_client_key_exchange);
+        wolfSSL_CTX_SetEccSkipSharedSecretCb(ctx,
+            maxq10xx_skip_ecc_shared_secret);
         wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
             maxq10xx_perform_tls12_record_processing);
     }

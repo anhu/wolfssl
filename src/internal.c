@@ -29410,12 +29410,9 @@ int SendClientKeyExchange(WOLFSSL* ssl)
                     peerKey = (ssl->specs.static_ecdh) ?
                               ssl->peerEccDsaKey : ssl->peerEccKey;
 
-                    #ifdef WOLFSSL_MAXQ10XX_TLS
-                    if ((ssl->hsKey) &&
-                        (((ecc_key*)ssl->hsKey)->maxq_ctx.hw_storage == 1)) {
-                        WOLFSSL_MSG("Skipping EccSharedSecret()");
-                    } else
-                    #endif /* WOLFSSL_MAXQ10XX_TLS */
+                    if ((!ssl->ctx->EccSkipSharedSecretCb) ||
+                        (ssl->ctx->EccSkipSharedSecretCb &&
+                         !ssl->ctx->EccSkipSharedSecretCb(ssl)))
                     {
                         ret = EccSharedSecret(ssl,
                                   (ecc_key*)ssl->hsKey, peerKey,
