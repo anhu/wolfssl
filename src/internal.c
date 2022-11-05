@@ -27065,12 +27065,6 @@ static int HashSkeData(WOLFSSL* ssl, enum wc_HashType hashType,
             ssl->options.sendVerify = SEND_BLANK_CERT;
         }
 
-    #ifdef WOLFSSL_MAXQ10XX_TLS
-        if (ssl->maxq_ctx.device_cert) {
-            ssl->options.sendVerify = SEND_CERT;
-        }
-    #endif /* WOLFSSL_MAXQ10XX_TLS */
-
         if (IsEncryptionOn(ssl, 0)) {
             *inOutIdx += ssl->keys.padSz;
         #if defined(HAVE_ENCRYPT_THEN_MAC) && !defined(WOLFSSL_AEAD_ONLY)
