@@ -7069,7 +7069,9 @@ int InitSSL(WOLFSSL* ssl, WOLFSSL_CTX* ctx, int writeDup)
 #endif
 
 #if defined(WOLFSSL_MAXQ10XX_TLS)
-    wolfSSL_maxq10xx_load_certificate(ssl);
+    ret = wolfSSL_maxq10xx_load_certificate(ssl);
+    if (ret != WOLFSSL_SUCCESS)
+        return ret;
 #endif
 
     return 0;
