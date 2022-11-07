@@ -13700,7 +13700,7 @@ int ProcessPeerCerts(WOLFSSL* ssl, byte* input, word32* inOutIdx,
                     }
                 #endif /* SESSION_CERTS && WOLFSSL_ALT_CERT_CHAINS */
 
-                #if !defined(OPENSSL_COMPATIBLE_DEFAULTS)
+                #ifndef OPENSSL_COMPATIBLE_DEFAULTS
                     /* Check peer's certificate version number. TLS 1.2 / 1.3
                      * requires the clients certificate be version 3 unless a
                      * different version has been negotiated using RFC 7250.
