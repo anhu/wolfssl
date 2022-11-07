@@ -2337,7 +2337,8 @@ int wolfSSL_CryptHwMutexUnLock(void)
             if (pthread_setspecific(key_own_hw_mutex, key_ptr)) {
                 return THREAD_STORE_SET_E;
             }
-        } else {
+        }
+        else {
             if ((trylock == 0) && (*((int *)key_ptr) > 0)) {
                 *((int *)key_ptr) = *((int *)key_ptr) + 1;
                 return 0;
@@ -2346,7 +2347,8 @@ int wolfSSL_CryptHwMutexUnLock(void)
 
         if (trylock) {
             ret = pthread_mutex_trylock(wcCryptHwSharedMutexPtr);
-        } else {
+        }
+        else {
             ret = pthread_mutex_lock(wcCryptHwSharedMutexPtr);
         }
 

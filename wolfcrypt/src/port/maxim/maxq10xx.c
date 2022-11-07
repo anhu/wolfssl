@@ -2097,7 +2097,8 @@ static int wc_MAXQ10XX_HmacSetKey(int type)
 
     if (mxq_rc == 0) {
         mac_comp_active = 1;
-    } else {
+    }
+    else {
         WOLFSSL_MSG("MAXQ: MXQ_MAC_Init() failed");
         rc = WC_HW_E;
     }
@@ -2448,7 +2449,7 @@ static int maxq10xx_RsaPssVerify_ex(WOLFSSL* ssl,
     return ret;
 }
 
-/* This will do all the work that is normally done in RsaVerify() and 
+/* This will do all the work that is normally done in RsaVerify() and
  * CheckRSASignature(). Thats why at the bottom, we release the key. Because
  * verification has been completed and CheckRSASignature() should be skipped.
  * The same reasoning for maxq10xx_RsaSkipSignCheck() doing nothing. */
@@ -2470,11 +2471,14 @@ static int maxq10xx_RsaPssVerify(WOLFSSL* ssl,
 
     if (hash == SHA256h) {
         hash = sha256_mac;
-    } else if (hash == SHA384h) {
+    }
+    else if (hash == SHA384h) {
         hash = sha384_mac;
-    } else if (hash  == SHA512h) {
+    }
+    else if (hash  == SHA512h) {
         hash = sha512_mac;
-    } else {
+    }
+    else {
         return BAD_FUNC_ARG;
     }
 
@@ -3271,7 +3275,8 @@ static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
 
     if (ssl->specs.bulk_cipher_algorithm == wolfssl_aes_gcm) {
         algo_id = ALGO_CIPHER_AES_GCM;
-    } else if (ssl->specs.bulk_cipher_algorithm == wolfssl_aes_ccm) {
+    }
+    else if (ssl->specs.bulk_cipher_algorithm == wolfssl_aes_ccm) {
         algo_id = ALGO_CIPHER_AES_CCM;
     }
 
@@ -3337,7 +3342,8 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
         wolfSSL_CTX_SetPerformTlsRecordProcessingCb(ctx,
             maxq10xx_perform_tls13_record_processing);
 
-    } else
+    }
+    else
 #endif /* WOLFSSL_MAXQ108X */
     {
         wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_perform_client_key_exchange);
