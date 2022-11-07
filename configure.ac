@@ -1881,20 +1881,16 @@ AC_ARG_WITH([maxq10xx],
         maxqpartnumber=$withval
 
         if test "$maxqpartnumber" = "MAXQ1065"; then
-            LIB_ADD="$LIB_ADD -lrt"
+            AC_CHECK_LIB([rt], [clock_gettime])
             LIB_STATIC_ADD="$LIB_STATIC_ADD lib/libmaxq1065_api.a"
             AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_MAXQ1065"
             ENABLED_MAXQ10XX="yes"
-        fi
-
-        if test "$maxqpartnumber" = "MAXQ108x"; then
-            LIB_ADD="$LIB_ADD -lrt"
+        elif test "$maxqpartnumber" = "MAXQ108x"; then
+            AC_CHECK_LIB([rt], [clock_gettime])
             LIB_STATIC_ADD="$LIB_STATIC_ADD lib/libmaxq108x_api.a"
             AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_MAXQ108X"
             ENABLED_MAXQ10XX="yes"
-        fi
-
-        if test "$ENABLED_MAXQ10XX" = "no"; then
+        else
             AC_MSG_ERROR([need a valid MAXQ part number])
         fi
 
