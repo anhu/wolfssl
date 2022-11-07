@@ -3347,8 +3347,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
             maxq10xx_perform_tls12_record_processing);
     }
 
-    wolfSSL_CTX_SetProcessServerCertCb(ctx,
-       maxq10xx_process_server_certificate);
+    wolfSSL_CTX_SetProcessPeerCertCb(ctx, maxq10xx_process_server_certificate);
     wolfSSL_CTX_SetProcessServerKexCb(ctx,
         maxq10xx_process_server_key_exchange);
     wolfSSL_CTX_SetGenMasterSecretCb(ctx, maxq10xx_make_tls_master_secret);

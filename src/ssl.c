@@ -29603,11 +29603,11 @@ void wolfSSL_CTX_SetHKDFExpandLabelCb(WOLFSSL_CTX* ctx,
     if (ctx)
         ctx->HKDFExpandLabelCb = cb;
 }
-void wolfSSL_CTX_SetProcessServerCertCb(WOLFSSL_CTX* ctx,
-                                        CallbackProcessServerCert cb)
+void wolfSSL_CTX_SetProcessPeerCertCb(WOLFSSL_CTX* ctx,
+                                        CallbackProcessPeerCert cb)
 {
     if (ctx)
-        ctx->ProcessServerCertCb = cb;
+        ctx->ProcessPeerCertCb = cb;
 }
 void wolfSSL_CTX_SetProcessServerKexCb(WOLFSSL_CTX* ctx,
                                        CallbackProcessServerKex cb)

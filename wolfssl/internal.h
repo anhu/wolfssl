@@ -3402,7 +3402,7 @@ struct WOLFSSL_CTX {
         #ifdef WC_RSA_PSS
             CallbackRsaPssSign   RsaPssSignCb;       /* User RsaSign (priv key) */
             CallbackRsaPssVerify RsaPssVerifyCb;     /* User RsaVerify (pub key) */
-            CallbackRsaPssVerify RsaPssSignCheckCb; /* User VerifyRsaSign (priv key) */
+            CallbackRsaPssVerify RsaPssSignCheckCb;  /* User VerifyRsaSign (priv key) */
         #endif
         CallbackRsaEnc    RsaEncCb;     /* User Rsa Public Encrypt  handler */
         CallbackRsaDec    RsaDecCb;     /* User Rsa Private Decrypt handler */
@@ -3415,8 +3415,8 @@ struct WOLFSSL_CTX {
 #if !defined(WOLFSSL_NO_TLS12) && !defined(WOLFSSL_AEAD_ONLY)
     CallbackVerifyMac           VerifyMacCb;        /* User Verify mac handler */
 #endif
-    CallbackProcessServerCert ProcessServerCertCb; /* User handler to process a certificate */
-    CallbackProcessServerKex ProcessServerKexCb; /* User handler to process the server's key exchange public key */
+    CallbackProcessPeerCert ProcessPeerCertCb;      /* User handler to process a certificate */
+    CallbackProcessServerKex ProcessServerKexCb;    /* User handler to process the server's key exchange public key */
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */
     CallbackEccSkipSharedSecret EccSkipSharedSecretCb; /* User indicator as to whether to skip calling EccSharedSecret() */
 

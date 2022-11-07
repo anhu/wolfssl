@@ -3533,8 +3533,8 @@ typedef int (*CallbackHKDFExpandLabel)(byte* okm, word32 okmLen,
        int digest, int side);
 WOLFSSL_API void wolfSSL_CTX_SetHKDFExpandLabelCb(WOLFSSL_CTX* ctx, CallbackHKDFExpandLabel cb);
 
-typedef int (*CallbackProcessServerCert)(WOLFSSL* ssl, DecodedCert* p_cert);
-WOLFSSL_API void wolfSSL_CTX_SetProcessServerCertCb(WOLFSSL_CTX* ctx, CallbackProcessServerCert cb);
+typedef int (*CallbackProcessPeerCert)(WOLFSSL* ssl, DecodedCert* p_cert);
+WOLFSSL_API void wolfSSL_CTX_SetProcessPeerCertCb(WOLFSSL_CTX* ctx, CallbackProcessPeerCert cb);
 
 typedef int (*CallbackProcessServerKex)(WOLFSSL* ssl, byte p_sig_algo,
        const byte* p_sig, word32 p_sig_len,

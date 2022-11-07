@@ -12952,10 +12952,13 @@ static int ProcessPeerCertParse(WOLFSSL* ssl, ProcPeerCertArgs* args,
 
 #ifdef HAVE_PK_CALLBACKS
     {
+        /* This block gives the callback a chance to process the peer cert.
+         * If there is no callback set or it returns NOT_COMPILED_IN, then the
+         * original return code is returned. */
         int orig_ret = ret;
         ret = NOT_COMPILED_IN;
-        if (ssl->ctx && ssl->ctx->ProcessServerCertCb) {
-            ret = ssl->ctx->ProcessServerCertCb(ssl, args->dCert);
+        if (ssl->ctx && ssl->ctx->ProcessPeerCertCb) {
+            ret = ssl->ctx->ProcessPeerCertCb(ssl, args->dCert);
         }
 
         if (ret == NOT_COMPILED_IN) {
