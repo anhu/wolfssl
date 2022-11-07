@@ -341,7 +341,7 @@ int wc_HmacSetKey(Hmac* hmac, int type, const byte* key, word32 length)
     hmac->keyLen = length;
 #endif
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108X)
     /* For MAXQ108x, nothing left to do. */
     return 0;
 #endif

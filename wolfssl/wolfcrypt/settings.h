@@ -263,7 +263,7 @@
 /* #define WOLFSSL_MAXQ1065 */
 
 /* Uncomment next line if using MAXQ108x */
-/* #define WOLFSSL_MAXQ108x */
+/* #define WOLFSSL_MAXQ108X */
 
 
 #include <wolfssl/wolfcrypt/visibility.h>
@@ -1329,7 +1329,7 @@ extern void uITRON4_free(void *p) ;
 #endif
 
 #if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || \
-    defined(WOLFSSL_MAXQ108x)
+    defined(WOLFSSL_MAXQ108X)
 
     #define MAXQ10XX_MODULE_INIT
 
@@ -1355,11 +1355,11 @@ extern void uITRON4_free(void *p) ;
         #define MAXQ_DEVICE_ID 1061
     #elif defined(WOLFSSL_MAXQ1065)
         #define MAXQ_DEVICE_ID 1065
-    #elif defined(WOLFSSL_MAXQ108x)
+    #elif defined(WOLFSSL_MAXQ108X)
         #define MAXQ_DEVICE_ID 1080
     #endif
 
-#endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108x */
+#endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108X */
 
 #if defined(WOLFSSL_STM32F2) || defined(WOLFSSL_STM32F4) || \
     defined(WOLFSSL_STM32F7) || defined(WOLFSSL_STM32F1) || \

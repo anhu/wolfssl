@@ -1890,7 +1890,7 @@ AC_ARG_WITH([maxq10xx],
         if test "$maxqpartnumber" = "MAXQ108x"; then
             LIB_ADD="$LIB_ADD -lrt"
             LIB_STATIC_ADD="$LIB_STATIC_ADD lib/libmaxq108x_api.a"
-            AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_MAXQ108x"
+            AM_CFLAGS="$AM_CFLAGS -DWOLFSSL_MAXQ108X"
             ENABLED_MAXQ10XX="yes"
         fi
 

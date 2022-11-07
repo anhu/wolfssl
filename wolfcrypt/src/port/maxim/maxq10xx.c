@@ -47,7 +47,7 @@ void dbg_dumphex(const char *identifier, const uint8_t* pdata, uint32_t plen);
 #endif /* MAXQ_DEBUG */
 
 #if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || \
-    defined(WOLFSSL_MAXQ108x)
+    defined(WOLFSSL_MAXQ108X)
 
 #define AES_KEY_ID_START      (0x2000)
 #define AES_KEY_ID_MAX_NUM    (32)
@@ -55,7 +55,7 @@ void dbg_dumphex(const char *identifier, const uint8_t* pdata, uint32_t plen);
 #define ECC_KEY_ID_MAX_NUM    (32)
 
 #define TEMP_KEY_ID_START     (0)
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
 #define TEMP_KEY_ID_MAX_NUM   (16)
 #else
 #define TEMP_KEY_ID_MAX_NUM   (2)
@@ -70,7 +70,7 @@ void dbg_dumphex(const char *identifier, const uint8_t* pdata, uint32_t plen);
 #define K_CIPHER_BLOCKSIZE     16
 #define ECC256_KEYSIZE         32
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108X)
 #define PSK_KID (0x1235)
 static unsigned char tls13active          =  0;
 static unsigned char tls13early           =  0;
@@ -111,7 +111,7 @@ static mxq_u1 KeyPairImport[] = {
     0xea,0x3a,0x4f,0xe3,0x6d,0x73
 };
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x) && \
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108X) && \
     defined(HAVE_HKDF)
 
 static const char derivedLabel[]     = "derived";
@@ -130,22 +130,22 @@ static int use_hw_hkdf_expand = 0;
 static int local_is_psk = 0;
 static int is_hs_key = 0;
 
-#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108x && HAVE_HKDF */
+#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108X && HAVE_HKDF */
 
 static int aes_key_id_arr[AES_KEY_ID_MAX_NUM];
 static int ecc_key_id_arr[ECC_KEY_ID_MAX_NUM];
 
 #if defined(HAVE_PK_CALLBACKS)
 static int init_pk_callbacks = 0;
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
 static int temp_key_id_arr[TEMP_KEY_ID_MAX_NUM] = {0};
 int *mac_key_obj_id = NULL;
 int mac_comp_active = 0;
-#endif /* WOLFSSL_MAXQ108x */
+#endif /* WOLFSSL_MAXQ108X */
 #endif /* HAVE_PK_CALLBACKS */
 
 int device_key_len = 32;
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
 int device_hs_key_type;
 #endif
 
@@ -301,7 +301,7 @@ static int getSignAlgoFromCurve(int c)
     return BAD_FUNC_ARG;
 }
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108X)
 
 static int wc_MAXQ10XX_HmacSetKey(int type);
 static int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length);
@@ -432,7 +432,7 @@ static void free_ecc_key_id(int obj_id)
     }
 }
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108X)
 static int alloc_temp_key_id(void)
 {
     int i;
@@ -459,7 +459,7 @@ static void free_temp_key_id(int obj_id)
         temp_key_id_arr[idx_for_arr] = 0;
     }
 }
-#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108x */
+#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108X */
 
 /*
  * WolfCrypt Functions
@@ -1050,7 +1050,7 @@ static int maxq10xx_ecc_verify(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
 #ifdef MAXQ_RNG
 static int maxq10xx_random(byte* output, unsigned short sz)
 {
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
     if (!tls13active) {
         return NOT_COMPILED_IN;
     }
@@ -1085,7 +1085,7 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
 
     int rc = CRYPTOCB_UNAVAILABLE;
 
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
     if (!tls13active)
 #endif
         return CRYPTOCB_UNAVAILABLE;
@@ -1386,7 +1386,7 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
         }
     #endif /* HAVE_ECC && MAXQ_ECC */
     }
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108X)
     else if (info->algo_type == WC_ALGO_TYPE_HMAC) {
         if (info->hmac.in != NULL && info->hmac.digest == NULL) {
             rc = 0;
@@ -1404,7 +1404,7 @@ int wolfSSL_MAXQ10XX_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
             rc = BAD_FUNC_ARG;
         }
     }
-#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108x */
+#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108X */
 
     if (rc != 0 && rc != CRYPTOCB_UNAVAILABLE) {
         rc = WC_HW_E;
@@ -1424,7 +1424,7 @@ static int wolfSSL_Soft_CryptoDevCb(int devId, wc_CryptoInfo* info, void* ctx)
 #endif /* WOLF_CRYPTO_CB */
 
 #ifdef WOLFSSL_MAXQ10XX_TLS
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
 static int calculate_modulus_offset(const unsigned char * cert_data, int offset)
 {
     int i;
@@ -1523,7 +1523,7 @@ static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
 
     totalkeylen = keycomplen * 2;
 
-#elif defined(WOLFSSL_MAXQ108x)
+#elif defined(WOLFSSL_MAXQ108X)
 
     if (p_cert->keyOID == ECDSAk )
     {
@@ -1594,7 +1594,7 @@ static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
         return WC_HW_E;
     }
 
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
     if (tls13_server_cert_id == -1) {
         tls13_server_cert_id = alloc_temp_key_id();
         if (tls13_server_cert_id == -1) {
@@ -1892,7 +1892,7 @@ static int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     mxq_err_t mxq_rc;
     word32 cert_size = 0;
 
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
     DecodedCert decoded;
     mxq_keyparam_id_t keyparam = MXQ_KEYPARAM_EC_P256R1;
     int pk_offset = 0;
@@ -1921,7 +1921,7 @@ static int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     }
     wolfSSL_CryptHwMutexUnLock();
 
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
     wc_InitDecodedCert(&decoded, p_dest_buff, *p_len, NULL);
     wc_ParseCert(&decoded, CERT_TYPE, NO_VERIFY, NULL);
     pk_offset = decoded.publicKeyIndex;
@@ -2052,7 +2052,7 @@ int maxq10xx_port_init(void)
     return ret;
 }
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108x)
+#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ108X)
 static int wc_MAXQ10XX_HmacSetKey(int type)
 {
     mxq_algo_id_t algo;
@@ -3301,7 +3301,7 @@ static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
     return 0;
 }
 #endif /* HAVE_HKDF */
-#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108x */
+#endif /* HAVE_PK_CALLBACKS && WOLFSSL_MAXQ108X */
 
 void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
 {
@@ -3316,7 +3316,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
         return;
     }
 
-#ifdef WOLFSSL_MAXQ108x
+#ifdef WOLFSSL_MAXQ108X
     #ifdef HAVE_HKDF
     wolfSSL_CTX_SetHKDFExtractCb(ctx, crypto_hkdf_extract);
     wolfSSL_CTX_SetHKDFExpandLabelCb(ctx, maxq10xx_HkdfExpandLabel);
@@ -3338,7 +3338,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
             maxq10xx_perform_tls13_record_processing);
 
     } else
-#endif /* WOLFSSL_MAXQ108x */
+#endif /* WOLFSSL_MAXQ108X */
     {
         wolfSSL_CTX_SetEccKeyGenCb(ctx, maxq10xx_perform_client_key_exchange);
         wolfSSL_CTX_SetEccSkipSharedSecretCb(ctx,
@@ -3359,4 +3359,4 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
     init_pk_callbacks = 1;
 }
 
-#endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108x */
+#endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108X */

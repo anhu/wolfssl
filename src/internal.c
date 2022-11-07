@@ -4992,7 +4992,7 @@ int EccVerify(WOLFSSL* ssl, const byte* in, word32 inSz, const byte* out,
     }
     #if !defined(WOLFSSL_RENESAS_SCEPROTECT) && \
         !defined(WOLFSSL_RENESAS_TSIP_TLS) && \
-        !defined(WOLFSSL_MAXQ108x)
+        !defined(WOLFSSL_MAXQ108X)
     else
     #else
     if (!ssl->ctx->EccVerifyCb || ret == CRYPTOCB_UNAVAILABLE)
@@ -5244,7 +5244,7 @@ int Ed25519Sign(WOLFSSL* ssl, const byte* in, word32 inSz, byte* out,
         ret = ssl->ctx->Ed25519SignCb(ssl, in, inSz, out, outSz, keyBuf,
             keySz, ctx);
     }
-#if defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ108X)
     if (ret == NOT_COMPILED_IN)
 #else
     else

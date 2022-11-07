@@ -22,7 +22,7 @@
 #ifndef _WOLFPORT_MAXQ10XX_H_
 #define _WOLFPORT_MAXQ10XX_H_
 
-#if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || defined(WOLFSSL_MAXQ108x)
+#if defined(WOLFSSL_MAXQ1061) || defined(WOLFSSL_MAXQ1065) || defined(WOLFSSL_MAXQ108X)
 
 #include <wolfssl/wolfcrypt/types.h>
 
@@ -34,13 +34,13 @@
         #define MAXQ_ECC
     #endif /* WOLFSSL_MAXQ1065 */
 
-    #ifdef WOLFSSL_MAXQ108x
+    #ifdef WOLFSSL_MAXQ108X
         #define MAXQ_AESGCM
         #define MAXQ_SHA256
         #define MAXQ_RNG
         #define MAXQ_ECC
         #define ENABLE_RSA
-    #endif /* WOLFSSL_MAXQ108x */
+    #endif /* WOLFSSL_MAXQ108X */
 #endif /* WOLF_CRYPTO_CB */
 
 struct WOLFSSL_CTX;
@@ -108,5 +108,5 @@ WOLFSSL_LOCAL int wolfSSL_maxq10xx_load_certificate(WOLFSSL *ssl);
     }
 #endif
 
-#endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108x */
+#endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108X */
 #endif /* _WOLFPORT_MAXQ10XX_H_ */

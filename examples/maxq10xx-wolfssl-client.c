@@ -44,7 +44,7 @@
 #include <wolfssl/wolfcrypt/asn.h>
 #include <wolfssl/wolfcrypt/error-crypt.h>
 
-#if (defined(WOLFSSL_MAXQ1065) || defined(WOLFSSL_MAXQ108x)) && \
+#if (defined(WOLFSSL_MAXQ1065) || defined(WOLFSSL_MAXQ108X)) && \
     defined(HAVE_PK_CALLBACKS) && defined(WOLF_CRYPTO_CB) && \
     !defined(NO_PSK) && !defined(HAVE_EXTENDED_MASTER) && \
     defined(NO_WOLFSSL_SERVER)
@@ -330,6 +330,6 @@ int main(int argc, char** argv)
 );
     return -1;
 }
-#endif /* (WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108x) && HAVE_PK_CALLBACKS &&
+#endif /* (WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108X) && HAVE_PK_CALLBACKS &&
         * WOLF_CRYPTO_CB && !NO_PSK && !HAVE_EXTENDED_MASTER &&
         * NO_WOLFSSL_SERVER */
