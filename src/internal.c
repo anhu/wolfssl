@@ -12940,16 +12940,6 @@ static int ProcessPeerCertParse(WOLFSSL* ssl, ProcPeerCertArgs* args,
     }
 #endif
 
-#ifdef WOLFSSL_MAXQ10XX_TLS
-    /* MAXQ10xx accepts ASN_NO_SIGNER_E because the CA cert is registered with
-     * the MAXQ hardware; not CertManager. All other return values are
-     * unexpected.
-     */
-    if (ret != ASN_NO_SIGNER_E) {
-        return ret;
-    }
-#endif /* WOLFSSL_MAXQ10XX_TLS */
-
 #ifdef HAVE_PK_CALLBACKS
     {
         /* This block gives the callback a chance to process the peer cert.
