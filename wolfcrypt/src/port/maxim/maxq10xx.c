@@ -549,7 +549,7 @@ static int aes_set_key(Aes* aes, const byte* userKey, word32 keylen)
 
     rc = maxq_CryptHwMutexTryLock();
     if (rc != 0) {
-        WOLFSSL_MSG("MAXQ: aes_set_key() lock could not be acquired");
+        WOLFSSL_ERROR_MSG("MAXQ: aes_set_key() lock could not be acquired");
         rc = NOT_COMPILED_IN;
         return rc;
     }
@@ -560,7 +560,7 @@ static int aes_set_key(Aes* aes, const byte* userKey, word32 keylen)
 
     int obj_id = alloc_aes_key_id();
     if (!obj_id) {
-        WOLFSSL_MSG("MAXQ: alloc_aes_key_id() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: alloc_aes_key_id() failed");
         rc = NOT_COMPILED_IN;
         goto end_AesSetKey;
     }
@@ -569,7 +569,7 @@ static int aes_set_key(Aes* aes, const byte* userKey, word32 keylen)
                               OBJPROP_PERSISTENT,
                               (char *)"ahs=rwdgx:ahs=rwdgx:ahs=rwdgx");
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_CreateObject() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_CreateObject() failed");
         rc = NOT_COMPILED_IN;
         goto end_AesSetKey;
     }
@@ -583,7 +583,7 @@ static int aes_set_key(Aes* aes, const byte* userKey, word32 keylen)
                           ALGO_CIPHER_AES_ECB, MXQ_KEYUSE_NONE, ALGO_NONE,
                           (mxq_u1 *)userKey);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_BuildKey() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_BuildKey() failed");
         rc = WC_HW_E;
         goto end_AesSetKey;
     }
@@ -594,7 +594,7 @@ static int aes_set_key(Aes* aes, const byte* userKey, word32 keylen)
     rc = HOST_ECDSA_sign(signature, &signature_len, sign_key,
                 key_buff, key_buff_len, sign_key_curve);
     if (rc) {
-        WOLFSSL_MSG("MAXQ: HOST_ECDSA_sign() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: HOST_ECDSA_sign() failed");
         goto end_AesSetKey;
     }
 
@@ -602,7 +602,7 @@ static int aes_set_key(Aes* aes, const byte* userKey, word32 keylen)
                            PUBKEY_IMPORT_OBJID, key_buff, key_buff_len,
                            signature, signature_len);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_ImportKey() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_ImportKey() failed");
         rc = WC_HW_E;
         goto end_AesSetKey;
     }
@@ -632,7 +632,7 @@ void wc_MAXQ10XX_AesFree(Aes* aes)
     if (rc == 0) {
         mxq_rc = MXQ_DeleteObject(aes->maxq_ctx.key_obj_id);
         if (mxq_rc) {
-            WOLFSSL_MSG("MAXQ: MXQ_DeleteObject() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: MXQ_DeleteObject() failed");
             rc = 1;
         }
 
@@ -675,7 +675,7 @@ static int ecc_set_key(ecc_key* key, const byte* userKey, word32 keycomplen)
 
     rc = maxq_CryptHwMutexTryLock();
     if (rc != 0) {
-        WOLFSSL_MSG("MAXQ: ecc_set_key() lock could not be acquired");
+        WOLFSSL_ERROR_MSG("MAXQ: ecc_set_key() lock could not be acquired");
         rc = NOT_COMPILED_IN;
         return rc;
     }
@@ -686,7 +686,7 @@ static int ecc_set_key(ecc_key* key, const byte* userKey, word32 keycomplen)
 
     int obj_id = alloc_ecc_key_id();
     if (!obj_id) {
-        WOLFSSL_MSG("MAXQ: alloc_ecc_key_id() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: alloc_ecc_key_id() failed");
         rc = NOT_COMPILED_IN;
         goto end_EccSetKey;
     }
@@ -694,7 +694,7 @@ static int ecc_set_key(ecc_key* key, const byte* userKey, word32 keycomplen)
     mxq_rc = MXQ_CreateObject(obj_id, keylen, objtype, OBJPROP_PERSISTENT,
                               (char *)"ahs=rwdgx:ahs=rwdgx:ahs=rwdgx");
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_CreateObject() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_CreateObject() failed");
         rc = NOT_COMPILED_IN;
         goto end_EccSetKey;
     }
@@ -707,7 +707,7 @@ static int ecc_set_key(ecc_key* key, const byte* userKey, word32 keycomplen)
                           MXQ_KEYUSE_DATASIGNATURE, ALGO_ECDSA_SHA_256,
                           MXQ_KEYUSE_NONE, ALGO_NONE, (mxq_u1 *)userKey);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_BuildKey() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_BuildKey() failed");
         rc = WC_HW_E;
         goto end_EccSetKey;
     }
@@ -718,7 +718,7 @@ static int ecc_set_key(ecc_key* key, const byte* userKey, word32 keycomplen)
     rc = HOST_ECDSA_sign(signature, &signature_len, sign_key, key_buff,
                          key_buff_len, sign_key_curve);
     if (rc) {
-        WOLFSSL_MSG("MAXQ: HOST_ECDSA_sign() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: HOST_ECDSA_sign() failed");
         goto end_EccSetKey;
     }
 
@@ -726,7 +726,7 @@ static int ecc_set_key(ecc_key* key, const byte* userKey, word32 keycomplen)
                            PUBKEY_IMPORT_OBJID, key_buff, key_buff_len,
                            signature, signature_len);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_ImportKey() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_ImportKey() failed");
         rc = WC_HW_E;
         goto end_EccSetKey;
     }
@@ -753,7 +753,7 @@ void wc_MAXQ10XX_EccFree(ecc_key* key)
 
     mxq_err_t mxq_rc = MXQ_DeleteObject(key->maxq_ctx.key_obj_id);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_DeleteObject() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_DeleteObject() failed");
         wolfSSL_CryptHwMutexUnLock();
         return;
     }
@@ -794,7 +794,7 @@ static int maxq10xx_hash_update_sha256(const mxq_u1* psrc, mxq_length inlen,
     if (running == 0) {
         mxq_rc = MXQ_MD_Init(ALGO_MD_SHA256);
         if (mxq_rc) {
-            WOLFSSL_MSG("MAXQ: MXQ_MD_Init() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: MXQ_MD_Init() failed");
             return WC_HW_E;
         }
     }
@@ -807,7 +807,7 @@ static int maxq10xx_hash_update_sha256(const mxq_u1* psrc, mxq_length inlen,
 
         mxq_rc = MXQ_MD_Update(&psrc[data_offset], data_len);
         if (mxq_rc) {
-            WOLFSSL_MSG("MAXQ: MXQ_MD_Update() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: MXQ_MD_Update() failed");
             return WC_HW_E;
         }
 
@@ -825,7 +825,7 @@ static int maxq10xx_hash_finish_sha256(mxq_u1* pdest)
 
     mxq_rc = MXQ_MD_Finish(pdest, &hashlen);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_MD_Finish() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_MD_Finish() failed");
         return WC_HW_E;
     }
 
@@ -867,7 +867,7 @@ static int maxq10xx_cipher_do(mxq_algo_id_t algo_id, mxq_u1 encrypt,
 
     mxq_rc = MXQ_Cipher_Init(encrypt, algo_id, key_id, &cparams, 0);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Cipher_Init() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Cipher_Init() failed");
         return WC_HW_E;
     }
 
@@ -877,7 +877,7 @@ static int maxq10xx_cipher_do(mxq_algo_id_t algo_id, mxq_u1 encrypt,
 
         mxq_rc = MXQ_Cipher_Update(&p_out, &p_in[data_offset], &proc_len);
         if (mxq_rc) {
-            WOLFSSL_MSG("MAXQ: MXQ_Cipher_Update() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: MXQ_Cipher_Update() failed");
             return WC_HW_E;
         }
 
@@ -889,7 +889,7 @@ static int maxq10xx_cipher_do(mxq_algo_id_t algo_id, mxq_u1 encrypt,
         proc_len = tag_len;
         mxq_rc = MXQ_Cipher_Finish(&p_int_data, &proc_len);
         if (mxq_rc) {
-            WOLFSSL_MSG("MAXQ: Encrypt, MXQ_Cipher_Finish() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: Encrypt, MXQ_Cipher_Finish() failed");
             return WC_HW_E;
         }
 
@@ -908,7 +908,7 @@ static int maxq10xx_cipher_do(mxq_algo_id_t algo_id, mxq_u1 encrypt,
 
         mxq_rc = MXQ_Cipher_Finish(&p_int_data, &proc_len);
         if (mxq_rc) {
-            WOLFSSL_MSG("MAXQ: Decrypt, MXQ_Cipher_Finish() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: Decrypt, MXQ_Cipher_Finish() failed");
             return WC_HW_E;
         }
 
@@ -953,7 +953,7 @@ static int maxq10xx_ecc_sign(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
     mxq_rc = MXQ_Sign(ALGO_ECDSA_PLAIN, key_id, input_digest,
                       keycomplen, buff_sign, &buff_len);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Sign() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Sign() failed");
         return WC_HW_E;
     }
 
@@ -961,7 +961,7 @@ static int maxq10xx_ecc_sign(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
     rc = wc_ecc_rs_raw_to_sig((const byte *)r, keycomplen, (const byte *)s,
                               keycomplen, p_sign_out, sign_len);
     if (rc != 0) {
-        WOLFSSL_MSG("MAXQ: converting r and s to signature failed");
+        WOLFSSL_ERROR_MSG("MAXQ: converting r and s to signature failed");
     }
 
     XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
@@ -1014,7 +1014,7 @@ static int maxq10xx_ecc_verify(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
         XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
         XFREE(buff_rs, NULL, DYNAMIC_TYPE_TMP_BUFFER);
         XFREE(buff_signature, NULL, DYNAMIC_TYPE_TMP_BUFFER);
-        WOLFSSL_MSG("MAXQ: extracting r and s from signature failed");
+        WOLFSSL_ERROR_MSG("MAXQ: extracting r and s from signature failed");
         *result = 0;
         return rc;
     }
@@ -1023,7 +1023,7 @@ static int maxq10xx_ecc_verify(mxq_u2 key_id, mxq_u1* p_in, mxq_u2 data_size,
         XFREE(input_digest, NULL, DYNAMIC_TYPE_TMP_BUFFER);
         XFREE(buff_rs, NULL, DYNAMIC_TYPE_TMP_BUFFER);
         XFREE(buff_signature, NULL, DYNAMIC_TYPE_TMP_BUFFER);
-        WOLFSSL_MSG("MAXQ: r and s corrupted");
+        WOLFSSL_ERROR_MSG("MAXQ: r and s corrupted");
         *result = 0;
         return BUFFER_E;
     }
@@ -1062,13 +1062,13 @@ static int maxq10xx_random(byte* output, unsigned short sz)
 
     int ret = maxq_CryptHwMutexTryLock();
     if (ret != 0) {
-        WOLFSSL_MSG("MAXQ: maxq10xx_random() lock could not be acquired");
+        WOLFSSL_ERROR_MSG("MAXQ: maxq10xx_random() lock could not be acquired");
         ret = NOT_COMPILED_IN;
         return ret;
     }
 
     if (MXQ_Get_Random_Ext(output, sz, 0)) {
-        WOLFSSL_MSG("MAXQ: MXQ_Get_Random_Ext() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Get_Random_Ext() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -1589,7 +1589,7 @@ static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
                                MXQ_KEYUSE_DATASIGNATURE, ALGO_ECDSA_SHA_any,
                                (mxq_u1 *)p_cert->source);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Build_EC_Cert() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Build_EC_Cert() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -1598,7 +1598,7 @@ static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
     if (tls13_server_cert_id == -1) {
         tls13_server_cert_id = alloc_temp_key_id();
         if (tls13_server_cert_id == -1) {
-            WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
             wolfSSL_CryptHwMutexUnLock();
             return WC_HW_E;
         }
@@ -1612,7 +1612,7 @@ static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
 #endif
 
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_ImportChildCert() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_ImportChildCert() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -1653,7 +1653,7 @@ static int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
                              (mxq_u1 *)p_server_params, p_server_params_len,
                              (mxq_u1 *)p_sig, p_sig_len);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_SetECDHEKey() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_SetECDHEKey() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -1705,7 +1705,7 @@ static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl,
                                      server_public_key_param, result_public_key,
                                      key_len_param, csid_param);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Ecdh_Compute_Shared() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Ecdh_Compute_Shared() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -1717,7 +1717,7 @@ static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl,
 
     rc = wc_ecc_set_curve(p_key, keysize, ECC_SECP256R1);
     if (rc != 0) {
-        WOLFSSL_MSG("MAXQ: wc_ecc_set_curve() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: wc_ecc_set_curve() failed");
         return rc;
     }
 
@@ -1726,14 +1726,14 @@ static int maxq10xx_perform_client_key_exchange(WOLFSSL* ssl,
 
     rc = mp_read_unsigned_bin(p_key->pubkey.x, &result_public_key[1], keysize);
     if (rc != 0) {
-        WOLFSSL_MSG("MAXQ: mp_read_unsigned_bin() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: mp_read_unsigned_bin() failed");
         return rc;
     }
 
     rc = mp_read_unsigned_bin(p_key->pubkey.y, &result_public_key[1 + keysize],
                               keysize);
     if (rc != 0) {
-        WOLFSSL_MSG("MAXQ: mp_read_unsigned_bin() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: mp_read_unsigned_bin() failed");
         return rc;
     }
 
@@ -1792,7 +1792,7 @@ static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, void *ctx)
 
     mxq_rc = MXQ_Perform_Key_Exchange(&secret_conf);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Perform_Key_Exchange() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Perform_Key_Exchange() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -1804,7 +1804,7 @@ static int maxq10xx_make_tls_master_secret(WOLFSSL* ssl, void *ctx)
     rc = StoreKeys(ssl, secret_conf.PSK_info.psk_key_bloc,
                    PROVISION_CLIENT_SERVER);
     if (rc != 0) {
-        WOLFSSL_MSG("MAXQ: StoreKeys() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: StoreKeys() failed");
         return rc;
     }
 #endif
@@ -1829,7 +1829,7 @@ static int maxq10xx_perform_client_finished(WOLFSSL* ssl, const byte* p_label,
                                  p_seed, seedSz, 
                                  p_dest, TLS_FINISHED_SZ);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_tls_prf_sha_256() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_tls_prf_sha_256() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -1875,7 +1875,7 @@ static int maxq10xx_perform_tls12_record_processing(WOLFSSL* ssl, int is_encrypt
                                 out, sz, (mxq_u1 *)iv, ivSz,
                                 (mxq_u1 *)authIn, authInSz, authTag, authTagSz);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: maxq10xx_cipher_do() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: maxq10xx_cipher_do() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -1904,7 +1904,7 @@ static int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
     }
 
     if (*p_len < 1024) {
-        WOLFSSL_MSG("MAXQ: insufficient buffer length");
+        WOLFSSL_ERROR_MSG("MAXQ: insufficient buffer length");
         return BAD_FUNC_ARG;
     }
 
@@ -1915,7 +1915,7 @@ static int maxq10xx_read_device_cert_der(byte* p_dest_buff, word32* p_len)
 
     mxq_rc = MXQ_ReadObject(DEVICE_CERT_OBJ_ID, 24, p_dest_buff, p_len);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_ReadObject() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_ReadObject() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -2001,7 +2001,7 @@ static int maxq10xx_sign_device_cert(WOLFSSL* ssl,
 
     wolfSSL_CryptHwMutexUnLock();
     if (rc) {
-        WOLFSSL_MSG("MAXQ: maxq10xx_ecc_sign() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: maxq10xx_ecc_sign() failed");
         return rc;
     }
 
@@ -2017,7 +2017,7 @@ int maxq10xx_port_init(void)
     #ifdef WOLF_CRYPTO_CB
     ret = wc_CryptoCb_RegisterDevice(0, wolfSSL_Soft_CryptoDevCb, NULL);
     if (ret != 0) {
-        WOLFSSL_MSG("MAXQ: wolfSSL_Soft_CryptoDevCb, "
+        WOLFSSL_ERROR_MSG("MAXQ: wolfSSL_Soft_CryptoDevCb, "
                     "wc_CryptoCb_RegisterDevice() failed");
         return ret;
     }
@@ -2025,14 +2025,14 @@ int maxq10xx_port_init(void)
 
     ret = maxq_CryptHwMutexTryLock();
     if (ret) {
-        WOLFSSL_MSG("MAXQ: maxq10xx_port_init() -> device is busy "
+        WOLFSSL_ERROR_MSG("MAXQ: maxq10xx_port_init() -> device is busy "
                     "(switching to soft mode)");
         return 0;
     }
 
     mxq_rc = MXQ_Module_Init();
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Module_Init() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Module_Init() failed");
         ret = WC_HW_E;
     }
 
@@ -2043,7 +2043,7 @@ int maxq10xx_port_init(void)
         ret = wc_CryptoCb_RegisterDevice(MAXQ_DEVICE_ID,
                                          wolfSSL_MAXQ10XX_CryptoDevCb, NULL);
         if (ret != 0) {
-            WOLFSSL_MSG("MAXQ: wolfSSL_MAXQ10XX_CryptoDevCb, "
+            WOLFSSL_ERROR_MSG("MAXQ: wolfSSL_MAXQ10XX_CryptoDevCb, "
                         "wc_CryptoCb_RegisterDevice() failed");
         }
     }
@@ -2099,7 +2099,7 @@ static int wc_MAXQ10XX_HmacSetKey(int type)
         mac_comp_active = 1;
     }
     else {
-        WOLFSSL_MSG("MAXQ: MXQ_MAC_Init() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_MAC_Init() failed");
         rc = WC_HW_E;
     }
 
@@ -2123,7 +2123,7 @@ static int wc_MAXQ10XX_HmacUpdate(const byte* msg, word32 length)
     wolfSSL_CryptHwMutexUnLock();
 
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_MAC_Update() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_MAC_Update() failed");
         rc = WC_HW_E;
     }
 
@@ -2147,7 +2147,7 @@ static int wc_MAXQ10XX_HmacFinal(byte* hash)
     mxq_rc = MXQ_MAC_Finish(hash, &maclen);
     wolfSSL_CryptHwMutexUnLock();
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_MAC_Finish() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_MAC_Finish() failed");
         rc = WC_HW_E;
     }
 
@@ -2190,7 +2190,7 @@ static int maxq10xx_create_dh_key(byte* p, word32 pSz, byte* g, word32 gSz,
 
     wolfSSL_CryptHwMutexUnLock();
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Generate_Key() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_TLS13_Generate_Key() failed");
         rc = WC_HW_E;
     }
 
@@ -2234,7 +2234,7 @@ static int maxq10xx_DhAgreeCb(WOLFSSL* ssl, struct DhKey* key,
                         (ssl->options.cipherSuite0 << 8);
 
     if (tls13_dh_obj_id == -1) {
-        WOLFSSL_MSG("MAXQ: DH key is not created before");
+        WOLFSSL_ERROR_MSG("MAXQ: DH key is not created before");
         rc = NOT_COMPILED_IN;
         return rc;
     }
@@ -2242,7 +2242,7 @@ static int maxq10xx_DhAgreeCb(WOLFSSL* ssl, struct DhKey* key,
     if (tls13_shared_secret_obj_id == -1) {
         tls13_shared_secret_obj_id = alloc_temp_key_id();
         if (tls13_shared_secret_obj_id == -1) {
-            WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
             return NOT_COMPILED_IN;
         }
     }
@@ -2258,7 +2258,7 @@ static int maxq10xx_DhAgreeCb(WOLFSSL* ssl, struct DhKey* key,
                                      out, outlen);
     wolfSSL_CryptHwMutexUnLock();
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: () failed");
+        WOLFSSL_ERROR_MSG("MAXQ: wolfSSL_CryptHwMutexUnLock() failed");
         rc = WC_HW_E;
     }
 
@@ -2285,7 +2285,7 @@ static int  maxq10xx_create_ecc_key_cb(WOLFSSL* ssl, ecc_key* key, word32 keySz,
     if (tls13_ecc_obj_id == -1) {
         tls13_ecc_obj_id = alloc_temp_key_id();
         if (tls13_ecc_obj_id == -1) {
-            WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
             rc = NOT_COMPILED_IN;
             return rc;
         }
@@ -2301,14 +2301,14 @@ static int  maxq10xx_create_ecc_key_cb(WOLFSSL* ssl, ecc_key* key, word32 keySz,
 
     wolfSSL_CryptHwMutexUnLock();
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Generate_Key() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_TLS13_Generate_Key() failed");
         return WC_HW_E;
     }
 
     rc = wc_ecc_import_unsigned(key, (byte*)mxq_key, (byte*)mxq_key + keySz,
                                 NULL, ecc_curve);
     if (rc) {
-        WOLFSSL_MSG("MAXQ: wc_ecc_import_raw_ex() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: wc_ecc_import_raw_ex() failed");
     }
 
     return rc;
@@ -2371,7 +2371,7 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
     rc = wc_ecc_export_public_raw(otherKey, qx, &qxLen, qy, &qyLen);
 
     if (tls13_ecc_obj_id == -1) {
-        WOLFSSL_MSG("MAXQ: ECDHE key is not created before");
+        WOLFSSL_ERROR_MSG("MAXQ: ECDHE key is not created before");
         rc = NOT_COMPILED_IN;
         return rc;
     }
@@ -2379,7 +2379,7 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
     if (tls13_shared_secret_obj_id == -1) {
         tls13_shared_secret_obj_id = alloc_temp_key_id();
         if (tls13_shared_secret_obj_id == -1) {
-            WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
             return NOT_COMPILED_IN;
         }
     }
@@ -2397,7 +2397,7 @@ static int maxq10xx_shared_secret_cb(WOLFSSL* ssl, ecc_key* otherKey,
 
     wolfSSL_CryptHwMutexUnLock();
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Create_Secret() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_TLS13_Create_Secret() failed");
         rc = WC_HW_E;
     }
 
@@ -2443,7 +2443,7 @@ static int maxq10xx_RsaPssVerify_ex(WOLFSSL* ssl,
     wolfSSL_CryptHwMutexUnLock();
 
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Verify() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Verify() failed");
         ret = WC_HW_E;
     }
     return ret;
@@ -2552,7 +2552,7 @@ static int maxq10xx_RsaPssSign(WOLFSSL* ssl, const byte* in, word32 inSz,
     wolfSSL_CryptHwMutexUnLock();
 
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Sign() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Sign() failed");
         return WC_HW_E;
     }
 
@@ -2566,7 +2566,7 @@ static int maxq10xx_RsaPssSign(WOLFSSL* ssl, const byte* in, word32 inSz,
 
     wolfSSL_CryptHwMutexUnLock();
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_Verify() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_Verify() failed");
         return WC_HW_E;
     }
 
@@ -2617,7 +2617,7 @@ static int crypto_hkdf_extract(byte* prk, const byte* salt, word32 saltLen,
         if (tls13_handshake_secret_obj_id == -1) {
             tls13_handshake_secret_obj_id = alloc_temp_key_id();
             if (tls13_handshake_secret_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
         }
@@ -2633,7 +2633,7 @@ static int crypto_hkdf_extract(byte* prk, const byte* salt, word32 saltLen,
         if (tls13_master_secret_obj_id == -1) {
             tls13_master_secret_obj_id = alloc_temp_key_id();
             if (tls13_master_secret_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
         }
@@ -2649,7 +2649,7 @@ static int crypto_hkdf_extract(byte* prk, const byte* salt, word32 saltLen,
         if (tls13_early_secret_obj_id == -1) {
             tls13_early_secret_obj_id = alloc_temp_key_id();
             if (tls13_early_secret_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
         }
@@ -2665,7 +2665,7 @@ static int crypto_hkdf_extract(byte* prk, const byte* salt, word32 saltLen,
         if (tls13_hs_early_secret_obj_id == -1) {
             tls13_hs_early_secret_obj_id = alloc_temp_key_id();
             if (tls13_hs_early_secret_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
         }
@@ -2710,7 +2710,7 @@ static int crypto_hkdf_extract(byte* prk, const byte* salt, word32 saltLen,
                                       salt, (mxq_u2)saltLen,
                                       (mxq_u2)ikm_kid, ikm, (mxq_u2)ikmLen);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Extract_Secret() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_TLS13_Extract_Secret() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -2781,14 +2781,14 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
         if (tls13early) {
             if (local_is_psk) {
                 if (tls13_hs_early_secret_obj_id == -1) {
-                        WOLFSSL_MSG("MAXQ: Handshake early secret is not "
+                        WOLFSSL_ERROR_MSG("MAXQ: Handshake early secret is not "
                                     "created yet");
                         return NOT_COMPILED_IN;
                 }
 
                 tls13_derived_secret_obj_id = alloc_temp_key_id();
                 if (tls13_derived_secret_obj_id == -1) {
-                    WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                    WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                     return NOT_COMPILED_IN;
                 }
                 prk_kid = tls13_hs_early_secret_obj_id;
@@ -2802,7 +2802,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                  *                      label: "derived", ctx: empty_hash) */
                 tls13_derived_secret_obj_id = alloc_temp_key_id();
                 if (tls13_derived_secret_obj_id == -1) {
-                    WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                    WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                     return NOT_COMPILED_IN;
                 }
 
@@ -2820,7 +2820,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
              *                      label: "derived", ctx: empty_hash) */
             tls13_derived_secret_obj_id = alloc_temp_key_id();
             if (tls13_derived_secret_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
 
@@ -2840,7 +2840,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
         if (tls13_client_secret_obj_id == -1) {
             tls13_client_secret_obj_id = alloc_temp_key_id();
             if (tls13_client_secret_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
         }
@@ -2857,7 +2857,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
         if (tls13_server_secret_obj_id == -1) {
             tls13_server_secret_obj_id = alloc_temp_key_id();
             if (tls13_server_secret_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
         }
@@ -2875,7 +2875,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
         if (tls13_client_secret_obj_id == -1) {
             tls13_client_secret_obj_id = alloc_temp_key_id();
             if (tls13_client_secret_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
         }
@@ -2891,7 +2891,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
          *                     label: "s ap traffic", ctx: handshake_hash) */
         tls13_server_secret_obj_id = alloc_temp_key_id();
         if (tls13_server_secret_obj_id == -1) {
-            WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
             return NOT_COMPILED_IN;
         }
 
@@ -2912,7 +2912,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                 if (tls13_client_hs_key_obj_id == -1) {
                     tls13_client_hs_key_obj_id = alloc_temp_key_id();
                     if (tls13_client_hs_key_obj_id == -1) {
-                        WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                        WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                         return NOT_COMPILED_IN;
                     }
                 }
@@ -2922,7 +2922,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                 if (tls13_client_app_key_obj_id == -1) {
                     tls13_client_app_key_obj_id = alloc_temp_key_id();
                     if (tls13_client_app_key_obj_id == -1) {
-                        WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                        WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                         return NOT_COMPILED_IN;
                     }
                 }
@@ -2944,7 +2944,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                 if (tls13_server_hs_key_obj_id == -1) {
                     tls13_server_hs_key_obj_id = alloc_temp_key_id();
                     if (tls13_server_hs_key_obj_id == -1) {
-                        WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                        WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                         return NOT_COMPILED_IN;
                     }
                 }
@@ -2954,7 +2954,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                 if (tls13_server_app_key_obj_id == -1) {
                     tls13_server_app_key_obj_id = alloc_temp_key_id();
                     if (tls13_server_app_key_obj_id == -1) {
-                        WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                        WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                         return NOT_COMPILED_IN;
                     }
                 }
@@ -2977,14 +2977,14 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
             int tls13_client_iv_obj_id = -1;
             if (is_hs_key) {
                 if (tls13_client_hs_key_obj_id == -1) {
-                    WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                    WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                     return NOT_COMPILED_IN;
                 }
                 tls13_client_iv_obj_id = tls13_client_hs_key_obj_id;
             }
             else {
                 if (tls13_client_app_key_obj_id == -1) {
-                    WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                    WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                     return NOT_COMPILED_IN;
                 }
                 tls13_client_iv_obj_id = tls13_client_app_key_obj_id;
@@ -3003,14 +3003,14 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
             int tls13_server_iv_obj_id = -1;
             if (is_hs_key) {
                 if (tls13_server_hs_key_obj_id == -1) {
-                    WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                    WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                     return NOT_COMPILED_IN;
                 }
                 tls13_server_iv_obj_id = tls13_server_hs_key_obj_id;
             }
             else {
                 if (tls13_server_app_key_obj_id == -1) {
-                    WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                    WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                     return NOT_COMPILED_IN;
                 }
                 tls13_server_iv_obj_id = tls13_server_app_key_obj_id;
@@ -3028,12 +3028,12 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
             if (tls13_client_finish_obj_id == -1) {
                 tls13_client_finish_obj_id = alloc_temp_key_id();
                 if (tls13_client_finish_obj_id == -1) {
-                    WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                    WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                     return NOT_COMPILED_IN;
                 }
             }
             if (tls13_binder_key_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: Binder key is not created yet");
+                WOLFSSL_ERROR_MSG("MAXQ: Binder key is not created yet");
                 return NOT_COMPILED_IN;
             }
             prk_kid = tls13_binder_key_obj_id;
@@ -3056,7 +3056,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                 if (tls13_client_finish_obj_id == -1) {
                     tls13_client_finish_obj_id = alloc_temp_key_id();
                     if (tls13_client_finish_obj_id == -1) {
-                        WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                        WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                         return NOT_COMPILED_IN;
                     }
                 }
@@ -3082,7 +3082,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                 if (tls13_server_finish_obj_id == -1) {
                     tls13_server_finish_obj_id = alloc_temp_key_id();
                     if (tls13_server_finish_obj_id == -1) {
-                        WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                        WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                         return NOT_COMPILED_IN;
                     }
                 }
@@ -3103,7 +3103,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
              *                  label: "ext binder", ctx: empty_hash) */
             tls13_binder_key_obj_id = alloc_temp_key_id();
             if (tls13_binder_key_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+                WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
                 return NOT_COMPILED_IN;
             }
 
@@ -3118,7 +3118,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
         /* TODO: */
         tls13_res_master_obj_id = alloc_temp_key_id();
         if (tls13_res_master_obj_id == -1) {
-            WOLFSSL_MSG("MAXQ: alloc_temp_key_id() failed");
+            WOLFSSL_ERROR_MSG("MAXQ: alloc_temp_key_id() failed");
             return NOT_COMPILED_IN;
         }
         prk_kid = tls13_master_secret_obj_id;
@@ -3133,7 +3133,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
             /* updated_client_secret = HKDF-Expand-Label(key: client_secret,
              *                             label: "traffic upd", ctx: "") */
             if (tls13_client_app_key_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: Client Application Key is not set before");
+                WOLFSSL_ERROR_MSG("MAXQ: Client Application Key was not set");
                 return NOT_COMPILED_IN;
             }
             prk_kid = tls13_client_secret_obj_id;
@@ -3145,7 +3145,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
             /* updated_server_secret = HKDF-Expand-Label(key: server_secret,
              *                             label: "traffic upd", ctx: "") */
             if (tls13_server_app_key_obj_id == -1) {
-                WOLFSSL_MSG("MAXQ: Client Application Key is not set before");
+                WOLFSSL_ERROR_MSG("MAXQ: Client Application Key was not set");
                 return NOT_COMPILED_IN;
             }
             prk_kid = tls13_server_secret_obj_id;
@@ -3155,7 +3155,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
         }
     }
     else {
-        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Expand_Secret() does not support");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_TLS13_Expand_Secret() does not support");
         return NOT_COMPILED_IN;
     }
 
@@ -3177,7 +3177,7 @@ static int maxq10xx_HkdfExpand(int digest, const byte* inKey, word32 inKeySz,
                                      (mxq_u2)prk_kid, inKey, inKeySz,
                                      info, infoSz );
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Expand_Secret() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_TLS13_Expand_Secret() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -3257,7 +3257,7 @@ static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
             key_id = tls13_client_app_key_obj_id;
         }
         else {
-            WOLFSSL_MSG("MAXQ: tls record encryption key is not selected");
+            WOLFSSL_ERROR_MSG("MAXQ: tls record enc key was not selected");
         }
     }
     else {
@@ -3268,7 +3268,7 @@ static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
             key_id = tls13_server_app_key_obj_id;
         }
         else {
-            WOLFSSL_MSG("MAXQ: tls record decryption key is not selected");
+            WOLFSSL_ERROR_MSG("MAXQ: tls record dec key was not selected");
         }
     }
     mxq_algo_id_t algo_id = 0;
@@ -3288,7 +3288,7 @@ static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
     WOLFSSL_MSG("MAXQ: MXQ_TLS13_Update_IV()");
     mxq_rc = MXQ_TLS13_Update_IV( key_id, (mxq_u1 *)iv, ivSz);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: MXQ_TLS13_Update_IV() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: MXQ_TLS13_Update_IV() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
@@ -3297,7 +3297,7 @@ static int maxq10xx_perform_tls13_record_processing(WOLFSSL* ssl,
                                 sz, (mxq_u1 *)iv, ivSz, (mxq_u1 *)authIn,
                                 authInSz, authTag, authTagSz);
     if (mxq_rc) {
-        WOLFSSL_MSG("MAXQ: maxq10xx_cipher_do() failed");
+        WOLFSSL_ERROR_MSG("MAXQ: maxq10xx_cipher_do() failed");
         wolfSSL_CryptHwMutexUnLock();
         return WC_HW_E;
     }
