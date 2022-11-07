@@ -28921,22 +28921,22 @@ int SendClientKeyExchange(WOLFSSL* ssl)
                 {
                     byte* pms = ssl->arrays->preMasterSecret;
                 #ifdef WOLFSSL_MAXQ10XX_TLS
+                    /* For MAXQ, the hardware stores the PSK so we don't need it
+                     * from the callback. The hardware also generates the pre
+                     * master secret so we don't need it. */
                     byte dummy_psk[MAX_PSK_KEY_LEN];
                     word32 ret_cb;
                     /* get client_identity */
                     ret_cb = ssl->options.client_psk_cb(ssl,
-                                 ssl->arrays->server_hint,
-                                 ssl->arrays->client_identity,
-                                 MAX_PSK_ID_LEN, dummy_psk,
-                                 MAX_PSK_KEY_LEN);
+                        ssl->arrays->server_hint, ssl->arrays->client_identity,
+                        MAX_PSK_ID_LEN, dummy_psk, MAX_PSK_KEY_LEN);
                     if (ret_cb == 0 || ret_cb > MAX_PSK_KEY_LEN) {
                         ERROR_OUT(PSK_KEY_ERROR, exit_scke);
                     }
 
-                    /* save client_identity */
+                    /* Ensure the buffer is null-terminated. */
                     ssl->arrays->client_identity[MAX_PSK_ID_LEN] = '\0';
-                    args->encSz = (word32)XSTRLEN(
-                                      ssl->arrays->client_identity);
+                    args->encSz = (word32)XSTRLEN(ssl->arrays->client_identity);
                     if (args->encSz > MAX_PSK_ID_LEN) {
                          ERROR_OUT(CLIENT_ID_ERROR, exit_scke);
                     }
