@@ -2388,11 +2388,11 @@ int InitSSL_Ctx(WOLFSSL_CTX* ctx, WOLFSSL_METHOD* method, void* heap)
     ret = wolfEventQueue_Init(&ctx->event_queue);
 #endif /* HAVE_WOLF_EVENT */
 
-#if defined(HAVE_PK_CALLBACKS) && defined(WOLFSSL_MAXQ10XX_TLS)
+#ifdef WOLFSSL_MAXQ10XX_TLS
     /* Let maxq10xx know what TLS version we are using. */
     ctx->devId = MAXQ_DEVICE_ID;
     maxq10xx_SetupPkCallbacks(ctx, &method->version);
-#endif
+#endif /* WOLFSSL_MAXQ10XX_TLS */
 
     return ret;
 }

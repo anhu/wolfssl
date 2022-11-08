@@ -1359,6 +1359,8 @@ extern void uITRON4_free(void *p) ;
         #define MAXQ_DEVICE_ID 1080
     #endif
 
+    #define HAVE_PK_CALLBACKS
+
 #endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108X */
 
 #if defined(WOLFSSL_STM32F2) || defined(WOLFSSL_STM32F4) || \
