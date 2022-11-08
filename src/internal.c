@@ -28140,9 +28140,10 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                     #ifdef HAVE_ECC
                         case ecc_dsa_sa_algo:
                         {
+                            ret = NOT_COMPILED_IN;
                         #ifdef HAVE_PK_CALLBACKS
-                            if (ssl->ctx && ssl->ctx->ProcessServerKexCb) {
-                                ret = ssl->ctx->ProcessServerKexCb(ssl,
+                            if (ssl->ctx && ssl->ctx->ProcessServerSigKexCb) {
+                                ret = ssl->ctx->ProcessServerSigKexCb(ssl,
                                     args->sigAlgo,
                                     args->verifySig, args->verifySigSz,
                                     ssl->buffers.sig.buffer, SEED_LEN,
@@ -28150,17 +28151,19 @@ static int DoServerKeyExchange(WOLFSSL* ssl, const byte* input,
                                     (ssl->buffers.sig.length - SEED_LEN));
                             }
                         #endif /* HAVE_PK_CALLBACKS */
-                            ret = EccVerify(ssl,
-                                args->verifySig, args->verifySigSz,
-                                ssl->buffers.digest.buffer,
-                                ssl->buffers.digest.length,
-                                ssl->peerEccDsaKey,
-                            #ifdef HAVE_PK_CALLBACKS
-                                &ssl->buffers.peerEccDsaKey
-                            #else
-                                NULL
-                            #endif
-                            );
+                            if (ret == NOT_COMPILED_IN) {
+                                ret = EccVerify(ssl,
+                                    args->verifySig, args->verifySigSz,
+                                    ssl->buffers.digest.buffer,
+                                    ssl->buffers.digest.length,
+                                    ssl->peerEccDsaKey,
+                                #ifdef HAVE_PK_CALLBACKS
+                                    &ssl->buffers.peerEccDsaKey
+                                #else
+                                    NULL
+                                #endif
+                                );
+                            }
 
                         #ifdef WOLFSSL_ASYNC_CRYPT
                             if (ret != WC_PENDING_E)

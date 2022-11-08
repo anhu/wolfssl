@@ -1622,7 +1622,7 @@ static int maxq10xx_process_server_certificate(WOLFSSL* ssl,
     return 0;
 }
 
-static int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
+static int maxq10xx_process_server_sig_kex(WOLFSSL* ssl, byte p_sig_algo,
                const byte* p_sig, word32 p_sig_len,
                const byte* p_rand, word32 p_rand_len,
                const byte* p_server_params, word32 p_server_params_len)
@@ -1649,6 +1649,7 @@ static int maxq10xx_process_server_key_exchange(WOLFSSL* ssl, byte p_sig_algo,
         return rc;
     }
 
+    /* NOTE: this funciton also does verification of the signature as well! */
     mxq_rc = MXQ_SetECDHEKey(ALGO_ECDSA_SHA_256, MXQ_KEYPARAM_EC_P256R1, 0,
                              (mxq_u1 *)p_rand, p_rand_len,
                              (mxq_u1 *)p_server_params, p_server_params_len,
@@ -3352,8 +3353,7 @@ void maxq10xx_SetupPkCallbacks(struct WOLFSSL_CTX* ctx, ProtocolVersion *pv)
     }
 
     wolfSSL_CTX_SetProcessPeerCertCb(ctx, maxq10xx_process_server_certificate);
-    wolfSSL_CTX_SetProcessServerKexCb(ctx,
-        maxq10xx_process_server_key_exchange);
+    wolfSSL_CTX_SetProcessServerSigKexCb(ctx, maxq10xx_process_server_sig_kex);
     wolfSSL_CTX_SetGenMasterSecretCb(ctx, maxq10xx_make_tls_master_secret);
     wolfSSL_CTX_SetTlsFinishedCb(ctx, maxq10xx_perform_client_finished);
 

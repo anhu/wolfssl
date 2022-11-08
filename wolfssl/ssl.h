@@ -3536,11 +3536,11 @@ WOLFSSL_API void wolfSSL_CTX_SetHKDFExpandLabelCb(WOLFSSL_CTX* ctx, CallbackHKDF
 typedef int (*CallbackProcessPeerCert)(WOLFSSL* ssl, DecodedCert* p_cert);
 WOLFSSL_API void wolfSSL_CTX_SetProcessPeerCertCb(WOLFSSL_CTX* ctx, CallbackProcessPeerCert cb);
 
-typedef int (*CallbackProcessServerKex)(WOLFSSL* ssl, byte p_sig_algo,
+typedef int (*CallbackProcessServerSigKex)(WOLFSSL* ssl, byte p_sig_algo,
        const byte* p_sig, word32 p_sig_len,
        const byte* p_rand, word32 p_rand_len,
        const byte* p_server_params, word32 p_server_params_len);
-WOLFSSL_API void wolfSSL_CTX_SetProcessServerKexCb(WOLFSSL_CTX* ctx, CallbackProcessServerKex cb);
+WOLFSSL_API void wolfSSL_CTX_SetProcessServerSigKexCb(WOLFSSL_CTX* ctx, CallbackProcessServerSigKex cb);
 
 typedef int (*CallbackPerformTlsRecordProcessing)(WOLFSSL* ssl, int is_encrypt,
        byte* out, const byte* in, word32 sz,

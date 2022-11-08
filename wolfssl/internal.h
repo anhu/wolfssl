@@ -3416,7 +3416,7 @@ struct WOLFSSL_CTX {
     CallbackVerifyMac           VerifyMacCb;        /* User Verify mac handler */
 #endif
     CallbackProcessPeerCert ProcessPeerCertCb;      /* User handler to process a certificate */
-    CallbackProcessServerKex ProcessServerKexCb;    /* User handler to process the server's key exchange public key */
+    CallbackProcessServerSigKex ProcessServerSigKexCb; /* User handler to process the server's key exchange public key */
     CallbackPerformTlsRecordProcessing PerformTlsRecordProcessingCb; /* User handler to process the TLS record */
     CallbackEccSkipSharedSecret EccSkipSharedSecretCb; /* User indicator as to whether to skip calling EccSharedSecret() */
 

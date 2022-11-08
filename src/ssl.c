@@ -29609,11 +29609,11 @@ void wolfSSL_CTX_SetProcessPeerCertCb(WOLFSSL_CTX* ctx,
     if (ctx)
         ctx->ProcessPeerCertCb = cb;
 }
-void wolfSSL_CTX_SetProcessServerKexCb(WOLFSSL_CTX* ctx,
-                                       CallbackProcessServerKex cb)
+void wolfSSL_CTX_SetProcessServerSigKexCb(WOLFSSL_CTX* ctx,
+                                       CallbackProcessServerSigKex cb)
 {
     if (ctx)
-        ctx->ProcessServerKexCb = cb;
+        ctx->ProcessServerSigKexCb = cb;
 }
 void wolfSSL_CTX_SetPerformTlsRecordProcessingCb(WOLFSSL_CTX* ctx,
                                           CallbackPerformTlsRecordProcessing cb)
