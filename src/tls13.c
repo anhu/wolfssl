@@ -7262,7 +7262,6 @@ static int SendTls13Certificate(WOLFSSL* ssl)
             WOLFSSL_MSG("Send Cert missing certificate buffer");
             return BUFFER_ERROR;
         }
-
         /* Certificate Data */
         certSz = ssl->buffers.certificate->length;
         /* Cert Req Ctx Len | Cert Req Ctx | Cert List Len | Cert Data Len */

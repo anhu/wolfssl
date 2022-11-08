@@ -859,7 +859,7 @@ static int maxq10xx_cipher_do(mxq_algo_id_t algo_id, mxq_u1 encrypt,
 
     if (encrypt) {
         cparams.aead_tag_len = tag_len;
-    } 
+    }
     else {
         XMEMCPY(cparams.aead_tag, p_tag, tag_len);
         cparams.aead_tag_len = tag_len;
@@ -1827,7 +1827,7 @@ static int maxq10xx_perform_client_finished(WOLFSSL* ssl, const byte* p_label,
     }
 
     mxq_rc = MXQ_tls_prf_sha_256(0, p_label, FINISHED_LABEL_SZ,
-                                 p_seed, seedSz, 
+                                 p_seed, seedSz,
                                  p_dest, TLS_FINISHED_SZ);
     if (mxq_rc) {
         WOLFSSL_ERROR_MSG("MAXQ: MXQ_tls_prf_sha_256() failed");
@@ -1852,7 +1852,7 @@ static int maxq10xx_perform_tls12_record_processing(WOLFSSL* ssl, int is_encrypt
 
     if (! ssl->maxq_ctx.use_hw_keys) {
         return NOT_COMPILED_IN;
-    } 
+    }
 
     if ((ssl->specs.bulk_cipher_algorithm != wolfssl_aes_gcm) &&
             (ssl->specs.bulk_cipher_algorithm != wolfssl_aes_ccm)) {
@@ -2558,7 +2558,7 @@ static int maxq10xx_RsaPssSign(WOLFSSL* ssl, const byte* in, word32 inSz,
     if (ret != 0) {
         return ret;
     }
- 
+
     mxq_rc = MXQ_Verify(ALGO_RSASSAPSSPKCS1_V2_1_PLAIN, DEVICE_KEY_PAIR_OBJ_ID,
                         in, inSz, out, *outSz);
 

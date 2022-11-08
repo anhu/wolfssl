@@ -1333,7 +1333,9 @@ extern void uITRON4_free(void *p) ;
 
     #define MAXQ10XX_MODULE_INIT
 
+    #define HAVE_PK_CALLBACKS
     #define WOLFSSL_STATIC_PSK
+
     #define WOLFSSL_USER_MUTEX
     #ifdef WOLFSSL_USER_MUTEX
         #define WOLFSSL_CRYPT_HW_MUTEX 1
@@ -1358,8 +1360,6 @@ extern void uITRON4_free(void *p) ;
     #elif defined(WOLFSSL_MAXQ108X)
         #define MAXQ_DEVICE_ID 1080
     #endif
-
-    #define HAVE_PK_CALLBACKS
 
 #endif /* WOLFSSL_MAXQ1061 || WOLFSSL_MAXQ1065 || WOLFSSL_MAXQ108X */
 
