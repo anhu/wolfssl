@@ -22949,7 +22949,92 @@ int wolfSSL_i2d_PrivateKey(const WOLFSSL_EVP_PKEY* key, unsigned char** der)
 
 int wolfSSL_i2d_PublicKey(const WOLFSSL_EVP_PKEY *key, unsigned char **der)
 {
-    return wolfSSL_EVP_PKEY_get_der(key, der);
+    unsigned char *local_der = NULL;
+    long local_derSz = 0;
+    unsigned char pub_der[512];
+    long pub_derSz = 512;
+    ecc_key eccKey;
+    RsaKey rsaKey;
+    word32 inOutIdx = 0;
+    int ret = 0;
+    int key_type = 0;
+
+    /* We need to get the DER, then convert it to a public key. But what we get
+     * might be a buffereed private key so we need to decode it and then encode
+     * the public part. */
+    local_derSz = wolfSSL_EVP_PKEY_get_der(key, &local_der);
+    if (local_derSz <= 0) {
+        ret = WOLFSSL_FATAL_ERROR;
+    }
+
+    key_type = key->type;
+    if ((key_type != EVP_PKEY_EC) && (key_type != EVP_PKEY_RSA)) {
+        ret = WOLFSSL_FATAL_ERROR;
+    }
+
+    if (ret == 0) {
+        if (key_type == EVP_PKEY_EC) {
+            ret = wc_ecc_init(&eccKey);
+        }
+        else {
+            ret = wc_InitRsaKey(&rsaKey, key->heap);
+        }
+    }
+
+    if (ret == 0) {
+        if (key_type == EVP_PKEY_EC) {
+            ret = wc_EccPublicKeyDecode(local_der, &inOutIdx, &eccKey,
+                                        local_derSz);
+        }
+        else {
+            ret = wc_RsaPublicKeyDecode(local_der, &inOutIdx, &rsaKey,
+                                        local_derSz);
+        }
+    }
+
+    if (ret == 0) {
+        if (key_type == EVP_PKEY_EC) {
+            pub_derSz = wc_EccPublicKeyToDer(&eccKey, pub_der, pub_derSz, 0);
+        }
+        else {
+            pub_derSz = wc_RsaKeyToPublicDer_ex(&rsaKey, pub_der, pub_derSz, 0);
+        }
+
+        if (pub_derSz <= 0) {
+            ret = WOLFSSL_FATAL_ERROR;
+        }
+    }
+
+    /* This block is for actually returning the DER of the public key */
+    if ((ret == 0) && (der != NULL)) {
+        if (*der == NULL) {
+            *der = (unsigned char*)XMALLOC(pub_derSz, NULL,
+                                           DYNAMIC_TYPE_PUBLIC_KEY);
+            if (*der == NULL) {
+                WOLFSSL_MSG("Failed to allocate output buffer.");
+                ret = WOLFSSL_FATAL_ERROR;
+            }
+        }
+
+        if (ret == 0) {
+            XMEMCPY(*der, pub_der, pub_derSz);
+            *der += pub_derSz;
+        }
+    }
+
+    XFREE(local_der, NULL, DYNAMIC_TYPE_OPENSSL);
+    if (key_type == EVP_PKEY_EC) {
+        wc_ecc_free(&eccKey);
+    }
+    else {
+        wc_FreeRsaKey(&rsaKey);
+    }
+
+    if (ret == 0) {
+        return pub_derSz;
+    }
+
+    return ret;
 }
 #endif /* !NO_ASN && !NO_PWDBASED */
 

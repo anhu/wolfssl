@@ -47225,6 +47225,9 @@ static int test_wolfSSL_d2i_and_i2d_PublicKey(void)
     /* Check that key can be successfully encoded. */
     AssertIntGE((derLen = wolfSSL_i2d_PublicKey(pkey, &der)), 0);
     /* Ensure that the encoded version matches the original. */
+    FILE * f = fopen("asdfasdf", "w");
+    fwrite(der, derLen, 1, f);
+    fclose(f);
     AssertIntEQ(derLen, sizeof_client_keypub_der_2048);
     AssertIntEQ(XMEMCMP(der, client_keypub_der_2048, derLen), 0);
 
