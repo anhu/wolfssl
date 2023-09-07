@@ -6678,7 +6678,7 @@ int DoTls13ClientHello(WOLFSSL* ssl, const byte* input, word32* inOutIdx,
             *inOutIdx += helloSz;
             goto exit_dch;
         }
-        if (ssl->chGoodCb != NULL && !IsSCR(ssl)) {
+        if (ssl->chGoodCb != NULL) {
             int cbret = ssl->chGoodCb(ssl, ssl->chGoodCtx);
             if (cbret < 0) {
                 ssl->error = cbret;
