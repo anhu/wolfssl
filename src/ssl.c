@@ -7314,16 +7314,16 @@ int ProcessBuffer(WOLFSSL_CTX* ctx, const unsigned char* buff,
             }
 
         #ifdef HAVE_PKCS8
-            /* if private key try and remove PKCS8 header */
+            /* This section of code mirrors what happens in PemToDer(). */
             if (ret == 0 && type == PRIVATEKEY_TYPE) {
-                if ((ret = ToTraditional_ex(der->buffer, der->length,
-                                                                 &algId)) > 0) {
-                    /* Found PKCS8 header */
-                    /* ToTraditional_ex moves buff and returns adjusted length */
-                    der->length = ret;
+                word32 derIdx = 0;
+                if ((ret = ToTraditionalInline_ex(der->buffer, &derIdx,
+                                                    der->length, &algId)) > 0) {
+                    /* Found and keeping PKCS8 header */
                     keyFormat = algId;
                 }
-                ret = 0; /* failures should be ignored */
+                ret = 0; /* Failures should be ignored because its fine if
+                          * keys are not PKCS8 wrapped. */
             }
         #endif
         }
