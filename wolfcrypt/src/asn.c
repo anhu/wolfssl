@@ -22031,6 +22031,7 @@ enum {
  * @param [out] extExtKeyUsageCount Number of usages read.
  * @param [out] extExtKeyUsage      Usages read.
  * @param [out] extExtKeyUsageSsh   SSH usages read.
+ * @param [in]  unknownCb           Callback for unknown EKU OIDs.
  * @return  0 on success.
  * @return  ASN_BITSTR_E when the expected BIT_STRING tag is not found.
  * @return  ASN_PARSE_E when BER encoded data does not match ASN.1 items or
@@ -22040,11 +22041,20 @@ enum {
 int DecodeExtKeyUsage(const byte* input, word32 sz,
         const byte **extExtKeyUsageSrc, word32 *extExtKeyUsageSz,
         word32 *extExtKeyUsageCount, byte *extExtKeyUsage,
-        byte *extExtKeyUsageSsh)
+        byte *extExtKeyUsageSsh,
+#ifdef WC_ASN_UNKNOWN_EXT_CB
+        wc_UnknownExtKeyUsageCallback unknownCb
+#else
+        void *unknownCb
+#endif
+        )
 {
 #ifndef WOLFSSL_ASN_TEMPLATE
     word32 idx = 0, oid;
     int length, ret;
+#ifdef WC_ASN_UNKNOWN_EXT_CB
+    word32 oidStartIdx;
+#endif
 
     WOLFSSL_ENTER("DecodeExtKeyUsage");
 
@@ -22052,6 +22062,9 @@ int DecodeExtKeyUsage(const byte* input, word32 sz,
     (void) extExtKeyUsageSz;
     (void) extExtKeyUsageCount;
     (void) extExtKeyUsageSsh;
+#ifndef WC_ASN_UNKNOWN_EXT_CB
+    (void) unknownCb;
+#endif
 
 #if defined(OPENSSL_EXTRA) || defined(OPENSSL_EXTRA_X509_SMALL)
     *extExtKeyUsageSrc = NULL;
@@ -22074,9 +22087,34 @@ int DecodeExtKeyUsage(const byte* input, word32 sz,
 #endif
 
     while (idx < (word32)sz) {
+    #ifdef WC_ASN_UNKNOWN_EXT_CB
+        oidStartIdx = idx;
+    #endif
         ret = GetObjectId(input, &idx, &oid, oidCertKeyUseType, sz);
-        if (ret == WC_NO_ERR_TRACE(ASN_UNKNOWN_OID_E))
+        if (ret == WC_NO_ERR_TRACE(ASN_UNKNOWN_OID_E)) {
+        #ifdef WC_ASN_UNKNOWN_EXT_CB
+            if (unknownCb != NULL) {
+                word16 decOid[MAX_OID_SZ];
+                word32 decOidSz = sizeof(decOid);
+                /* Skip past the tag and length to get raw OID bytes */
+                word32 oidIdx = oidStartIdx;
+                int oidLen;
+                byte tag;
+                if (GetASNTag(input, &oidIdx, &tag, sz) == 0 &&
+                    tag == ASN_OBJECT_ID &&
+                    GetLength(input, &oidIdx, &oidLen, sz) >= 0) {
+                    ret = DecodeObjectId(input + oidIdx, (word32)oidLen,
+                                         decOid, &decOidSz);
+                    if (ret == 0) {
+                        ret = unknownCb(decOid, decOidSz);
+                    }
+                    if (ret != 0)
+                        return ret;
+                }
+            }
+        #endif
             continue;
+        }
         else if (ret < 0)
             return ret;
 
@@ -22127,6 +22165,9 @@ int DecodeExtKeyUsage(const byte* input, word32 sz,
     word32 idx = 0;
     int length;
     int ret = 0;
+#ifdef WC_ASN_UNKNOWN_EXT_CB
+    int isKnownOid;
+#endif
 
     WOLFSSL_ENTER("DecodeExtKeyUsage");
 
@@ -22134,6 +22175,9 @@ int DecodeExtKeyUsage(const byte* input, word32 sz,
     (void) extExtKeyUsageSz;
     (void) extExtKeyUsageCount;
     (void) extExtKeyUsageSsh;
+#ifndef WC_ASN_UNKNOWN_EXT_CB
+    (void) unknownCb;
+#endif
 
 #if defined(OPENSSL_EXTRA) || defined(OPENSSL_EXTRA_X509_SMALL)
     *extExtKeyUsageSrc = NULL;
@@ -22171,9 +22215,29 @@ int DecodeExtKeyUsage(const byte* input, word32 sz,
                            input, &idx, sz);
         /* Skip unknown OIDs. */
         if (ret == WC_NO_ERR_TRACE(ASN_UNKNOWN_OID_E)) {
+        #ifdef WC_ASN_UNKNOWN_EXT_CB
+            if (unknownCb != NULL) {
+                word16 decOid[MAX_OID_SZ];
+                word32 decOidSz = sizeof(decOid);
+                ret = DecodeObjectId(
+                          dataASN[KEYPURPOSEIDASN_IDX_OID].data.oid.data,
+                          dataASN[KEYPURPOSEIDASN_IDX_OID].data.oid.length,
+                          decOid, &decOidSz);
+                if (ret == 0) {
+                    ret = unknownCb(decOid, decOidSz);
+                }
+            }
+            else {
+                ret = 0;
+            }
+        #else
             ret = 0;
+        #endif
         }
         else if (ret == 0) {
+        #ifdef WC_ASN_UNKNOWN_EXT_CB
+            isKnownOid = 1;
+        #endif
             /* Store the bit for the OID. */
             switch (dataASN[KEYPURPOSEIDASN_IDX_OID].data.oid.sum) {
                 case EKU_ANY_OID:
@@ -22197,7 +22261,28 @@ int DecodeExtKeyUsage(const byte* input, word32 sz,
                 case EKU_OCSP_SIGN_OID:
                     *extExtKeyUsage |= EXTKEYUSE_OCSP_SIGN;
                     break;
+            #ifdef WC_ASN_UNKNOWN_EXT_CB
+                default:
+                    isKnownOid = 0;
+                    break;
+            #endif
             }
+
+        #ifdef WC_ASN_UNKNOWN_EXT_CB
+            /* Handle unknown OIDs that parsed successfully but aren't
+             * recognized */
+            if (!isKnownOid && unknownCb != NULL) {
+                word16 decOid[MAX_OID_SZ];
+                word32 decOidSz = sizeof(decOid);
+                ret = DecodeObjectId(
+                          dataASN[KEYPURPOSEIDASN_IDX_OID].data.oid.data,
+                          dataASN[KEYPURPOSEIDASN_IDX_OID].data.oid.length,
+                          decOid, &decOidSz);
+                if (ret == 0) {
+                    ret = unknownCb(decOid, decOidSz);
+                }
+            }
+        #endif
 
         #if defined(OPENSSL_EXTRA) || defined(OPENSSL_EXTRA_X509_SMALL)
             /* Keep count for WOLFSSL_X509. */
@@ -22238,7 +22323,12 @@ static int DecodeExtKeyUsageInternal(const byte* input, word32 sz,
 #endif
             &cert->extExtKeyUsage,
 #ifdef WOLFSSL_WOLFSSH
-            &cert->extExtKeyUsageSsh
+            &cert->extExtKeyUsageSsh,
+#else
+            NULL,
+#endif
+#ifdef WC_ASN_UNKNOWN_EXT_CB
+            cert->unknownExtKeyUsageCallback
 #else
             NULL
 #endif
@@ -23661,6 +23751,16 @@ int wc_SetUnknownExtCallbackEx(DecodedCert* cert,
 
     cert->unknownExtCallbackEx = cb;
     cert->unknownExtCallbackExCtx = ctx;
+    return 0;
+}
+
+int wc_SetUnknownExtKeyUsageCallback(DecodedCert* cert,
+                                     wc_UnknownExtKeyUsageCallback cb) {
+    if (cert == NULL) {
+        return BAD_FUNC_ARG;
+    }
+
+    cert->unknownExtKeyUsageCallback = cb;
     return 0;
 }
 #endif /* WC_ASN_UNKNOWN_EXT_CB */

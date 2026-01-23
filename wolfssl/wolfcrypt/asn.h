@@ -1721,6 +1721,7 @@ typedef int (*wc_UnknownExtCallback)(const word16* oid, word32 oidSz, int crit,
 typedef int (*wc_UnknownExtCallbackEx)(const word16* oid, word32 oidSz,
                                        int crit, const unsigned char* der,
                                        word32 derSz, void *ctx);
+typedef int (*wc_UnknownExtKeyUsageCallback)(const word16* oid, word32 oidSz);
 #endif
 
 struct DecodedCert {
@@ -2052,6 +2053,7 @@ struct DecodedCert {
     wc_UnknownExtCallback unknownExtCallback;
     wc_UnknownExtCallbackEx unknownExtCallbackEx;
     void *unknownExtCallbackExCtx;
+    wc_UnknownExtKeyUsageCallback unknownExtKeyUsageCallback;
 #endif
 #ifdef WOLFSSL_DUAL_ALG_CERTS
     /* Subject Alternative Public Key Info */
@@ -2277,6 +2279,8 @@ WOLFSSL_API int wc_SetUnknownExtCallback(DecodedCert* cert,
 WOLFSSL_API int wc_SetUnknownExtCallbackEx(DecodedCert* cert,
                                                wc_UnknownExtCallbackEx cb,
                                                void *ctx);
+WOLFSSL_API int wc_SetUnknownExtKeyUsageCallback(DecodedCert* cert,
+                                             wc_UnknownExtKeyUsageCallback cb);
 #endif
 
 WOLFSSL_LOCAL int DecodePolicyOID(char *out, word32 outSz, const byte *in,
@@ -2341,7 +2345,13 @@ WOLFSSL_LOCAL int DecodeKeyUsage(const byte* input, word32 sz,
 WOLFSSL_LOCAL int DecodeExtKeyUsage(const byte* input, word32 sz,
         const byte **extExtKeyUsageSrc, word32 *extExtKeyUsageSz,
         word32 *extExtKeyUsageCount, byte *extExtKeyUsage,
-        byte *extExtKeyUsageSsh);
+        byte *extExtKeyUsageSsh,
+#ifdef WC_ASN_UNKNOWN_EXT_CB
+        wc_UnknownExtKeyUsageCallback unknownCb
+#else
+        void *unknownCb
+#endif
+        );
 
 WOLFSSL_LOCAL int TryDecodeRPKToKey(DecodedCert* cert);
 WOLFSSL_LOCAL int wc_GetPubX509(DecodedCert* cert, int verify, int* badDate);
