@@ -3889,6 +3889,62 @@ int wc_SetCustomExtension(Cert *cert, int critical, const char *oid,
 */
 int wc_SetUnknownExtCallback(DecodedCert* cert,
                                              wc_UnknownExtCallback cb);
+
+/*!
+    \ingroup ASN
+
+    \brief This function registers a callback that will be used anytime
+    wolfSSL encounters an unknown OID within the Extended Key Usage (EKU)
+    extension in a certificate while parsing. The prototype of the callback
+    should be:
+
+    \code
+    int myUnknownEKUCallback(const word16* oid, word32 oidSz);
+    \endcode
+
+    \return 0 Returned on success.
+    \return BAD_FUNC_ARG Returned when cert is NULL.
+
+    \param cert the DecodedCert struct that is to be associated with this
+    callback.
+    \param cb function to register as the unknown EKU OID callback.
+
+    _Example_
+    \code
+    int ret = 0;
+    DecodedCert cert;
+
+    // Unknown EKU callback prototype
+    int myUnknownEKUCallback(const word16* oid, word32 oidSz);
+
+    // Initialize cert, then register callback
+    ret = wc_SetUnknownExtKeyUsageCallback(&cert, myUnknownEKUCallback);
+    if (ret != 0) {
+        // failed to set the callback
+    }
+
+    // oid: Array of integers that are the dot separated values in an OID.
+    //      For example, OID 1.2.3.4.5 would be {1, 2, 3, 4, 5}.
+    // oidSz: Number of values in oid array.
+    int myUnknownEKUCallback(const word16* oid, word32 oidSz) {
+
+        // Logic to handle unknown EKU OID goes here.
+        // For example, check if the OID is acceptable for your application.
+
+        // NOTE: by returning zero, we are accepting this OID and
+        // informing wolfSSL that it is acceptable. If you find an OID
+        // that you do not find acceptable, you should return an error
+        // which will cause certificate parsing to fail.
+        return 0;
+    }
+    \endcode
+
+    \sa ParseCert
+    \sa wc_SetUnknownExtCallback
+*/
+int wc_SetUnknownExtKeyUsageCallback(DecodedCert* cert,
+                                     wc_UnknownExtKeyUsageCallback cb);
+
 /*!
     \ingroup ASN
 
